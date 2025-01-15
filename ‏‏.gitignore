@@ -1,0 +1,22 @@
+# User-specific files
+*.user
+*.suo
+*.vcxproj.user
+*.filters
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.log
+*.obj
+*.exe
+*.dll
+*.pdb
+
+# VS Code settings
+.vscode/
+
+# Visual Studio
+.vs/

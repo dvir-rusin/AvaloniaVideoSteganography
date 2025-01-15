@@ -1,0 +1,252 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\viewmodels\\viewmodelbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\viewmodels\\viewmodelbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\viewlocator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\viewlocator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\viewmodels\\mainwindowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\viewmodels\\mainwindowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\homeview.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\homeview.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\embedview.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\embedview.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\embedview.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\embedview.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\mainwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\mainwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\homeview.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\homeview.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\extractview.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\extractview.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\app.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\app.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\views\\extractview.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\views\\extractview.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|c:\\projects\\gitgames\\avalonialsbproject1\\avalonialsbproject1\\app.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{4370CA6E-4AA3-454B-89D3-56681D2128E1}|AvaloniaLsbProject1\\AvaloniaLsbProject1.csproj|solutionrelative:avalonialsbproject1\\app.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 12,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "App.axaml",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\App.axaml",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\App.axaml",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\App.axaml",
+              "RelativeToolTip": "AvaloniaLsbProject1\\App.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-11-18T10:34:53.79Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ExtractView.axaml",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\ExtractView.axaml",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\ExtractView.axaml",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\ExtractView.axaml",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\ExtractView.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-11-18T10:28:12.898Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ExtractView.axaml.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\ExtractView.axaml.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\ExtractView.axaml.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\ExtractView.axaml.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\ExtractView.axaml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:28:12.323Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "App.axaml.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\App.axaml.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\App.axaml.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\App.axaml.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\App.axaml.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAABoAAAAzAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:27:16.698Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "EmbedView.axaml",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\EmbedView.axaml",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\EmbedView.axaml",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\EmbedView.axaml",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\EmbedView.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-11-18T10:26:54.466Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "EmbedView.axaml.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\EmbedView.axaml.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\EmbedView.axaml.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\EmbedView.axaml.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\EmbedView.axaml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAiAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:26:54.303Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainWindow.axaml.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\MainWindow.axaml.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\MainWindow.axaml.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\MainWindow.axaml.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\MainWindow.axaml.cs",
+              "ViewState": "AQIAAAoAAAAAAAAAAAAzwAoAAAAbAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:23:37.866Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "HomeView.axaml",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\HomeView.axaml",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\HomeView.axaml",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\HomeView.axaml",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\HomeView.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-11-18T10:23:17.511Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "HomeView.axaml.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\HomeView.axaml.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\HomeView.axaml.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\HomeView.axaml.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\HomeView.axaml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:23:17.345Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ViewModelBase.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\ViewModels\\ViewModelBase.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\ViewModels\\ViewModelBase.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\ViewModels\\ViewModelBase.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\ViewModels\\ViewModelBase.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:13:47.874Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Program.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Program.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Program.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:13:27.314Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ViewLocator.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\ViewLocator.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\ViewLocator.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\ViewLocator.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\ViewLocator.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAAAoAAAAdAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:13:21.176Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MainWindow.axaml",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\MainWindow.axaml",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\Views\\MainWindow.axaml",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Views\\MainWindow.axaml",
+              "RelativeToolTip": "AvaloniaLsbProject1\\Views\\MainWindow.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-11-18T10:12:42.512Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainWindowViewModel.cs",
+              "DocumentMoniker": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\ViewModels\\MainWindowViewModel.cs",
+              "RelativeDocumentMoniker": "AvaloniaLsbProject1\\ViewModels\\MainWindowViewModel.cs",
+              "ToolTip": "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\ViewModels\\MainWindowViewModel.cs",
+              "RelativeToolTip": "AvaloniaLsbProject1\\ViewModels\\MainWindowViewModel.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAA2AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-18T10:12:42.168Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

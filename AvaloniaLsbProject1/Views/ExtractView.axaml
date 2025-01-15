@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaLsbProject1.Views.ExtractView"
+			 xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
+			  x:DataType="vm:ExtractViewModel">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+		<TextBlock Text="Extract Hidden Message Screen" FontSize="20" />
+		<!-- Add more UI elements as needed -->
+		<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
+		<Button Name="BackButton" Content="Back to Home" />
+		<TextBox Text="{Binding SelectedVideoPath}" Width="300" Margin="5" IsReadOnly="True" />
+	</StackPanel>
+</UserControl>
