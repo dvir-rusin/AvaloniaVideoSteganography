@@ -12,23 +12,26 @@ namespace AvaloniaLsbProject1.Services
     internal class Embedding
     {
 
-        public static void EmbedMessageInFramesTestInVideo
+        public static string EmbedMessageInFramesTestInVideo
             (string inputframesDirectory,
             string outputframesDirectrory,
-            int[] IframesLocation)
+            int[] IframesLocation,
+            string text,
+            string password)
         {
+            string ErrorMessage;
             Console.WriteLine("Enter text to encrypt:");
-            string UserInputMessage = Console.ReadLine(); // Read the plaintext input from the user
+            string UserInputMessage = text; // Read the plaintext input from the user
 
-            string UserPassword = EncryptionAes.GetUserCustomKey(); // Get the user-provided custom key
+            string UserPassword = password; // Get the user-provided custom key
 
             string EncryptedMessage = EncryptionAes.Encrypt(UserInputMessage, UserPassword); // Encrypt the plaintext using the custom key
             Console.WriteLine($"Encrypted Text: {EncryptedMessage}");
 
             if (!Directory.Exists(inputframesDirectory))
             {
-                Console.WriteLine("EmbedMessageInFramesTestInVideo function message : inputframesDirectory does not exist ");
-                return;
+                ErrorMessage = "EmbedMessageInFramesTestInVideo function message : inputframesDirectory does not exist ";
+                return ErrorMessage;
             }
             EncryptedMessage += char.MinValue;
             Console.WriteLine(EncryptedMessage);
@@ -111,7 +114,8 @@ namespace AvaloniaLsbProject1.Services
                 }
             }
 
-            Console.WriteLine("Message embedded in all frames.");
+            ErrorMessage = "Message embedded in all frames.";
+            return ErrorMessage;
         }
 
         public static int EmbedBitInColorChannel(int colorChannelValue, string binaryMessage, ref int messageIndex)

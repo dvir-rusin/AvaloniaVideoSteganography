@@ -13,6 +13,19 @@ namespace AvaloniaLsbProject1.ViewModels
     {
         [ObservableProperty]
         private string? selectedVideoPath;
+
+        [ObservableProperty]
+        private string? messageText;
+
+        [ObservableProperty]
+        private string? encryptionPassword;
+
+        [ObservableProperty]
+        private string? errorMessage;
+
+        [ObservableProperty]
+        private string? videoNameAndFormat;
+
         public EmbedViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
@@ -25,30 +38,59 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private async Task SelectVideoAsync()
         {
-            var dialog = new OpenFileDialog
+            try
             {
-                Title = "Select a Video File",
-                Filters =
+                var dialog = new OpenFileDialog
                 {
-                    
+                    Title = "Select a Video File",
+                    Filters =
+                {
+
                     new FileDialogFilter { Name = "Video Files", Extensions = { "mp4", "avi", "mkv", "mov", "wmv" } },
                     //new FileDialogFilter { Name = "All Files", Extensions = { "*" } }
                 },
-                AllowMultiple = false
-            };
+                    AllowMultiple = false
+                };
 
-            var result = await dialog.ShowAsync(MainWindow.Instance); // Ensure MainWindow.Instance is available in your app.
-            if (result?.Length > 0)
+                var result = await dialog.ShowAsync(MainWindow.Instance); // Ensure MainWindow.Instance is available in your app.
+                if (result?.Length > 0)
+                {
+                    SelectedVideoPath = result[0];
+
+                }
+                else
+                {
+                    ErrorMessage = "No video file was selected.";
+                }
+            }
+            catch (Exception ex)
             {
-                SelectedVideoPath = result[0];
+                ErrorMessage = $"Error selecting video: {ex.Message}";
             }
         }
 
         private async Task EmbeddMessageAsync()
         {
+            if (string.IsNullOrEmpty(MessageText) || string.IsNullOrEmpty(EncryptionPassword))
+            {
+                ErrorMessage = "Message text or password is missing.";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(SelectedVideoPath))
+            {
+                ErrorMessage = "No video file selected. Please select a video file before embedding a message.";
+                return;
+            }
+
+            string messageText = MessageText;
+            string password = EncryptionPassword;
             // Base project directory
             string projectPath = "C:\\AvaloniaVideoStenagraphy";
             string allFramesFolder = Path.Combine(projectPath, "AllFrames");
+            string allFramesWithMessageFolder = Path.Combine(projectPath, "allFramesWithMessage");
+            string metaDataFile = Path.Combine(projectPath, "MetaData.csv");
+            string NewVideo = Path.Combine(projectPath, videoNameAndFormat);
 
             try
             {
@@ -74,17 +116,56 @@ namespace AvaloniaLsbProject1.ViewModels
                     });
 
                     // Notify the user of success (optional)
-                   
+
                 }
                 else
                 {
-                    
+                    Console.WriteLine("SelectedVideoPath is null");
                 }
             }
             catch (Exception ex)
             {
-                
+                Console.WriteLine(ex.Message);
             }
+            //check if directory exists and is not empty
+            if (Directory.Exists(allFramesFolder))
+            {
+                try
+                {
+                    //await Services.Extraction.ExtractFrameMetadata(selectedVideoPath, metaDataFile);
+                    int[] iframesLocation = await Services.Extraction.GetIFrameLocations(metaDataFile);
+
+                    if (!Directory.Exists(allFramesWithMessageFolder))
+                    {
+                        Directory.CreateDirectory(allFramesWithMessageFolder);
+                        //ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(allFramesFolder, allFramesWithMessageFolder, iframesLocation,messageText,password);
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                   ErrorMessage =  (ex.Message);
+                }
+            }
+
+            if(Directory.Exists(allFramesWithMessageFolder))
+            {
+                try
+                {
+                    Services.HelperFunctions.ReconstructVideo(allFramesWithMessageFolder, NewVideo, 30);
+                    //ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(allFramesWithMessageFolder,"123");
+                }
+                catch(Exception ex)
+                {
+                    ErrorMessage = ex.Message; 
+                }
+            }
+            else
+            {
+                ErrorMessage = "allFramesWithMessageFolder does not exist";
+            }
+            
         }
     }
 }

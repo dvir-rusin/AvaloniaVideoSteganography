@@ -6,8 +6,18 @@
 	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 		<TextBlock Text="Extract Hidden Message Screen" FontSize="20" />
 		<!-- Add more UI elements as needed -->
+		<TextBlock Text="video path:" FontWeight="Bold"/>
 		<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
-		<Button Name="BackButton" Content="Back to Home" />
 		<TextBox Text="{Binding SelectedVideoPath}" Width="300" Margin="5" IsReadOnly="True" />
+
+		<TextBlock Text="Enter password for decryption" FontWeight="Bold"/>
+		<TextBox Text="{Binding DecryptionPassword}" Width="300" Margin="5"/>
+
+		<Button Content="Extract measge from video" Command="{Binding ExtractMessageCommand}" />
+
+		<TextBlock Text="Error Messages" FontWeight="Bold"/>
+		<TextBox Text="{Binding ErrorMessage}" Width="300" Height="100" Margin="5" IsReadOnly="True" AcceptsReturn="True"/>
+
+		<Button Name="BackButton" Content="Back to Home" />
 	</StackPanel>
 </UserControl>

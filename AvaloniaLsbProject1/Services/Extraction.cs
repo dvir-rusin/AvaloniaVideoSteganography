@@ -66,64 +66,43 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("All I-frames have been extracted and saved to the output directory.");
         }
 
-        public static void ExtractMessageFromIFrames(string IframeDirectory)
+        public static string ExtractMessageFromIFrames(string IframeDirectory,string password)
         {
             Console.WriteLine("meow");
             Console.WriteLine("");
             Console.WriteLine("Extracting message from frames...");
             // Get the first image to read the message length
+            string MESSAGE = "NULL";
             string firstFramePath = Directory.GetFiles(IframeDirectory, "*.png").FirstOrDefault();
             if (firstFramePath == null)
             {
-                Console.WriteLine("No frames found in the directory.");
+                MESSAGE = "No frames found in the directory.";
                 Console.WriteLine("-exiting-");
-                return;
+                return MESSAGE;
             }
 
 
-            //foreach (string filePath in Directory.GetFiles(frameDirectory, "*.png"))
-            //{
-            //    Bitmap frameBitmap = new Bitmap(filePath);
-            //    int msglen = GetMessageLength(frameBitmap);
-
-            //}
-
-            //// Initialize to extract the message based on length
 
             foreach (string filePath in Directory.GetFiles(IframeDirectory, "*.png"))
             {
+                string message;
                 Bitmap frameBitmap = new Bitmap(filePath);
                 using (frameBitmap)
                 {
                     //int messageLength = GetMessageLength(frameBitmap);
                     //Console.WriteLine("msglen:" + messageLength);
-                    string message = GetHiddenMessage(frameBitmap);
-                    Console.WriteLine("Hidden Message: " + message);
+                    MESSAGE = GetHiddenMessage(frameBitmap,password);
+                    MESSAGE = ("Hidden Message: " + MESSAGE);
                 }
+                return MESSAGE;
             }
-
+            return MESSAGE;
 
         }
 
 
-        //private static int GetMessageLength(Bitmap bitmap)
-        //{
-        //    StringBuilder binaryLength = new StringBuilder();
-        //    int lengthBitsExtracted = 0;
-        //    Color pixelColor;
-        //    for (int i = 0;i<3;i++)  
-        //    {
-        //        pixelColor = bitmap.GetPixel(i, 0);
-        //        binaryLength.Append((pixelColor.R & 1) == 1 ? "1" : "0");
-        //        binaryLength.Append((pixelColor.G & 1) == 1 ? "1" : "0");
-        //        binaryLength.Append((pixelColor.B & 1) == 1 ? "1" : "0");
 
-        //        lengthBitsExtracted += 3;
-        //    }
-        //    return Convert.ToInt32(binaryLength.ToString(), 2);
-        //}
-
-        private static string GetHiddenMessage(Bitmap frameBitmap)
+        private static string GetHiddenMessage(Bitmap frameBitmap,string password)
         {
             StringBuilder binaryMessage = new StringBuilder();
             int messageBitsExtracted = 0;
@@ -183,7 +162,7 @@ namespace AvaloniaLsbProject1.Services
             //HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
 
             Console.WriteLine("\nEnter the custom key to decrypt:");
-            string inputKey = Console.ReadLine(); // Read the custom key from the user for decryption
+            string inputKey = password; // Read the custom key from the user for decryption
             string decrypted = "null";
 
             try

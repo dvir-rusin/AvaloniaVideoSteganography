@@ -4,19 +4,29 @@ using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using AvaloniaLsbProject1.Views;
+using System.IO;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
     public partial class ExtractViewModel : ObservableObject
     {
+
         [ObservableProperty]
         private string? selectedVideoPath;
+
+        [ObservableProperty]
+        private string? decryptionPassword;
+
+        [ObservableProperty]
+        private string? errorMessage;
         public ExtractViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
+            ExtractMessageCommand = new AsyncRelayCommand(ExtractMessageAsync);
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
+        public IAsyncRelayCommand ExtractMessageCommand { get; }
 
         private async Task SelectVideoAsync()
         {
@@ -38,5 +48,39 @@ namespace AvaloniaLsbProject1.ViewModels
             }
 
         }
+
+        private async Task ExtractMessageAsync()
+        {
+            string projectPath = "C:\\AvaloniaVideoStenagraphy";
+            string allFramesFolder = Path.Combine(projectPath, "AllFrames");
+            string allFramesWithMessageFolder = Path.Combine(projectPath, "allFramesWithMessage");
+            string metaDataFile = Path.Combine(projectPath, "MetaData.csv");
+            string NewVideoIframes = Path.Combine(projectPath, "NewVideoIframes");
+            
+                
+            try
+            {
+                //creates i frames folder 
+                if (!Directory.Exists(NewVideoIframes))
+                {
+                    Directory.CreateDirectory(NewVideoIframes);
+                }
+                //inserts new video i frames into folder 
+                Services.Extraction.ExtractIFrames(selectedVideoPath, NewVideoIframes);
+                //extrcats message from i frames 
+                if (decryptionPassword != null)
+                {
+                    ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(NewVideoIframes, decryptionPassword);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+                
+            
+            
+        }
+
     }
 }

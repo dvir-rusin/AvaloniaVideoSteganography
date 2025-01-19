@@ -4,11 +4,28 @@
 			 xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
 			  x:DataType="vm:EmbedViewModel">
 	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-		<TextBlock Text="Embed Message in Video Screen"/>
+		<TextBlock Text="Embed Message in Video Screen" FontWeight="Bold" FontSize="20"/>
 		<!-- Additional UI elements for embedding will go here -->
+		
+		
+		<TextBlock Text="video path:" FontWeight="Bold"/>
 		<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
-		<Button Name="BackButton" Content="Back to Home" />
 		<TextBox Text="{Binding SelectedVideoPath}" Width="300" Margin="5" IsReadOnly="True" />
+		
+		<TextBlock Text="Enter text to be encrypted" FontWeight="Bold"/>
+		<TextBox Text="{Binding MessageText}" Width="300" Margin="5"/>
+		
+		<TextBlock Text="Enter password for encryption" FontWeight="Bold"/>
+		<TextBox Text="{Binding EncryptionPassword}" Width="300" Margin="5"/>
+
+		<TextBlock Text="Enter New Video Name" FontWeight="Bold"/>
+		<TextBox Text="{Binding VideoNameAndFormat}" Width="300" Margin="5"/>
+		
 		<Button Content="Embedd measge in video" Command="{Binding EmbeddMessageCommand}" />
+		
+		<TextBlock Text="Error Messages" FontWeight="Bold"/>
+		<TextBox Text="{Binding ErrorMessage}" Width="300" Height="100" Margin="5" IsReadOnly="True" AcceptsReturn="True"/>
+
+		<Button Name="BackButton" Content="Back to Home" />
 	</StackPanel>
 </UserControl>
