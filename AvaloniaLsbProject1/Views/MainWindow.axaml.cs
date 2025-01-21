@@ -33,5 +33,9 @@ namespace AvaloniaLsbProject1.Views
         {
             ContentArea.Content = new HomeView();
         }
+        public void NavigateToStreamVideoView()
+        {
+            ContentArea.Content = new StreamVideoView();
+        }
     }
 }

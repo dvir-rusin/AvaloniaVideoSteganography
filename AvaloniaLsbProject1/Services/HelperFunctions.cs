@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.IO;
+using Xabe.FFmpeg;
 
 namespace AvaloniaLsbProject1.Services
 {
@@ -123,7 +124,47 @@ namespace AvaloniaLsbProject1.Services
             {
                 Console.WriteLine($"An error occurred while reconstructing the video: {ex.Message}");
             }
+
         }
+
+        public static void PlayVideo(string videoPath, int windowWidth = 640, int windowHeight = 360)
+        {
+            // Path to ffplay executable
+            string ffplayPath = @"C:\ffmpeg\bin\ffplay.exe"; 
+
+            // Command arguments with window size
+            string arguments = $"-i \"{videoPath}\" -x {windowWidth} -y {windowHeight}";
+
+            Process ffplayProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = ffplayPath, // Use ffplay instead of ffmpeg
+                    Arguments = arguments,
+                    UseShellExecute = false, // Do not use the shell to execute the process
+                    RedirectStandardOutput = false, // We do not need to capture the output
+                    RedirectStandardError = false,  // We do not need to capture the error output
+                    CreateNoWindow = false // Allow ffplay to open its own playback window
+                }
+            };
+
+            try
+            {
+                ffplayProcess.Start();
+                Console.WriteLine("Playing video...");
+                ffplayProcess.WaitForExit(); // Wait for the process to finish
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                ffplayProcess.Close();
+                
+            }
+        }
+
 
     }
 }

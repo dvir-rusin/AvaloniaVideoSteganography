@@ -19,5 +19,10 @@ namespace AvaloniaLsbProject1.Views
         {
             (this.VisualRoot as MainWindow)?.OnExtractButtonClick(sender, e);
         }
+
+        private void OnStreamVideoButtonClick(object sender, RoutedEventArgs e)
+        {
+            (this.VisualRoot as MainWindow)?.NavigateToStreamVideoView();
+        }
     }
 }

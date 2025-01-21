@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using AvaloniaLsbProject1.Views;
 using System.IO;
+using AvaloniaLsbProject1.Services;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -23,10 +24,13 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             ExtractMessageCommand = new AsyncRelayCommand(ExtractMessageAsync);
+            PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
         public IAsyncRelayCommand ExtractMessageCommand { get; }
+
+        public IAsyncRelayCommand PlayVideoCommand { get; }
 
         private async Task SelectVideoAsync()
         {
@@ -63,7 +67,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 //creates i frames folder 
                 if (!Directory.Exists(NewVideoIframes))
                 {
-                    Directory.CreateDirectory(NewVideoIframes);
+                     Directory.CreateDirectory(NewVideoIframes);
                 }
                 //inserts new video i frames into folder 
                 Services.Extraction.ExtractIFrames(selectedVideoPath, NewVideoIframes);
@@ -80,6 +84,17 @@ namespace AvaloniaLsbProject1.ViewModels
                 
             
             
+        }
+        private async Task PlayVideoAsync()
+        {
+            if (selectedVideoPath != null)
+            {
+                HelperFunctions.PlayVideo(selectedVideoPath);
+            }
+            else
+            {
+                ErrorMessage = "CANT PLAY VIDEO selectedVideoPath is null";
+            }
         }
 
     }

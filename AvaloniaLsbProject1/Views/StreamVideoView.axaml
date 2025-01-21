@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaLsbProject1.Views.StreamVideoView"
+             xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
+             x:DataType="vm:StreamVideoViewModel">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+		<TextBlock Text="Stream Video Screen" FontWeight="Bold" FontSize="20"/>
+
+		<!-- Video Selection -->
+		<TextBlock Text="Video Path:" FontWeight="Bold"/>
+		<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
+		<TextBox Text="{Binding SelectedVideoPath}" Width="300" Margin="5" IsReadOnly="True" />
+
+		<!-- Streaming Options -->
+		<TextBlock Text="Enter Multicast IP:" FontWeight="Bold"/>
+		<TextBox Text="{Binding MulticastIP}" Width="300" Margin="5"/>
+
+		<TextBlock Text="Enter Port:" FontWeight="Bold"/>
+		<TextBox Text="{Binding Port}" Width="300" Margin="5"/>
+
+		<Button Content="Start Stream" Command="{Binding StreamVideoCommand}" />
+		<Button Content="Stop Stream" Command="{Binding StopStreamCommand}" />
+
+		<!-- Playback Options -->
+		<Button Content="Play Video from IP" Command="{Binding PlayVideoCommand}" />
+
+		<!-- Error Messages -->
+		<TextBlock Text="Error Messages" FontWeight="Bold"/>
+		<TextBox Text="{Binding ErrorMessage}" Width="300" Height="100" Margin="5" IsReadOnly="True" AcceptsReturn="True"/>
+
+		<Button Name="BackButton" Content="Back to Home" />
+	</StackPanel>
+</UserControl>

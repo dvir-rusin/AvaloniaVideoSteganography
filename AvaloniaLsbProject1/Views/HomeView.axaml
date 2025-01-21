@@ -4,5 +4,7 @@
 	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
 		<Button Content="Embed Message in Video" Click="OnEmbedButtonClick"/>
 		<Button Content="Extract Hidden Message" Click="OnExtractButtonClick"/>
+		<Button Content="Stream Video" Click="OnStreamVideoButtonClick"/>
+		
 	</StackPanel>
 </UserControl>

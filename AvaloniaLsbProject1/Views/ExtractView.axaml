@@ -18,6 +18,8 @@
 		<TextBlock Text="Error Messages" FontWeight="Bold"/>
 		<TextBox Text="{Binding ErrorMessage}" Width="300" Height="100" Margin="5" IsReadOnly="True" AcceptsReturn="True"/>
 
+		<Button Content="play video" Command="{Binding PlayVideoCommand}" />
+		
 		<Button Name="BackButton" Content="Back to Home" />
 	</StackPanel>
 </UserControl>

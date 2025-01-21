@@ -6,6 +6,9 @@ using Avalonia.Controls;
 using AvaloniaLsbProject1.Views;
 using System.Runtime.InteropServices;
 using System.IO;
+using AvaloniaLsbProject1.Services;
+using Xabe.FFmpeg;
+using System.Linq;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -26,16 +29,61 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string? videoNameAndFormat;
 
+        [ObservableProperty]
+        private string? height;
+
+        [ObservableProperty]
+        private string? width;
+
+        [ObservableProperty]
+        private string? frameRate;
+
+        [ObservableProperty]
+        private string? bitRate;
+
+        [ObservableProperty]
+        private string? duration;
+
         public EmbedViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
+            PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
 
         public IAsyncRelayCommand EmbeddMessageCommand { get; }
 
+        public IAsyncRelayCommand PlayVideoCommand { get; }
+
+        // Add method to extract video attributes
+        private async Task LoadVideoAttributesAsync(string videoPath)
+        {
+            try
+            {
+                // Use Xabe.FFmpeg to get video metadata
+                var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
+                var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
+
+                if (videoStream != null)
+                {
+                    Height = $"{videoStream.Height}";
+                    Width = $"{videoStream.Width}";
+                    FrameRate = $"{videoStream.Framerate} fps";
+                    BitRate = $"{videoStream.Bitrate / 1000} kbps";
+                    Duration = mediaInfo.Duration.ToString(@"hh\:mm\:ss\.fff");
+                }
+                else
+                {
+                    ErrorMessage = "No video stream found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error extracting video attributes: {ex.Message}";
+            }
+        }
         private async Task SelectVideoAsync()
         {
             try
@@ -56,6 +104,8 @@ namespace AvaloniaLsbProject1.ViewModels
                 if (result?.Length > 0)
                 {
                     SelectedVideoPath = result[0];
+                    await LoadVideoAttributesAsync(SelectedVideoPath); // Extract attributes after selection
+
 
                 }
                 else
@@ -166,6 +216,19 @@ namespace AvaloniaLsbProject1.ViewModels
                 ErrorMessage = "allFramesWithMessageFolder does not exist";
             }
             
+        }
+
+        private async Task PlayVideoAsync()
+        {
+            if (selectedVideoPath != null)
+            {
+                HelperFunctions.PlayVideo(selectedVideoPath);
+                
+            }
+            else
+            {
+                ErrorMessage = "CANT PLAY VIDEO selectedVideoPath is null";
+            }
         }
     }
 }
