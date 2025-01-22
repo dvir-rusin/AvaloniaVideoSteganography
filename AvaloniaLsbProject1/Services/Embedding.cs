@@ -55,6 +55,9 @@ namespace AvaloniaLsbProject1.Services
                 int numberInFile = HelperFunctions.extractNumberFromFilePath(filePath);
                 using (Bitmap bitmap = new Bitmap(filePath))
                 {
+
+
+
                     for (int i = indexer; isNumberInFile != true && i < IframesLocation.Length; i++)
                     {
                         if (numberInFile == IframesLocation.ElementAt(i))
@@ -85,19 +88,19 @@ namespace AvaloniaLsbProject1.Services
                                 {
                                     messageComplete = true;
 
-                                    bitmap.SetPixel(1000, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1001, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1002, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1003, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1004, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1005, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1006, 1000, Color.FromArgb(254, 0, 0));
-                                    bitmap.SetPixel(1007, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1000, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1001, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1002, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1003, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1004, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1005, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1006, 1000, Color.FromArgb(254, 0, 0));
+                                    //bitmap.SetPixel(1007, 1000, Color.FromArgb(254, 0, 0));
 
-                                    bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
-                                    bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 2, Color.FromArgb(254, 1, 1));
-                                    bitmap.SetPixel(bitmap.Width - 3, bitmap.Height - 3, Color.FromArgb(254, 1, 1));
-                                    bitmap.SetPixel(bitmap.Width - 4, bitmap.Height - 4, Color.FromArgb(254, 1, 1));
+                                    //bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
+                                    //bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 2, Color.FromArgb(254, 1, 1));
+                                    //bitmap.SetPixel(bitmap.Width - 3, bitmap.Height - 3, Color.FromArgb(254, 1, 1));
+                                    //bitmap.SetPixel(bitmap.Width - 4, bitmap.Height - 4, Color.FromArgb(254, 1, 1));
                                 }
 
                                 bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));

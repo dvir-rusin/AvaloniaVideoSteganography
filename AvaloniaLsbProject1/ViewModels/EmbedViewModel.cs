@@ -139,6 +139,7 @@ namespace AvaloniaLsbProject1.ViewModels
             string projectPath = "C:\\AvaloniaVideoStenagraphy";
             string allFramesFolder = Path.Combine(projectPath, "AllFrames");
             string allFramesWithMessageFolder = Path.Combine(projectPath, "allFramesWithMessage");
+            //string allFramesWithMessageFolderTest = Path.Combine(projectPath, "allFramesWithMessageTestForAllFrames");
             string metaDataFile = Path.Combine(projectPath, "MetaData.csv");
             string NewVideo = Path.Combine(projectPath, videoNameAndFormat);
 
@@ -154,24 +155,25 @@ namespace AvaloniaLsbProject1.ViewModels
                 if (!Directory.Exists(allFramesFolder))
                 {
                     Directory.CreateDirectory(allFramesFolder);
+                    if (!string.IsNullOrEmpty(SelectedVideoPath))
+                    {
+                        // Extract all frames to the AllFrames folder
+                        await Task.Run(() =>
+                        {
+                            Services.Extraction.ExtractAllFrames(SelectedVideoPath, allFramesFolder);
+                        });
+
+                        // Notify the user of success (optional)
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("SelectedVideoPath is null");
+                    }
                 }
 
                 // Ensure a video file is selected
-                if (!string.IsNullOrEmpty(SelectedVideoPath))
-                {
-                    // Extract all frames to the AllFrames folder
-                    await Task.Run(() =>
-                    {
-                        Services.Extraction.ExtractAllFrames(SelectedVideoPath, allFramesFolder);
-                    });
-
-                    // Notify the user of success (optional)
-
-                }
-                else
-                {
-                    Console.WriteLine("SelectedVideoPath is null");
-                }
+                
             }
             catch (Exception ex)
             {
@@ -188,7 +190,7 @@ namespace AvaloniaLsbProject1.ViewModels
                     if (!Directory.Exists(allFramesWithMessageFolder))
                     {
                         Directory.CreateDirectory(allFramesWithMessageFolder);
-                        //ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(allFramesFolder, allFramesWithMessageFolder, iframesLocation,messageText,password);
+                        ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(allFramesFolder, allFramesWithMessageFolder, iframesLocation,messageText,password);
                     }
 
 

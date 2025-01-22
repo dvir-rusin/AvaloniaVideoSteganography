@@ -32,6 +32,21 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string? errorMessage;
 
+        [ObservableProperty]
+        private string? height;
+
+        [ObservableProperty]
+        private string? width;
+
+        [ObservableProperty]
+        private string? frameRate;
+
+        [ObservableProperty]
+        private string? bitRate;
+
+        [ObservableProperty]
+        private string? duration;
+
         private Process? ffmpegProcess; // Reference to the FFmpeg process for stopping
 
         public StreamVideoViewModel()
@@ -40,12 +55,15 @@ namespace AvaloniaLsbProject1.ViewModels
             StreamVideoCommand = new AsyncRelayCommand(StreamVideoAsync);
             StopStreamCommand = new RelayCommand(StopStream);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
+            DownloadStreamCommand = new AsyncRelayCommand(DownloadStreamAsync);
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
         public IAsyncRelayCommand StreamVideoCommand { get; }
         public IAsyncRelayCommand PlayVideoCommand { get; }
         public IRelayCommand StopStreamCommand { get; }
+
+        public IAsyncRelayCommand DownloadStreamCommand { get; }
 
         private async Task SelectVideoAsync()
         {
@@ -66,6 +84,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 if (result?.Length > 0)
                 {
                     SelectedVideoPath = result[0];
+                    await LoadVideoAttributesAsync(SelectedVideoPath);
                 }
                 else
                 {
@@ -78,6 +97,33 @@ namespace AvaloniaLsbProject1.ViewModels
             }
         }
 
+        private async Task LoadVideoAttributesAsync(string videoPath)
+        {
+            try
+            {
+                // Use Xabe.FFmpeg to get video metadata
+                var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
+                var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
+
+                if (videoStream != null)
+                {
+                    Height = $"{videoStream.Height}";
+                    Width = $"{videoStream.Width}";
+                    FrameRate = $"{videoStream.Framerate} fps";
+                    BitRate = $"{videoStream.Bitrate / 1000} kbps";
+                    Duration = mediaInfo.Duration.ToString(@"hh\:mm\:ss\.fff");
+                }
+                else
+                {
+                    ErrorMessage = "No video stream found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error extracting video attributes: {ex.Message}";
+            }
+        }
+
         private async Task StreamVideoAsync()
         {
             if (string.IsNullOrEmpty(SelectedVideoPath) || string.IsNullOrEmpty(MulticastIP) || string.IsNullOrEmpty(Port))
@@ -86,10 +132,16 @@ namespace AvaloniaLsbProject1.ViewModels
                 return;
             }
 
+            if (string.IsNullOrEmpty(Duration))
+            {
+                ErrorMessage = "video artribute : Duration, is null.  ";
+                return;
+            }
+
             try
             {
-                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
-                string arguments = $"-re -i \"{SelectedVideoPath}\" -f mpegts udp://{MulticastIP}:{Port}";
+                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; 
+                string arguments = $"-re -i \"{SelectedVideoPath}\" -t {Duration} -f mpegts udp://{MulticastIP}:{Port}";
 
                 Process ffmpegProcess = new Process
                 {
@@ -169,5 +221,52 @@ namespace AvaloniaLsbProject1.ViewModels
                 ErrorMessage = $"Error playing video: {ex.Message}";
             }
         }
+
+        private async Task DownloadStreamAsync()
+        {
+            if (string.IsNullOrEmpty(MulticastIP) || string.IsNullOrEmpty(Port))
+            {
+                ErrorMessage = "Multicast IP or port is missing.";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Duration))
+            {
+                ErrorMessage = "video artribute : Duration, is null.  ";
+                return;
+            }
+
+            try
+            {
+                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
+                string outputDirectory = @"C:\AvaloniaVideoStenagraphy"; // Desired output directory
+                string outputFile = Path.Combine(outputDirectory, "stream_capture.mp4"); // Combine directory and filename
+                string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t {Duration} \"{outputFile}\"";
+
+
+                Process ffmpegProcess = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = ffmpegPath,
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = false,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                ffmpegProcess.Start();
+                ErrorMessage = $"Downloading stream to {outputFile} for {Duration} seconds...";
+                await ffmpegProcess.WaitForExitAsync(); // Wait for the process to finish
+                ErrorMessage = "Stream download completed.";
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error downloading stream: {ex.Message}";
+            }
+        }
+
     }
 }

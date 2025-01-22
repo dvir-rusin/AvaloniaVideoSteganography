@@ -85,6 +85,7 @@ namespace AvaloniaLsbProject1.Services
 
             foreach (string filePath in Directory.GetFiles(IframeDirectory, "*.png"))
             {
+               
                 string message;
                 Bitmap frameBitmap = new Bitmap(filePath);
                 using (frameBitmap)
@@ -93,7 +94,9 @@ namespace AvaloniaLsbProject1.Services
                     //Console.WriteLine("msglen:" + messageLength);
                     MESSAGE = GetHiddenMessage(frameBitmap,password);
                     MESSAGE = ("Hidden Message: " + MESSAGE);
+                    
                 }
+               
                 return MESSAGE;
             }
             return MESSAGE;
