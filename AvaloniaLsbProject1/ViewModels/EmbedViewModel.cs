@@ -225,11 +225,10 @@ namespace AvaloniaLsbProject1.ViewModels
             if (selectedVideoPath != null)
             {
                 HelperFunctions.PlayVideo(selectedVideoPath);
-                
             }
             else
             {
-                ErrorMessage = "CANT PLAY VIDEO selectedVideoPath is null";
+                ErrorMessage = "CANT PLAY VIDEO selectedVideoPath is null";  
             }
         }
     }

@@ -15,7 +15,6 @@ using System.IO;
 using AvaloniaLsbProject1.Services;
 using Xabe.FFmpeg;
 using System.Linq;
-using static Emgu.CV.DISOpticalFlow;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -54,6 +53,7 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             StreamVideoCommand = new AsyncRelayCommand(StreamVideoAsync);
+            StopStreamCommand = new RelayCommand(StopStream);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             DownloadStreamCommand = new AsyncRelayCommand(DownloadStreamAsync);
         }
@@ -61,6 +61,7 @@ namespace AvaloniaLsbProject1.ViewModels
         public IAsyncRelayCommand SelectVideoCommand { get; }
         public IAsyncRelayCommand StreamVideoCommand { get; }
         public IAsyncRelayCommand PlayVideoCommand { get; }
+        public IRelayCommand StopStreamCommand { get; }
 
         public IAsyncRelayCommand DownloadStreamCommand { get; }
 
@@ -140,7 +141,8 @@ namespace AvaloniaLsbProject1.ViewModels
             try
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; 
-                string arguments = $"-re -i \"{SelectedVideoPath}\" - c:v libx264rgb -t 2.2 - preset veryfast - qp 0 - pix_fmt bgr24 - f mpegts udp://{MulticastIP}:{Port}";
+                string arguments = $"-re -i \"{SelectedVideoPath}\" -t {Duration} -f mpegts udp://{MulticastIP}:{Port}";
+
                 Process ffmpegProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -239,7 +241,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
                 string outputDirectory = @"C:\AvaloniaVideoStenagraphy"; // Desired output directory
                 string outputFile = Path.Combine(outputDirectory, "stream_capture.mp4"); // Combine directory and filename
-                string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t 2 \"{outputFile}\"";
+                string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t {Duration} \"{outputFile}\"";
 
 
                 Process ffmpegProcess = new Process

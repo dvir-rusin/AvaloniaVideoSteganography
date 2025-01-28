@@ -1,25 +1,58 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
              x:Class="AvaloniaLsbProject1.Views.ExtractView"
-			 xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
-			  x:DataType="vm:ExtractViewModel">
-	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-		<TextBlock Text="Extract Hidden Message Screen" FontSize="20" />
-		<!-- Add more UI elements as needed -->
-		<TextBlock Text="video path:" FontWeight="Bold"/>
-		<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
-		<TextBox Text="{Binding SelectedVideoPath}" Width="300" Margin="5" IsReadOnly="True" />
+             x:DataType="vm:ExtractViewModel">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15" Background="DarkGreen">
+		<!-- Title -->
+		<TextBlock Text="Extract Hidden Message Screen"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20" />
 
-		<TextBlock Text="Enter password for decryption" FontWeight="Bold"/>
-		<TextBox Text="{Binding DecryptionPassword}" Width="300" Margin="5"/>
+		<!-- Select Video -->
+		<TextBlock Text="Video Path:" FontWeight="Bold" />
+		<StackPanel Orientation="Horizontal" Spacing="10">
+			<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
+			<TextBox Text="{Binding SelectedVideoPath}"
+                     Width="300"
+                     IsReadOnly="True"
+                     VerticalAlignment="Center" />
+		</StackPanel>
 
-		<Button Content="Extract measge from video" Command="{Binding ExtractMessageCommand}" />
+		<!-- Password Input -->
+		<TextBlock Text="Enter Password for Decryption:" FontWeight="Bold" />
+		<TextBox Text="{Binding DecryptionPassword}"
+                 Width="300"
+                 Margin="0,5"
+                 Watermark="Enter decryption password" />
 
-		<TextBlock Text="Error Messages" FontWeight="Bold"/>
-		<TextBox Text="{Binding ErrorMessage}" Width="300" Height="100" Margin="5" IsReadOnly="True" AcceptsReturn="True"/>
+		<!-- Extract Message -->
+		<Button Content="Extract Message from Video"
+                Command="{Binding ExtractMessageCommand}"
+                Width="250"
+                HorizontalAlignment="Center" />
 
-		<Button Content="play video" Command="{Binding PlayVideoCommand}" />
-		
-		<Button Name="BackButton" Content="Back to Home" />
+		<!-- Error Messages -->
+		<TextBlock Text="Error Messages:" FontWeight="Bold" />
+		<TextBox Text="{Binding ErrorMessage}"
+                 Width="300"
+                 Height="100"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 Background="LightGray" />
+
+		<!-- Play Video -->
+		<Button Content="Play Video"
+                Command="{Binding PlayVideoCommand}"
+                Width="200"
+                HorizontalAlignment="Center" />
+
+		<!-- Back Button -->
+		<Button Name="BackButton"
+                Content="Back to Home"
+                Width="200"
+                HorizontalAlignment="Center" />
 	</StackPanel>
 </UserControl>

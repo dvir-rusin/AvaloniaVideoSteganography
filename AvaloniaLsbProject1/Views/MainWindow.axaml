@@ -1,8 +1,25 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:views="clr-namespace:Avalonia.Views"
+        xmlns:views="clr-namespace:AvaloniaLsbProject1.Views"
+        xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
         x:Class="AvaloniaLsbProject1.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="Video Steganography"
         Width="800" Height="600">
-	<ContentControl x:Name="ContentArea" />
+	<DockPanel Background="GreenYellow">
+		<!-- Top Navigation Bar -->
+		<DockPanel DockPanel.Dock="Top" Background="LightBlue">
+			<Grid>
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+					<MenuItem Header="Home" Command="{Binding NavigateToHomeCommand}" />
+					<MenuItem Header="Embed Message" Command="{Binding NavigateToEmbedCommand}" />
+					<MenuItem Header="Extract Message" Command="{Binding NavigateToExtractCommand}" />
+					<MenuItem Header="Stream and Play Video" Command="{Binding NavigateToStreamCommand}" />
+				</StackPanel>
+			</Grid>
+		</DockPanel>
+
+		<!-- Main Content Area -->
+		<ContentControl x:Name="ContentArea" />
+	</DockPanel>
 </Window>

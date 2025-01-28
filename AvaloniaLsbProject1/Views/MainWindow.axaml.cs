@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AvaloniaLsbProject1.Views;
 using AvaloniaLsbProject1;
+using AvaloniaLsbProject1.ViewModels;
 
 
 namespace AvaloniaLsbProject1.Views
@@ -9,13 +10,17 @@ namespace AvaloniaLsbProject1.Views
     public partial class MainWindow : Window
     {
         public static MainWindow? Instance { get; private set; }
+
+
         public MainWindow()
         {
             InitializeComponent();
             Instance = this;
             // Load the HomeView as the initial content
             ContentArea.Content = new HomeView();
-            
+            DataContext = new MainWindowViewModel(ContentArea);
+
+
         }
 
         // Navigate to the EmbedView
@@ -37,5 +42,7 @@ namespace AvaloniaLsbProject1.Views
         {
             ContentArea.Content = new StreamVideoView();
         }
+
+
     }
 }

@@ -1,10 +1,39 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AvaloniaLsbProject1.Views.HomeView">
-	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-		<Button Content="Embed Message in Video" Click="OnEmbedButtonClick"/>
-		<Button Content="Extract Hidden Message" Click="OnExtractButtonClick"/>
-		<Button Content="Stream Video" Click="OnStreamVideoButtonClick"/>
-		
-	</StackPanel>
+             xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
+             x:Class="AvaloniaLsbProject1.Views.HomeView"
+             x:DataType="vm:MainWindowViewModel">
+	<Grid>
+		<!-- Main Layout -->
+		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20" Background="DarkGreen">
+			<!-- Title -->
+			<TextBlock Text="Welcome to Video Steganography Tool"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"/>
+
+			<!-- Description -->
+			<TextBlock Text="Choose an action to get started:"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+			<!-- Action Buttons -->
+			<Button Width="250" Height="50"
+                    HorizontalAlignment="Center"
+                    Content="Embed Message in Video"
+                    Command="{Binding NavigateToEmbedCommand}"/>
+
+			<Button Width="250" Height="50"
+                    HorizontalAlignment="Center"
+                    Content="Extract Hidden Message"
+                    Command="{Binding NavigateToExtractCommand}"/>
+
+			<Button Width="250" Height="50"
+                    HorizontalAlignment="Center"
+                    Content="Stream and Play Video"
+                    Command="{Binding NavigateToStreamCommand}"/>
+		</StackPanel>
+	</Grid>
 </UserControl>
