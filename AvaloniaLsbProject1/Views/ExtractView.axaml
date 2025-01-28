@@ -3,56 +3,92 @@
              xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
              x:Class="AvaloniaLsbProject1.Views.ExtractView"
              x:DataType="vm:ExtractViewModel">
-	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15" Background="DarkGreen">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15" Background="#1E223D">
 		<!-- Title -->
 		<TextBlock Text="Extract Hidden Message Screen"
                    FontSize="24"
                    FontWeight="Bold"
+                   Foreground="#FFFFFF"
                    HorizontalAlignment="Center"
                    Margin="0,0,0,20" />
 
 		<!-- Select Video -->
-		<TextBlock Text="Video Path:" FontWeight="Bold" />
+		<TextBlock Text="Video Path:" FontWeight="Bold" Foreground="#CCCCCC" />
 		<StackPanel Orientation="Horizontal" Spacing="10">
-			<Button Content="Select Video" Command="{Binding SelectVideoCommand}" />
+			<Button Content="Select Video" Command="{Binding SelectVideoCommand}" Background="#5661A6" Foreground="#FFFFFF" CornerRadius="8"/>
 			<TextBox Text="{Binding SelectedVideoPath}"
                      Width="300"
                      IsReadOnly="True"
-                     VerticalAlignment="Center" />
+                     VerticalAlignment="Center"
+                     Background="#2A2F50"
+                     Foreground="#FFFFFF"
+                     BorderBrush="#7481D4"/>
 		</StackPanel>
 
 		<!-- Password Input -->
-		<TextBlock Text="Enter Password for Decryption:" FontWeight="Bold" />
+		<TextBlock Text="Enter Password for Decryption:" FontWeight="Bold" Foreground="#CCCCCC" />
 		<TextBox Text="{Binding DecryptionPassword}"
                  Width="300"
                  Margin="0,5"
-                 Watermark="Enter decryption password" />
+                 Watermark="Enter decryption password"
+                 Background="#2A2F50"
+                 Foreground="#FFFFFF"
+                 BorderBrush="#7481D4" />
 
 		<!-- Extract Message -->
 		<Button Content="Extract Message from Video"
                 Command="{Binding ExtractMessageCommand}"
                 Width="250"
-                HorizontalAlignment="Center" />
+                HorizontalAlignment="Center"
+                Background="#5661A6"
+                Foreground="#FFFFFF"
+                CornerRadius="8">
+			<Button.Styles>
+				<Style Selector="Button:hover">
+					<Setter Property="Background" Value="#7481D4"/>
+				</Style>
+			</Button.Styles>
+		</Button>
 
 		<!-- Error Messages -->
-		<TextBlock Text="Error Messages:" FontWeight="Bold" />
+		<TextBlock Text="Error Messages:" FontWeight="Bold" Foreground="#CCCCCC" />
 		<TextBox Text="{Binding ErrorMessage}"
                  Width="300"
                  Height="100"
                  IsReadOnly="True"
                  AcceptsReturn="True"
-                 Background="LightGray" />
+                 Background="#2A2F50"
+                 Foreground="#FFFFFF"
+                 BorderBrush="#7481D4" />
 
 		<!-- Play Video -->
 		<Button Content="Play Video"
                 Command="{Binding PlayVideoCommand}"
                 Width="200"
-                HorizontalAlignment="Center" />
+                HorizontalAlignment="Center"
+                Background="#5661A6"
+                Foreground="#FFFFFF"
+                CornerRadius="8">
+			<Button.Styles>
+				<Style Selector="Button:hover">
+					<Setter Property="Background" Value="#7481D4"/>
+				</Style>
+			</Button.Styles>
+		</Button>
 
 		<!-- Back Button -->
 		<Button Name="BackButton"
                 Content="Back to Home"
                 Width="200"
-                HorizontalAlignment="Center" />
+                HorizontalAlignment="Center"
+                Background="#5661A6"
+                Foreground="#FFFFFF"
+                CornerRadius="8">
+			<Button.Styles>
+				<Style Selector="Button:hover">
+					<Setter Property="Background" Value="#7481D4"/>
+				</Style>
+			</Button.Styles>
+		</Button>
 	</StackPanel>
 </UserControl>
