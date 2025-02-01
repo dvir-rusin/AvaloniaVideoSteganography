@@ -3,136 +3,98 @@
              xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
              x:Class="AvaloniaLsbProject1.Views.EmbedView"
              x:DataType="vm:EmbedViewModel">
-	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15" Background="#1E223D">
-		<!-- Title -->
-		<TextBlock Text="Embed Message in Video Screen"
-                   FontWeight="Bold"
-                   FontSize="24"
-                   Foreground="#FFFFFF"
-                   HorizontalAlignment="Center" />
-
-		<!-- Video Selection -->
-		<TextBlock Text="Video Path:" FontWeight="Bold" Foreground="#CCCCCC" />
-		<StackPanel Orientation="Horizontal" Spacing="10">
-			<Button Content="Select Video" Command="{Binding SelectVideoCommand}" Background="#5661A6" Foreground="#FFFFFF" CornerRadius="8"/>
-			<TextBox Text="{Binding SelectedVideoPath}"
-                     Width="300"
-                     IsReadOnly="True"
-                     VerticalAlignment="Center"
-                     Background="#2A2F50"
-                     Foreground="#FFFFFF"
-                     BorderBrush="#7481D4"/>
-		</StackPanel>
-
-		<!-- Video Attributes -->
-		<TextBlock Text="Video Attributes:" FontWeight="Bold" Foreground="#CCCCCC" Margin="0,10,0,0" />
-		<StackPanel Orientation="Vertical" Margin="10" Spacing="5">
-			<TextBlock Foreground="#FFFFFF">
-				<Run Text="Height: " />
-				<Run Text="{Binding Height}" />
-			</TextBlock>
-			<TextBlock Foreground="#FFFFFF">
-				<Run Text="Width: " />
-				<Run Text="{Binding Width}" />
-			</TextBlock>
-			<TextBlock Foreground="#FFFFFF">
-				<Run Text="Frame Rate: " />
-				<Run Text="{Binding FrameRate}" />
-			</TextBlock>
-			<TextBlock Foreground="#FFFFFF">
-				<Run Text="Bit Rate: " />
-				<Run Text="{Binding BitRate}" />
-			</TextBlock>
-			<TextBlock Foreground="#FFFFFF">
-				<Run Text="Duration: " />
-				<Run Text="{Binding Duration}" />
-			</TextBlock>
-		</StackPanel>
-
-		<!-- Text to Encrypt -->
-		<TextBlock Text="Enter Text to be Encrypted:" FontWeight="Bold" Foreground="#CCCCCC" />
-		<TextBox Text="{Binding MessageText}"
-                 Width="300"
-                 Margin="0,5"
-                 Watermark="Enter your secret message"
-                 Background="#2A2F50"
-                 Foreground="#FFFFFF"
-                 BorderBrush="#7481D4" />
-
-		<!-- Password for Encryption -->
-		<TextBlock Text="Enter Password for Encryption:" FontWeight="Bold" Foreground="#CCCCCC" />
-		<TextBox Text="{Binding EncryptionPassword}"
-                 Width="300"
-                 Margin="0,5"
-                 Watermark="Enter a strong password"
-                 Background="#2A2F50"
-                 Foreground="#FFFFFF"
-                 BorderBrush="#7481D4" />
-
-		<!-- New Video Name -->
-		<TextBlock Text="Enter New Video Name:" FontWeight="Bold" Foreground="#CCCCCC" />
-		<TextBox Text="{Binding VideoNameAndFormat}"
-                 Width="300"
-                 Margin="0,5"
-                 Watermark="NewVideo.mp4"
-                 Background="#2A2F50"
-                 Foreground="#FFFFFF"
-                 BorderBrush="#7481D4" />
-
-		<!-- Embed Message Button -->
-		<Button Content="Embed Message in Video"
-                Command="{Binding EmbeddMessageCommand}"
-                Width="250"
-                HorizontalAlignment="Center"
-                Background="#5661A6"
-                Foreground="#FFFFFF"
-                CornerRadius="8">
-			<Button.Styles>
-				<Style Selector="Button:hover">
-					<Setter Property="Background" Value="#7481D4"/>
-				</Style>
-			</Button.Styles>
-		</Button>
-
-		<!-- Error Messages -->
-		<TextBlock Text="Error Messages:" FontWeight="Bold" Foreground="#CCCCCC" />
-		<TextBox Text="{Binding ErrorMessage}"
-                 Width="300"
-                 Height="100"
-                 IsReadOnly="True"
-                 AcceptsReturn="True"
-                 Background="#2A2F50"
-                 Foreground="#FFFFFF"
-                 BorderBrush="#7481D4" />
-
-		<!-- Play Video Button -->
-		<Button Content="Play Video"
-                Command="{Binding PlayVideoCommand}"
-                Width="200"
-                HorizontalAlignment="Center"
-                Background="#5661A6"
-                Foreground="#FFFFFF"
-                CornerRadius="8">
-			<Button.Styles>
-				<Style Selector="Button:hover">
-					<Setter Property="Background" Value="#7481D4"/>
-				</Style>
-			</Button.Styles>
-		</Button>
-
-		<!-- Back Button -->
-		<Button Name="BackButton"
-                Content="Back to Home"
-                Width="200"
-                HorizontalAlignment="Center"
-                Background="#5661A6"
-                Foreground="#FFFFFF"
-                CornerRadius="8">
-			<Button.Styles>
-				<Style Selector="Button:hover">
-					<Setter Property="Background" Value="#7481D4"/>
-				</Style>
-			</Button.Styles>
-		</Button>
-	</StackPanel>
+	<Grid>
+		<!-- Full-Screen Gradient Background -->
+		<Grid.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+				<GradientStop Color="#1E223D" Offset="0"/>
+				<GradientStop Color="#12141B" Offset="1"/>
+			</LinearGradientBrush>
+		</Grid.Background>
+		<!-- Scrollable Content -->
+		<ScrollViewer VerticalScrollBarVisibility="Auto">
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30" Margin="20">
+				<!-- Header Section -->
+				<Border Classes="header-border">
+					<TextBlock Text="Embed Your Secret Message" Classes="header-text"/>
+				</Border>
+				<!-- Tagline -->
+				<TextBlock Text="Conceal your message securely within your video" Classes="tagline"/>
+				<!-- Embed Form Panel -->
+				<StackPanel Spacing="20">
+					<!-- Video Selection -->
+					<TextBlock Text="Select Video" Classes="label"/>
+					<StackPanel Orientation="Horizontal" Spacing="10">
+						<Button Content="Browse Video"
+								Command="{Binding SelectVideoCommand}"
+								ToolTip.Tip="Select a video file"/>
+						<TextBox Text="{Binding SelectedVideoPath}"
+								 IsReadOnly="True"
+								 VerticalAlignment="Center"
+								 Width="320"/>
+					</StackPanel>
+					<!-- Video Attributes -->
+					<TextBlock Text="Video Attributes" Classes="label"/>
+					<StackPanel Orientation="Vertical" Margin="10" Spacing="5">
+						<TextBlock Foreground="White">
+							<Run Text="Height: "/>
+							<Run Text="{Binding Height}"/>
+						</TextBlock>
+						<TextBlock Foreground="White">
+							<Run Text="Width: "/>
+							<Run Text="{Binding Width}"/>
+						</TextBlock>
+						<TextBlock Foreground="White">
+							<Run Text="Frame Rate: "/>
+							<Run Text="{Binding FrameRate}"/>
+						</TextBlock>
+						<TextBlock Foreground="White">
+							<Run Text="Bit Rate: "/>
+							<Run Text="{Binding BitRate}"/>
+						</TextBlock>
+						<TextBlock Foreground="White">
+							<Run Text="Duration: "/>
+							<Run Text="{Binding Duration}"/>
+						</TextBlock>
+					</StackPanel>
+					<!-- Text to Encrypt -->
+					<TextBlock Text="Text to Encrypt" Classes="label"/>
+					<TextBox Text="{Binding MessageText}"
+							 Watermark="Enter your secret message"
+							 Width="320"/>
+					<!-- Encryption Password -->
+					<TextBlock Text="Encryption Password" Classes="label"/>
+					<TextBox Text="{Binding EncryptionPassword}"
+							 Watermark="Enter a strong password"
+							 Width="320"/>
+					<!-- New Video Name -->
+					<TextBlock Text="New Video Name" Classes="label"/>
+					<TextBox Text="{Binding VideoNameAndFormat}"
+							 Watermark="NewVideo.mp4"
+							 Width="320"/>
+					<!-- Embed Message Button -->
+					<Button Content="Embed Message"
+							Command="{Binding EmbeddMessageCommand}"
+							Width="250"
+							HorizontalAlignment="Center"/>
+					<!-- Error Messages -->
+					<TextBlock Text="Error Messages" Classes="label"/>
+					<TextBox Text="{Binding ErrorMessage}"
+							 Height="100"
+							 Width="320"
+							 IsReadOnly="True"
+							 AcceptsReturn="True"/>
+					<!-- Playback and Navigation -->
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+						<Button Content="Play Video"
+								Command="{Binding PlayVideoCommand}"
+								Width="200"/>
+						<Button Content="Back to Home"
+								Name="BackButton"
+								Width="200"/>
+					</StackPanel>
+				</StackPanel>
+			</StackPanel>
+		</ScrollViewer>
+	</Grid>
 </UserControl>

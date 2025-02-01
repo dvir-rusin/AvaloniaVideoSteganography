@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<!-- Base style for all Buttons -->
+	<Style Selector="Button">
+		<Setter Property="Background" Value="#5661A6"/>
+		<Setter Property="Foreground" Value="#FFFFFF"/>
+		<Setter Property="CornerRadius" Value="10"/>
+		<Setter Property="Padding" Value="10,5"/>
+		<Setter Property="Margin" Value="5"/>
+	</Style>
+
+	<!-- Hover effect for Buttons -->
+	<Style Selector="Button:hover">
+		<Setter Property="Background" Value="#7481D4"/>
+	</Style>
+
+	<!-- Base style for TextBox controls -->
+	<Style Selector="TextBox">
+		<Setter Property="Background" Value="#2A2F50"/>
+		<Setter Property="Foreground" Value="#FFFFFF"/>
+		<Setter Property="BorderBrush" Value="#7481D4"/>
+		<Setter Property="Margin" Value="0,5"/>
+		<!-- Adjusted width to fit new design -->
+		<Setter Property="Width" Value="320"/>
+	</Style>
+
+	<!-- Style for TextBlock used as labels -->
+	<Style Selector="TextBlock.label">
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="#CCCCCC"/>
+		<Setter Property="Margin" Value="0,10,0,0"/>
+	</Style>
+
+	<!-- Header Text Style for prominent headings -->
+	<Style Selector="TextBlock.header-text">
+		<Setter Property="FontSize" Value="36"/>
+		<Setter Property="FontWeight" Value="ExtraBold"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="0,0,0,20"/>
+	</Style>
+
+	<!-- Tagline Text Style for subtitles or taglines -->
+	<Style Selector="TextBlock.tagline">
+		<Setter Property="FontSize" Value="20"/>
+		<Setter Property="Foreground" Value="#CCCCCC"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="0,0,0,20"/>
+	</Style>
+
+	<!-- Header Border Style for encapsulating headers -->
+	<Style Selector="Border.header-border">
+		<Setter Property="Background" Value="#2A2F50"/>
+		<Setter Property="CornerRadius" Value="15"/>
+		<Setter Property="Padding" Value="30"/>
+		<Setter Property="Margin" Value="0,0,0,20"/>
+		<Setter Property="Opacity" Value="0.95"/>
+	</Style>
+
+</Styles>

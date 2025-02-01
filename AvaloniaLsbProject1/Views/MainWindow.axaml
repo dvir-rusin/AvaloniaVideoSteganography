@@ -6,20 +6,36 @@
         x:DataType="vm:MainWindowViewModel"
         Title="Video Steganography"
         Width="800" Height="600">
-	<DockPanel Background="GreenYellow" >
+
+	<!-- Full-Screen Gradient Background -->
+	<Window.Background>
+		<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#1E223D" Offset="0"/>
+			<GradientStop Color="#12141B" Offset="1"/>
+		</LinearGradientBrush>
+	</Window.Background>
+
+	<DockPanel>
 		<!-- Top Navigation Bar -->
-		<DockPanel DockPanel.Dock="Top" Background="#7481D4">
-			<Grid >
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<MenuItem Header="Home" Command="{Binding NavigateToHomeCommand}" BorderThickness="3" />
-					<MenuItem Header="Embed Message" Command="{Binding NavigateToEmbedCommand}" BorderThickness="3" />
-					<MenuItem Header="Extract Message" Command="{Binding NavigateToExtractCommand}"  BorderThickness="3" />
-					<MenuItem Header="Stream and Play Video" Command="{Binding NavigateToStreamCommand}"  BorderThickness="3"/>
-				</StackPanel>
-			</Grid>
-		</DockPanel>
+		<Border DockPanel.Dock="Top" Background="#2A2F50" Padding="10" Opacity="0.95">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
+				<MenuItem Header="🏠 Home"
+          Command="{Binding NavigateToHomeCommand}"
+          Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Home}"/>
+				<MenuItem Header="🔒 Embed Message"
+						  Command="{Binding NavigateToEmbedCommand}"
+						  Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Embed}"/>
+				<MenuItem Header="🔓 Extract Message"
+						  Command="{Binding NavigateToExtractCommand}"
+						  Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Extract}"/>
+				<MenuItem Header="📺 Stream and Play Video"
+						  Command="{Binding NavigateToStreamCommand}"
+						  Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Stream}"/>
+
+			</StackPanel>
+		</Border>
 
 		<!-- Main Content Area -->
-		<ContentControl x:Name="ContentArea" />
+		<ContentControl x:Name="ContentArea"/>
 	</DockPanel>
 </Window>

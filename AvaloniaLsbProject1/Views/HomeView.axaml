@@ -4,79 +4,32 @@
              x:Class="AvaloniaLsbProject1.Views.HomeView"
              x:DataType="vm:MainWindowViewModel">
 	<Grid Background="#1E223D">
-		<!-- Main Layout -->
-		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30" Margin="20">
 			<!-- Header Section -->
-			<Border Background="#2A2F50" CornerRadius="10" Margin="0,20,0,40" Padding="20">
-				<TextBlock Text="Welcome to Video Steganography Tool"
-                           FontSize="28"
-                           FontWeight="Bold"
-                           Foreground="#FFFFFF"
-                           HorizontalAlignment="Center"/>
+			<Border Classes="header-border">
+				<TextBlock Text="Video Steganography Hub" Classes="header-text"/>
 			</Border>
-
-			<!-- Description -->
-			<TextBlock Text="Choose an action to get started:"
-                       FontSize="18"
-                       Foreground="#CCCCCC"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,20"/>
-
+			<!-- Tagline -->
+			<TextBlock Text="Secure your videos with hidden messages" Classes="tagline"/>
 			<!-- Action Buttons -->
-			<StackPanel Spacing="15">
-				<Button Width="300" Height="50"
-                        HorizontalAlignment="Center"
-                        Content="Embed Message in Video"
-                        Background="#5661A6"
-                        Foreground="#FFFFFF"
-                        FontSize="23"
-                        CornerRadius="8"
-                        Command="{Binding NavigateToEmbedCommand}">
-					<Button.Styles>
-						<Style Selector="Button:hover">
-							<Setter Property="Background" Value="#7481D4"/>
-						</Style>
-					</Button.Styles>
-				</Button>
-
-				<Button Width="300" Height="50"
-                        HorizontalAlignment="Center"
-                        Content="Extract Hidden Message"
-                        Background="#5661A6"
-                        Foreground="#FFFFFF"
-                        FontSize="24"
-                        CornerRadius="8"
-                        Command="{Binding NavigateToExtractCommand}">
-					<Button.Styles>
-						<Style Selector="Button:hover">
-							<Setter Property="Background" Value="#7481D4"/>
-						</Style>
-					</Button.Styles>
-				</Button>
-
-				<Button Width="300" Height="50"
-                        HorizontalAlignment="Center"
-                        Content="Stream and Play Video" 
-                        Background="#5661A6"
-                        Foreground="#FFFFFF"
-                        FontSize="26"
-                        CornerRadius="8"
-                        Command="{Binding NavigateToStreamCommand}">
-					<Button.Styles>
-						<Style Selector="Button:hover">
-							<Setter Property="Background" Value="#7481D4"/>
-						</Style>
-					</Button.Styles>
-				</Button>
+			<StackPanel Spacing="15" HorizontalAlignment="Center">
+				<Button Content="Embed Message in Video"
+						Command="{Binding NavigateToEmbedCommand}"
+						Width="320" Height="60"
+						FontSize="20"/>
+				<Button Content="Extract Hidden Message"
+						Command="{Binding NavigateToExtractCommand}"
+						Width="320" Height="60"
+						FontSize="20"/>
+				<Button Content="Stream and Play Video"
+						Command="{Binding NavigateToStreamCommand}"
+						Width="320" Height="60"
+						FontSize="20"/>
 			</StackPanel>
-
 			<!-- Footer Section -->
 			<TextBlock Text="© 2025 Video Steganography Tool - All Rights Reserved"
-                       FontSize="12"
-                       Foreground="#777777"
-                       HorizontalAlignment="Center"
-                       Margin="0,40,0,0"
-					   />
+					   FontSize="12" Foreground="#777777"
+					   HorizontalAlignment="Center" Margin="0,30,0,0"/>
 		</StackPanel>
 	</Grid>
 </UserControl>

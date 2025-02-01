@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Windows.Input;
 using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
-    public class MainWindowViewModel
+    public partial class MainWindowViewModel: ObservableObject
     {
+        [ObservableProperty]
+        private string _currentPage;
+
         public ICommand NavigateToHomeCommand { get; }
         public ICommand NavigateToEmbedCommand { get; }
         public ICommand NavigateToExtractCommand { get; }
@@ -16,31 +20,39 @@ namespace AvaloniaLsbProject1.ViewModels
         public MainWindowViewModel(ContentControl contentArea)
         {
             _contentArea = contentArea;
+            
 
-            NavigateToHomeCommand = new RelayCommand(_ => NavigateToHome());
-            NavigateToEmbedCommand = new RelayCommand(_ => NavigateToEmbed());
-            NavigateToExtractCommand = new RelayCommand(_ => NavigateToExtract());
-            NavigateToStreamCommand = new RelayCommand(_ => NavigateToStream());
+            NavigateToHomeCommand = new RelayCommand(_ => NavigateToHome("Home"));
+            NavigateToEmbedCommand = new RelayCommand(_ => NavigateToEmbed("Embed"));
+            NavigateToExtractCommand = new RelayCommand(_ => NavigateToExtract("Extract"));
+            NavigateToStreamCommand = new RelayCommand(_ => NavigateToStream("Stream"));
+
+            CurrentPage = "Home";
         }
 
-        private void NavigateToHome()
+        private void NavigateToHome(string page)
         {
             _contentArea.Content = new Views.HomeView();
+            CurrentPage = page;
         }
 
-        private void NavigateToEmbed()
+        private void NavigateToEmbed(string page)
         {
             _contentArea.Content = new Views.EmbedView();
+            CurrentPage = page;
+
         }
 
-        private void NavigateToExtract()
+        private void NavigateToExtract(string page)
         {
             _contentArea.Content = new Views.ExtractView();
+            CurrentPage = page;
         }
 
-        private void NavigateToStream()
+        private void NavigateToStream(string page)
         {
             _contentArea.Content = new Views.StreamVideoView();
+            CurrentPage = page;
         }
     }
 

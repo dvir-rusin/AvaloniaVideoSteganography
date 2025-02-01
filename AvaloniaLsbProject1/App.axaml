@@ -1,15 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AvaloniaLsbProject1.App"
+             xmlns:services="clr-namespace:AvaloniaLsbProject1.Services"
              xmlns:local="using:AvaloniaLsbProject1"
+             x:Class="AvaloniaLsbProject1.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
-  
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
+	<!-- Application Resources -->
+	<Application.Resources>
+		<!-- Register the PageToColorConverter -->
+		<services:PageToColorConverter x:Key="PageToColorConverter"/>
+	</Application.Resources>
+
+	<Application.Styles>
+		<!-- Include your global styles -->
+		<StyleInclude Source="avares://AvaloniaLsbProject1/Styles/Styles.axaml"/>
+		<!-- Include FluentTheme (or any other theme) -->
+		<FluentTheme />
+	</Application.Styles>
+
+	<!-- Data Templates (e.g., ViewLocator for MVVM) -->
+	<Application.DataTemplates>
+		<local:ViewLocator/>
+	</Application.DataTemplates>
+
 </Application>
