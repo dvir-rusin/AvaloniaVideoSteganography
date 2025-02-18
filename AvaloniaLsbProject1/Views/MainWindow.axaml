@@ -7,35 +7,92 @@
         Title="Video Steganography"
         Width="800" Height="600">
 
-	<!-- Full-Screen Gradient Background -->
-	<Window.Background>
-		<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-			<GradientStop Color="#1E223D" Offset="0"/>
-			<GradientStop Color="#12141B" Offset="1"/>
-		</LinearGradientBrush>
-	</Window.Background>
+	<Window.Styles>
+		<Style Selector="MenuItem">
+			<Setter Property="Padding" Value="15,10"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+		</Style>
 
-	<DockPanel>
-		<!-- Top Navigation Bar -->
-		<Border DockPanel.Dock="Top" Background="#2A2F50" Padding="10" Opacity="0.95">
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
-				<MenuItem Header="🏠 Home"
-          Command="{Binding NavigateToHomeCommand}"
-          Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Home}"/>
-				<MenuItem Header="🔒 Embed Message"
-						  Command="{Binding NavigateToEmbedCommand}"
-						  Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Embed}"/>
-				<MenuItem Header="🔓 Extract Message"
-						  Command="{Binding NavigateToExtractCommand}"
-						  Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Extract}"/>
-				<MenuItem Header="📺 Stream and Play Video"
-						  Command="{Binding NavigateToStreamCommand}"
-						  Background="{Binding CurrentPage, Converter={StaticResource PageToColorConverter}, ConverterParameter=Stream}"/>
+		<Style Selector="MenuItem:pointerover">
+			<Setter Property="Background" Value="#424B82"/>
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.2"/>
+				</Transitions>
+			</Setter>
+		</Style>
 
-			</StackPanel>
-		</Border>
+		<Style Selector="MenuItem.active">
+			<Setter Property="Background" Value="#2D3250"/>
+		</Style>
+	</Window.Styles>
 
-		<!-- Main Content Area -->
-		<ContentControl x:Name="ContentArea"/>
-	</DockPanel>
+	<Grid>
+		<Grid.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+				<GradientStop Color="#1E223D" Offset="0"/>
+				<GradientStop Color="#12141B" Offset="0.7"/>
+				<GradientStop Color="#0D0F15" Offset="1"/>
+			</LinearGradientBrush>
+		</Grid.Background>
+
+		<DockPanel>
+			<!-- Top Navigation Bar -->
+			<Border DockPanel.Dock="Top"
+                    Background="#1A1E36"
+                    BorderThickness="0,0,0,1"
+                    BorderBrush="#2D3250">
+
+				<StackPanel Margin="0,15">
+					<!-- App Title -->
+					<TextBlock Text="Video Steganography"
+                             FontSize="24"
+                             FontWeight="Bold"
+                             Foreground="White"
+                             HorizontalAlignment="Center"
+                             Margin="0,0,0,15"/>
+
+					<!-- Navigation Menu -->
+					<StackPanel Orientation="Horizontal"
+                              HorizontalAlignment="Center"
+                              Spacing="10">
+						<MenuItem Header="🏠 Home"
+                                  Command="{Binding NavigateToHomeCommand}"
+                                  Classes.active="{Binding CurrentPage, 
+                                    Converter={StaticResource PageToColorConverter}, 
+                                    ConverterParameter=Home}"/>
+						<MenuItem Header="🔒 Embed Message"
+                                  Command="{Binding NavigateToEmbedCommand}"
+                                  Classes.active="{Binding CurrentPage, 
+                                    Converter={StaticResource PageToColorConverter}, 
+                                    ConverterParameter=Embed}"/>
+						<MenuItem Header="🔓 Extract Message"
+                                  Command="{Binding NavigateToExtractCommand}"
+                                  Classes.active="{Binding CurrentPage, 
+                                    Converter={StaticResource PageToColorConverter}, 
+                                    ConverterParameter=Extract}"/>
+						<MenuItem Header="📺 Stream Video"
+                                  Command="{Binding NavigateToStreamCommand}"
+                                  Classes.active="{Binding CurrentPage, 
+                                    Converter={StaticResource PageToColorConverter}, 
+                                    ConverterParameter=Stream}"/>
+					</StackPanel>
+				</StackPanel>
+			</Border>
+
+			<!-- Main Content Area -->
+			<ContentControl x:Name="ContentArea">
+				<ContentControl>
+					<PageSlide Duration="0.2"
+                              Orientation="Horizontal"
+                              SlideInEasing="CubicEaseOut"
+                              SlideOutEasing="CubicEaseIn"/>
+				</ContentControl>
+			</ContentControl>
+		</DockPanel>
+	</Grid>
 </Window>

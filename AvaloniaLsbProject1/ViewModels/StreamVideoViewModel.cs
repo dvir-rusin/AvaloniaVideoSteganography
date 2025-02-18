@@ -60,6 +60,7 @@ namespace AvaloniaLsbProject1.ViewModels
 
         public IAsyncRelayCommand DownloadStreamCommand { get; }
 
+        // Select a video file loads its attributes 
         private async Task SelectVideoAsync()
         {
             try
@@ -80,6 +81,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     SelectedVideoPath = result[0];
                     await LoadVideoAttributesAsync(SelectedVideoPath);
+
                 }
                 else
                 {
@@ -135,23 +137,37 @@ namespace AvaloniaLsbProject1.ViewModels
 
             try
             {
-                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; 
-                string arguments = $"-re -i \"{SelectedVideoPath}\" - c:v libx264rgb -t 2.2 - preset veryfast - qp 0 - pix_fmt bgr24 - f mpegts udp://{MulticastIP}:{Port}";
+                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe";
+                //string arguments = $"-re -i \"{SelectedVideoPath}\" -c:v libx264rgb -t 2.2 -preset veryfast -qp 0 -pix_fmt bgr24 -f mpegts udp://{MulticastIP}:{Port}";
+                string arguments = $" -re -i \"{SelectedVideoPath}\" -c:v libx264 -f mpegts udp://{MulticastIP}:{Port}";
                 Process ffmpegProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = ffmpegPath,
                         Arguments = arguments,
+                        WorkingDirectory = Path.GetDirectoryName(ffmpegPath),
                         UseShellExecute = false,
                         RedirectStandardOutput = false,
-                        RedirectStandardError = false,
-                        CreateNoWindow = true
+                        RedirectStandardError = true,  // Redirect error stream
+                        CreateNoWindow = false
+                    }
+                };
+
+                ffmpegProcess.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        // You can log this output or display it in your UI.
+                        Debug.WriteLine(e.Data);
                     }
                 };
 
                 ffmpegProcess.Start();
+                ffmpegProcess.BeginErrorReadLine();
                 ErrorMessage = $"Streaming to {MulticastIP}:{Port}...";
+
+
             }
             catch (Exception ex)
             {
@@ -159,27 +175,7 @@ namespace AvaloniaLsbProject1.ViewModels
             }
         }
 
-        private void StopStream()
-        {
-            if (ffmpegProcess != null && !ffmpegProcess.HasExited)
-            {
-                try
-                {
-                    ffmpegProcess.Kill(); // Terminate the FFmpeg process
-                    ffmpegProcess.Dispose();
-                    ffmpegProcess = null;
-                    ErrorMessage = "Streaming stopped.";
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessage = $"Error stopping stream: {ex.Message}";
-                }
-            }
-            else
-            {
-                ErrorMessage = "No active stream to stop.";
-            }
-        }
+
 
         private async Task PlayVideoAsync()
         {
@@ -234,7 +230,7 @@ namespace AvaloniaLsbProject1.ViewModels
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
                 string outputDirectory = @"C:\AvaloniaVideoStenagraphy"; // Desired output directory
-                string outputFile = Path.Combine(outputDirectory, "stream_capture.mp4"); // Combine directory and filename
+                string outputFile = Path.Combine(outputDirectory, "stream_capture.mp4feb11"); // Combine directory and filename
                 string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t 2 \"{outputFile}\"";
 
 
@@ -247,12 +243,12 @@ namespace AvaloniaLsbProject1.ViewModels
                         UseShellExecute = false,
                         RedirectStandardOutput = false,
                         RedirectStandardError = true,
-                        CreateNoWindow = true
+                        CreateNoWindow = false
                     }
                 };
 
                 ffmpegProcess.Start();
-                ErrorMessage = $"Downloading stream to {outputFile} for {Duration} seconds...";
+                ErrorMessage = $"Downloading stream to {outputFile} for 2 seconds...";
                 await ffmpegProcess.WaitForExitAsync(); // Wait for the process to finish
                 ErrorMessage = "Stream download completed.";
             }

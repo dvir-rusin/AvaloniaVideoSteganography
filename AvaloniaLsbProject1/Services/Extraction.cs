@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
 
@@ -68,20 +70,21 @@ namespace AvaloniaLsbProject1.Services
 
         public static string ExtractMessageFromIFrames(string IframeDirectory,string password)
         {
-            Console.WriteLine("meow");
-            Console.WriteLine("");
+           
             Console.WriteLine("Extracting message from frames...");
             // Get the first image to read the message length
             string MESSAGE = "NULL";
+
+            //added delay so it does not look for an I frame not existed yet
+            Thread.Sleep(1000);
             string firstFramePath = Directory.GetFiles(IframeDirectory, "*.png").FirstOrDefault();
+            
             if (firstFramePath == null)
             {
                 MESSAGE = "No frames found in the directory.";
                 Console.WriteLine("-exiting-");
                 return MESSAGE;
             }
-
-
 
             foreach (string filePath in Directory.GetFiles(IframeDirectory, "*.png"))
             {
@@ -94,9 +97,7 @@ namespace AvaloniaLsbProject1.Services
                     //Console.WriteLine("msglen:" + messageLength);
                     MESSAGE = GetHiddenMessage(frameBitmap,password);
                     MESSAGE = ("Hidden Message: " + MESSAGE);
-                    
                 }
-               
                 return MESSAGE;
             }
             return MESSAGE;
@@ -111,8 +112,19 @@ namespace AvaloniaLsbProject1.Services
             int messageBitsExtracted = 0;
             Color pixelColor;
             string HiddenMsg = "null";
+            bool DoesContainMessage = true;
 
-            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height; i++)
+            for (int i = 1;i<=4;i++)
+            {
+                if (frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1) != Color.FromArgb(254, 1, 1))
+                {
+                    DoesContainMessage = false;
+                    HiddenMsg = "this video does not contain a message ";
+                    break;
+                }
+            }
+            
+            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && DoesContainMessage; i++)
             {
                 int x = i % frameBitmap.Width;
                 int y = i / frameBitmap.Width;
@@ -130,8 +142,6 @@ namespace AvaloniaLsbProject1.Services
                     }
 
                 }
-
-
 
                 binaryMessage.Append((pixelColor.G & 1) == 1 ? "1" : "0");
                 messageBitsExtracted++;
@@ -166,27 +176,29 @@ namespace AvaloniaLsbProject1.Services
 
             Console.WriteLine("\nEnter the custom key to decrypt:");
             string inputKey = password; // Read the custom key from the user for decryption
-            string decrypted = "null";
-
-            try
+            string decrypted = "this video does not contain a message ";
+            if (DoesContainMessage == true)
             {
-                // Attempt to decrypt the ciphertext with the user-provided key
-                decrypted = EncryptionAes.Decrypt(HiddenMsg, inputKey);
-                Console.WriteLine($"Decrypted Text: {decrypted}");
+                try
+                {
+                    decrypted = "this video contains a message was unable to decrypt ";
+                    // Attempt to decrypt the ciphertext with the user-provided key
+                    decrypted = EncryptionAes.Decrypt(HiddenMsg, inputKey);
+                    Console.WriteLine($"Decrypted Text: {decrypted}");
+                }
+                catch
+                {
+                    // Handle decryption failure (e.g., incorrect custom key)
+                    decrypted = ("Decryption failed. Check your custom key.");
+                }
             }
-            catch
-            {
-                // Handle decryption failure (e.g., incorrect custom key)
-                Console.WriteLine("Decryption failed. Check your custom key.");
-            }
-
             return decrypted;
             //string extractedMessage = lsbExtractIFramesProject.HelperFunctions.BinaryToString(binaryMessage.ToString());
             //Console.WriteLine($"Extracted Message: {extractedMessage}");
 
         }
 
-
+        //this functions prints the last 4 pixels of the image
         public static void GetPixelColor(string filePath)
         {
             
@@ -209,6 +221,7 @@ namespace AvaloniaLsbProject1.Services
 
         }
 
+        //this functions checks if the last character in the hidden message is a null character
         private static bool NullCheck(string HiddenMsg, int messageBitsExtracted)
         {
 
@@ -229,7 +242,8 @@ namespace AvaloniaLsbProject1.Services
             FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Adjust this path as necessary
 
             // Use ffprobe to extract frame metadata
-            var ffprobeCommand = $"ffprobe -i \"{videoFilePath}\" -select_streams v:0 -show_entries frame=pict_type -of csv=p=0 > \"{metadataFile}\"";
+            var ffprobeCommand = $"ffprobe -v error -i \"{videoFilePath}\" -select_streams v:0 -show_entries frame=pict_type -of csv=p=0 > \"{metadataFile}\"";
+
 
             Console.WriteLine("Extracting frame metadata...");
             await RunCommand(ffprobeCommand);
@@ -241,7 +255,7 @@ namespace AvaloniaLsbProject1.Services
             var processStartInfo = new ProcessStartInfo("cmd", "/C " + command)
             {
                 RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                RedirectStandardError = false,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
@@ -263,13 +277,7 @@ namespace AvaloniaLsbProject1.Services
         }
 
 
-        private static bool IsIFrame(Bitmap frame)
-        {
-            // Use metadata from FFmpeg or pixel properties to detect if the frame is an I-frame
-            // For now, this is a placeholder returning `true` for demonstration
-
-            return true; // Replace with actual detection logic
-        }
+        
 
 
         public static async Task<int[]> GetIFrameLocations(string metadataFile)
@@ -304,7 +312,7 @@ namespace AvaloniaLsbProject1.Services
                     }
 
                     // Output the locations for debugging purposes
-                    Console.WriteLine($"I-Frame Locations: {string.Join(", ", iFrameLocations)}");
+                    Console.Write($"I-Frame Locations: {string.Join(", ", iFrameLocations)}");
                     break; // Exit the loop if successful
                 }
                 catch (IOException ex) when (ex.Message.Contains("being used by another process"))

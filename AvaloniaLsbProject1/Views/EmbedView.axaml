@@ -3,98 +3,185 @@
              xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
              x:Class="AvaloniaLsbProject1.Views.EmbedView"
              x:DataType="vm:EmbedViewModel">
+	<UserControl.Styles>
+		
+		<!-- Define reusable styles -->
+		
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#2D3250"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Padding" Value="20,12"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+
+		<Style Selector="Button:pointerover">
+			<Setter Property="Background" Value="#424B82"/>
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.2"/>
+				</Transitions>
+			</Setter>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="Background" Value="#282C4A"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="Padding" Value="12,8"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="#3D4266"/>
+		</Style>
+
+		<Style Selector="TextBlock.label">
+			<Setter Property="Foreground" Value="#B8BCD2"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
+
+		<Style Selector="TextBlock.header-text">
+			<Setter Property="FontSize" Value="28"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+
+		<Style Selector="TextBlock.tagline">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Foreground" Value="#8C91B6"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Styles>
+
 	<Grid>
-		<!-- Full-Screen Gradient Background -->
 		<Grid.Background>
-			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+			<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
 				<GradientStop Color="#1E223D" Offset="0"/>
-				<GradientStop Color="#12141B" Offset="1"/>
+				<GradientStop Color="#12141B" Offset="0.7"/>
+				<GradientStop Color="#0D0F15" Offset="1"/>
 			</LinearGradientBrush>
 		</Grid.Background>
-		<!-- Scrollable Content -->
+
 		<ScrollViewer VerticalScrollBarVisibility="Auto">
-			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30" Margin="20">
-				<!-- Header Section -->
-				<Border Classes="header-border">
-					<TextBlock Text="Embed Your Secret Message" Classes="header-text"/>
-				</Border>
-				<!-- Tagline -->
-				<TextBlock Text="Conceal your message securely within your video" Classes="tagline"/>
-				<!-- Embed Form Panel -->
-				<StackPanel Spacing="20">
+			<Border Background="#1A1E36"
+                    CornerRadius="16"
+                    Margin="20,40"
+                    MaxWidth="800"
+                    BoxShadow="0 4 20 0 #0F111A">
+				<StackPanel Margin="40,30" Spacing="25">
+					<!-- Header Section -->
+					<StackPanel Spacing="10">
+						<TextBlock Text="Embed Your Secret Message" Classes="header-text"/>
+						<TextBlock Text="Conceal your message securely within your video" Classes="tagline"/>
+					</StackPanel>
+
 					<!-- Video Selection -->
-					<TextBlock Text="Select Video" Classes="label"/>
-					<StackPanel Orientation="Horizontal" Spacing="10">
-						<Button Content="Browse Video"
-								Command="{Binding SelectVideoCommand}"
-								ToolTip.Tip="Select a video file"/>
-						<TextBox Text="{Binding SelectedVideoPath}"
-								 IsReadOnly="True"
-								 VerticalAlignment="Center"
-								 Width="320"/>
-					</StackPanel>
+					<Border Background="#242842" CornerRadius="12" Padding="20">
+						<StackPanel Spacing="15">
+							<TextBlock Text="Video Selection" Classes="label"/>
+							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+								<Button Grid.Column="0"
+                                        Content="Browse Video"
+                                        Command="{Binding SelectVideoCommand}"/>
+								<TextBox Grid.Column="1"
+                                         Text="{Binding SelectedVideoPath}"
+                                         IsReadOnly="True"
+                                         Margin="10,0,0,0"/>
+							</Grid>
+						</StackPanel>
+					</Border>
+
 					<!-- Video Attributes -->
-					<TextBlock Text="Video Attributes" Classes="label"/>
-					<StackPanel Orientation="Vertical" Margin="10" Spacing="5">
-						<TextBlock Foreground="White">
-							<Run Text="Height: "/>
-							<Run Text="{Binding Height}"/>
-						</TextBlock>
-						<TextBlock Foreground="White">
-							<Run Text="Width: "/>
-							<Run Text="{Binding Width}"/>
-						</TextBlock>
-						<TextBlock Foreground="White">
-							<Run Text="Frame Rate: "/>
-							<Run Text="{Binding FrameRate}"/>
-						</TextBlock>
-						<TextBlock Foreground="White">
-							<Run Text="Bit Rate: "/>
-							<Run Text="{Binding BitRate}"/>
-						</TextBlock>
-						<TextBlock Foreground="White">
-							<Run Text="Duration: "/>
-							<Run Text="{Binding Duration}"/>
-						</TextBlock>
+					<Border Background="#242842" CornerRadius="12" Padding="20">
+						<StackPanel Spacing="15">
+							<TextBlock Text="Video Attributes" Classes="label"/>
+							<UniformGrid Columns="2" Rows="3">
+								<StackPanel Margin="5">
+									<TextBlock Text="Height" Foreground="#8C91B6"/>
+									<TextBlock Text="{Binding Height}" Foreground="White"/>
+								</StackPanel>
+								<StackPanel Margin="5">
+									<TextBlock Text="Width" Foreground="#8C91B6"/>
+									<TextBlock Text="{Binding Width}" Foreground="White"/>
+								</StackPanel>
+								<StackPanel Margin="5">
+									<TextBlock Text="Frame Rate" Foreground="#8C91B6"/>
+									<TextBlock Text="{Binding FrameRate}" Foreground="White"/>
+								</StackPanel>
+								<StackPanel Margin="5">
+									<TextBlock Text="Bit Rate" Foreground="#8C91B6"/>
+									<TextBlock Text="{Binding BitRate}" Foreground="White"/>
+								</StackPanel>
+								<StackPanel Margin="5" Grid.ColumnSpan="2">
+									<TextBlock Text="Duration" Foreground="#8C91B6"/>
+									<TextBlock Text="{Binding Duration}" Foreground="White"/>
+								</StackPanel>
+							</UniformGrid>
+						</StackPanel>
+					</Border>
+
+					<!-- Message Input -->
+					<Border Background="#242842" CornerRadius="12" Padding="20">
+						<StackPanel Spacing="15">
+							<TextBlock Text="Message Details" Classes="label"/>
+							<StackPanel Spacing="15">
+								<StackPanel Spacing="5">
+									<TextBlock Text="Text to Encrypt" Classes="label"/>
+									<TextBox Text="{Binding MessageText}"
+                                             Watermark="Enter your secret message"
+                                             Height="80"
+                                             AcceptsReturn="True"/>
+								</StackPanel>
+								<StackPanel Spacing="5">
+									<TextBlock Text="Encryption Password" Classes="label"/>
+									<TextBox Text="{Binding EncryptionPassword}"
+                                             Watermark="Enter a strong password"
+                                             PasswordChar="•"/>
+								</StackPanel>
+								<StackPanel Spacing="5">
+									<TextBlock Text="New Video Name" Classes="label"/>
+									<TextBox Text="{Binding VideoNameAndFormat}"
+                                             Watermark="NewVideo.mp4"/>
+								</StackPanel>
+							</StackPanel>
+						</StackPanel>
+					</Border>
+
+					<!-- Action Buttons -->
+					<StackPanel Spacing="15" HorizontalAlignment="Center">
+						<Button Content="Embed Message"
+                                Command="{Binding EmbeddMessageCommand}"
+                                Width="300"
+                                Height="45"
+                                FontSize="16"
+                                FontWeight="Bold"/>
+
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<Button Content="Play Video"
+                                    Command="{Binding PlayVideoCommand}"
+                                    Width="145"/>
+							<Button Content="Back to Home"
+                                    Name="BackButton"
+                                    Width="145"/>
+						</StackPanel>
 					</StackPanel>
-					<!-- Text to Encrypt -->
-					<TextBlock Text="Text to Encrypt" Classes="label"/>
-					<TextBox Text="{Binding MessageText}"
-							 Watermark="Enter your secret message"
-							 Width="320"/>
-					<!-- Encryption Password -->
-					<TextBlock Text="Encryption Password" Classes="label"/>
-					<TextBox Text="{Binding EncryptionPassword}"
-							 Watermark="Enter a strong password"
-							 Width="320"/>
-					<!-- New Video Name -->
-					<TextBlock Text="New Video Name" Classes="label"/>
-					<TextBox Text="{Binding VideoNameAndFormat}"
-							 Watermark="NewVideo.mp4"
-							 Width="320"/>
-					<!-- Embed Message Button -->
-					<Button Content="Embed Message"
-							Command="{Binding EmbeddMessageCommand}"
-							Width="250"
-							HorizontalAlignment="Center"/>
+
 					<!-- Error Messages -->
-					<TextBlock Text="Error Messages" Classes="label"/>
-					<TextBox Text="{Binding ErrorMessage}"
-							 Height="100"
-							 Width="320"
-							 IsReadOnly="True"
-							 AcceptsReturn="True"/>
-					<!-- Playback and Navigation -->
-					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-						<Button Content="Play Video"
-								Command="{Binding PlayVideoCommand}"
-								Width="200"/>
-						<Button Content="Back to Home"
-								Name="BackButton"
-								Width="200"/>
-					</StackPanel>
+					<Border Background="#2A1E1E"
+                            BorderBrush="#FF4444"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            IsVisible="{Binding !!ErrorMessage}">
+						<TextBox Text="{Binding ErrorMessage}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 IsReadOnly="True"
+                                 AcceptsReturn="True"
+                                 Margin="10"/>
+					</Border>
 				</StackPanel>
-			</StackPanel>
+			</Border>
 		</ScrollViewer>
 	</Grid>
 </UserControl>

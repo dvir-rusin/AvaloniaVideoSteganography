@@ -3,64 +3,143 @@
              xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
              x:Class="AvaloniaLsbProject1.Views.ExtractView"
              x:DataType="vm:ExtractViewModel">
+	<UserControl.Styles>
+		<!-- Define reusable styles -->
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#2D3250"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Padding" Value="20,12"/>
+			<Setter Property="Cursor" Value="Hand"/>
+		</Style>
+
+		<Style Selector="Button:pointerover">
+			<Setter Property="Background" Value="#424B82"/>
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.2"/>
+				</Transitions>
+			</Setter>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="Background" Value="#282C4A"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="Padding" Value="12,8"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="#3D4266"/>
+		</Style>
+
+		<Style Selector="TextBlock.label">
+			<Setter Property="Foreground" Value="#B8BCD2"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
+
+		<Style Selector="TextBlock.header-text">
+			<Setter Property="FontSize" Value="28"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+
+		<Style Selector="TextBlock.tagline">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Foreground" Value="#8C91B6"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Styles>
+
 	<Grid>
-		<!-- Full-Screen Gradient Background -->
 		<Grid.Background>
-			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+			<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
 				<GradientStop Color="#1E223D" Offset="0"/>
-				<GradientStop Color="#12141B" Offset="1"/>
+				<GradientStop Color="#12141B" Offset="0.7"/>
+				<GradientStop Color="#0D0F15" Offset="1"/>
 			</LinearGradientBrush>
 		</Grid.Background>
-		<!-- Scrollable Content -->
+
 		<ScrollViewer VerticalScrollBarVisibility="Auto">
-			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30" Margin="20">
-				<!-- Header Section -->
-				<Border Classes="header-border">
-					<TextBlock Text="Extract Hidden Message" Classes="header-text"/>
-				</Border>
-				<!-- Tagline -->
-				<TextBlock Text="Retrieve your hidden secrets with ease" Classes="tagline"/>
-				<!-- Extraction Form Panel -->
-				<StackPanel Spacing="20">
-					<!-- Video Selection -->
-					<TextBlock Text="Select Video" Classes="label"/>
-					<StackPanel Orientation="Horizontal" Spacing="10">
-						<Button Content="Browse Video"
-								Command="{Binding SelectVideoCommand}"
-								ToolTip.Tip="Select the video file"/>
-						<TextBox Text="{Binding SelectedVideoPath}"
-								 IsReadOnly="True"
-								 VerticalAlignment="Center"
-								 Width="320"/>
+			<Border Background="#1A1E36"
+                    CornerRadius="16"
+                    Margin="20,40"
+                    MaxWidth="800"
+                    BoxShadow="0 4 20 0 #0F111A">
+				<StackPanel Margin="40,30" Spacing="25">
+					<!-- Header Section -->
+					<StackPanel Spacing="10">
+						<TextBlock Text="Extract Hidden Message" Classes="header-text"/>
+						<TextBlock Text="Retrieve your hidden secrets with ease" Classes="tagline"/>
 					</StackPanel>
-					<!-- Password Input -->
-					<TextBlock Text="Enter Decryption Password" Classes="label"/>
-					<TextBox Text="{Binding DecryptionPassword}"
-							 Watermark="Enter your password"
-							 Width="320"/>
-					<!-- Extract Button -->
-					<Button Content="Extract Message"
-							Command="{Binding ExtractMessageCommand}"
-							Width="250"
-							HorizontalAlignment="Center"/>
+
+					<!-- Video Selection -->
+					<Border Background="#242842" CornerRadius="12" Padding="20">
+						<StackPanel Spacing="15">
+							<TextBlock Text="Video Selection" Classes="label"/>
+							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+								<Button Grid.Column="0"
+                                        Content="Browse Video"
+                                        Command="{Binding SelectVideoCommand}"/>
+								<TextBox Grid.Column="1"
+                                         Text="{Binding SelectedVideoPath}"
+                                         IsReadOnly="True"
+                                         Margin="10,0,0,0"/>
+							</Grid>
+						</StackPanel>
+					</Border>
+
+					<!-- Password Section -->
+					<Border Background="#242842" CornerRadius="12" Padding="20">
+						<StackPanel Spacing="15">
+							<TextBlock Text="Decryption" Classes="label"/>
+							<StackPanel Spacing="5">
+								<TextBlock Text="Password" Classes="label"/>
+								<TextBox Text="{Binding DecryptionPassword}"
+                                         Watermark="Enter your decryption password"
+                                         PasswordChar="•"/>
+								<Button Content="Extract Message"
+                                        Command="{Binding ExtractMessageCommand}"
+                                        Margin="0,10,0,0"
+                                        HorizontalAlignment="Center"
+                                        Width="200"/>
+							</StackPanel>
+						</StackPanel>
+					</Border>
+
 					<!-- Error Messages -->
-					<TextBlock Text="Error Messages" Classes="label"/>
-					<TextBox Text="{Binding ErrorMessage}"
-							 Height="100"
-							 Width="320"
-							 IsReadOnly="True"
-							 AcceptsReturn="True"/>
-					<!-- Playback and Navigation -->
-					<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+					<Border Background="#2A1E1E"
+                            BorderBrush="#FF4444"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            IsVisible="{Binding !!ErrorMessage}">
+						<StackPanel Spacing="5" Margin="15">
+							<TextBlock Text="Error"
+                                      Foreground="#FF6666"
+                                      FontWeight="SemiBold"/>
+							<TextBox Text="{Binding ErrorMessage}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"/>
+						</StackPanel>
+					</Border>
+
+					<!-- Navigation -->
+					<StackPanel Orientation="Horizontal"
+                              HorizontalAlignment="Center"
+                              Spacing="10"
+                              Margin="0,10,0,0">
 						<Button Content="Play Video"
-								Command="{Binding PlayVideoCommand}"
-								Width="200"/>
+                                Command="{Binding PlayVideoCommand}"
+                                Width="145"/>
 						<Button Content="Back to Home"
-								Name="BackButton"
-								Width="200"/>
+                                Name="BackButton"
+                                Width="145"/>
 					</StackPanel>
 				</StackPanel>
-			</StackPanel>
+			</Border>
 		</ScrollViewer>
 	</Grid>
 </UserControl>

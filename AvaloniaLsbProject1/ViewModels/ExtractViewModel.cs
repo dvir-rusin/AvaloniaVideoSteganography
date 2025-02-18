@@ -71,12 +71,13 @@ namespace AvaloniaLsbProject1.ViewModels
                 }
 
                 //inserts new video i frames into folder 
-                Services.Extraction.ExtractIFrames(selectedVideoPath, NewVideoIframes);
+                await Services.Extraction.ExtractIFrames(selectedVideoPath, NewVideoIframes);
 
                 
                 if (decryptionPassword != null)
                 {
                     ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(NewVideoIframes, decryptionPassword);
+                    Directory.Delete(NewVideoIframes,true);
                 }
             }
             catch (Exception ex)

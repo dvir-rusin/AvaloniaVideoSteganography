@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AvaloniaLsbProject1.Services
@@ -43,7 +44,7 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("Binary Length: " + binaryLength);
             int indexer = 0;
 
-
+            Thread.Sleep(20000);
 
             foreach (string filePath in Directory.GetFiles(inputframesDirectory, "*.png"))
             {
@@ -97,10 +98,11 @@ namespace AvaloniaLsbProject1.Services
                                     //bitmap.SetPixel(1006, 1000, Color.FromArgb(254, 0, 0));
                                     //bitmap.SetPixel(1007, 1000, Color.FromArgb(254, 0, 0));
 
-                                    //bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
-                                    //bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 2, Color.FromArgb(254, 1, 1));
-                                    //bitmap.SetPixel(bitmap.Width - 3, bitmap.Height - 3, Color.FromArgb(254, 1, 1));
-                                    //bitmap.SetPixel(bitmap.Width - 4, bitmap.Height - 4, Color.FromArgb(254, 1, 1));
+                                    //creating an indication for message or no message 4 pixel with specific color 
+                                    bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
+                                    bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
+                                    bitmap.SetPixel(bitmap.Width - 3, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
+                                    bitmap.SetPixel(bitmap.Width - 4, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
                                 }
 
                                 bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
@@ -116,8 +118,17 @@ namespace AvaloniaLsbProject1.Services
                     //if (messageComplete) break; // Stop for only checking the first frame break will be removed later on
                 }
             }
+            string firstFramePath = Directory.GetFiles(outputframesDirectrory, "*.png").FirstOrDefault();
 
-            ErrorMessage = "Message embedded in all frames.";
+            if (firstFramePath == null)
+            {
+                ErrorMessage = "No frames found in allFramesWithMessageFolder directory.";
+            }
+            else
+            {
+                ErrorMessage = "Message embedded in all frames.";
+            }
+           
             return ErrorMessage;
         }
 

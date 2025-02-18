@@ -9,6 +9,8 @@ using System.IO;
 using AvaloniaLsbProject1.Services;
 using Xabe.FFmpeg;
 using System.Linq;
+using System.Threading;
+using Tmds.DBus.Protocol;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -86,6 +88,8 @@ namespace AvaloniaLsbProject1.ViewModels
         }
         private async Task SelectVideoAsync()
         {
+            string projectPath = "C:\\AvaloniaVideoStenagraphy";
+            string metaDataFile = Path.Combine(projectPath, "MetaData.csv");
             try
             {
                 var dialog = new OpenFileDialog
@@ -105,6 +109,11 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     SelectedVideoPath = result[0];
                     await LoadVideoAttributesAsync(SelectedVideoPath); // Extract attributes after selection
+                    if (!File.Exists(metaDataFile))
+                    {
+                        using (File.Create(metaDataFile)) { }
+                        Extraction.ExtractFrameMetadata(SelectedVideoPath, metaDataFile);
+                    }
 
 
                 }
@@ -184,14 +193,39 @@ namespace AvaloniaLsbProject1.ViewModels
             {
                 try
                 {
-                    //await Services.Extraction.ExtractFrameMetadata(selectedVideoPath, metaDataFile);
-                    int[] iframesLocation = await Services.Extraction.GetIFrameLocations(metaDataFile);
-
-                    if (!Directory.Exists(allFramesWithMessageFolder))
+                    if(File.Exists(metaDataFile))
                     {
-                        Directory.CreateDirectory(allFramesWithMessageFolder);
-                        ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(allFramesFolder, allFramesWithMessageFolder, iframesLocation,messageText,password);
+                        int[] iframesLocation = await Services.Extraction.GetIFrameLocations(metaDataFile);
+
+
+
+
+                        if (!Directory.Exists(allFramesWithMessageFolder))
+                        {
+                            Directory.CreateDirectory(allFramesWithMessageFolder);
+
+                            Thread.Sleep(1000);
+                            ErrorMessage = "EMBEDDING MESSAGE IN FRAMES";
+                            ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(allFramesFolder, allFramesWithMessageFolder, iframesLocation, messageText, password);
+
+                            string firstFramePath = Directory.GetFiles(allFramesWithMessageFolder, "*.png").FirstOrDefault();
+
+                            if (firstFramePath == null)
+                            {
+                                ErrorMessage = "No frames found in allFramesWithMessageFolder directory.";
+                                return;
+                            }
+                        }
+
                     }
+                    else
+                    {
+                        ErrorMessage = "metaDataFile does not exist ";
+                        return;
+                    }
+                    
+                    //await Services.Extraction.ExtractFrameMetadata(selectedVideoPath, metaDataFile);
+                    
 
 
                 }
@@ -207,10 +241,13 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     Services.HelperFunctions.ReconstructVideo(allFramesWithMessageFolder, NewVideo, 30);
                     //ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(allFramesWithMessageFolder,"123");
+                    ErrorMessage = "NEW VIDEO HAS BEEN CREATED ";
+                    DeleteDirectoryAndFiles(allFramesWithMessageFolder, allFramesFolder, metaDataFile);
+
                 }
                 catch(Exception ex)
                 {
-                    ErrorMessage = ex.Message; 
+                    ErrorMessage = ex.Message;
                 }
             }
             else
@@ -220,6 +257,18 @@ namespace AvaloniaLsbProject1.ViewModels
             
         }
 
+        private void DeleteDirectoryAndFiles(string allFramesWithMessageFolder, string allFramesFolder, string metaDataFile)
+        {
+            try
+            {
+                Directory.Delete(allFramesWithMessageFolder,true);
+                Directory.Delete(allFramesFolder,true);
+                File.Delete(metaDataFile);
+            }
+            catch (Exception ex) {
+                ErrorMessage = ex.Message;
+            }
+        }
         private async Task PlayVideoAsync()
         {
             if (selectedVideoPath != null)

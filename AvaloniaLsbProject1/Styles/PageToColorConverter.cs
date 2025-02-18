@@ -4,7 +4,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media;
 using System.Diagnostics;
 
-namespace AvaloniaLsbProject1.Services
+namespace AvaloniaLsbProject1.Styles
 {
     public class PageToColorConverter : IValueConverter
     {
