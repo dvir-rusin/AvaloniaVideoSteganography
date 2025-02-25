@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:services="clr-namespace:AvaloniaLsbProject1.Services"
+             xmlns:styles="clr-namespace:AvaloniaLsbProject1.Styles"
              xmlns:local="using:AvaloniaLsbProject1"
              x:Class="AvaloniaLsbProject1.App"
              RequestedThemeVariant="Default">
@@ -9,7 +9,7 @@
 	<!-- Application Resources -->
 	<Application.Resources>
 		<!-- Register the PageToColorConverter -->
-		<services:PageToColorConverter x:Key="PageToColorConverter"/>
+		<styles:PageToColorConverter x:Key="PageToColorConverter"/>
 	</Application.Resources>
 
 	<Application.Styles>

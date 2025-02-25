@@ -138,8 +138,41 @@ namespace AvaloniaLsbProject1.ViewModels
             try
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe";
+
+                string fileExtension = Path.GetExtension(SelectedVideoPath).ToLower();
                 //string arguments = $"-re -i \"{SelectedVideoPath}\" -c:v libx264rgb -t 2.2 -preset veryfast -qp 0 -pix_fmt bgr24 -f mpegts udp://{MulticastIP}:{Port}";
-                string arguments = $" -re -i \"{SelectedVideoPath}\" -c:v libx264 -f mpegts udp://{MulticastIP}:{Port}";
+                //string arguments = $" -re -i \"{SelectedVideoPath}\" -c:v libx264 -f mpegts udp://{MulticastIP}:{Port}";
+                string arguments;
+
+                // Configure streaming parameters based on file format
+                switch (fileExtension)
+                {
+                    case ".mp4":
+                        // For MP4: Direct stream with minimal processing when possible
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 2.2 -f mpegts udp://{MulticastIP}:{Port}";
+                        break;
+
+                    case ".avi":
+                        // For AVI: Often needs transcoding due to container limitations
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
+                        break;
+
+                    case ".mkv":
+                        // For MKV: Try to copy video stream but normalize audio
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c:v copy -c:a aac -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
+                        break;
+
+                    case ".mov":
+                        // For MOV: Apple formats sometimes need specific handling
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
+                        break;
+
+                    default:
+                        // Generic approach for other formats - more conversion but more compatible
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 6 -c:a mp2 -b:a 128k -f mpegts udp://{MulticastIP}:{Port}";
+                        break;
+                }
+                
                 Process ffmpegProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -230,7 +263,7 @@ namespace AvaloniaLsbProject1.ViewModels
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
                 string outputDirectory = @"C:\AvaloniaVideoStenagraphy"; // Desired output directory
-                string outputFile = Path.Combine(outputDirectory, "stream_capture.mp4feb11"); // Combine directory and filename
+                string outputFile = Path.Combine(outputDirectory, "stream_capturefeb25.mp4"); // Combine directory and filename
                 string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t 2 \"{outputFile}\"";
 
 

@@ -122,6 +122,7 @@
 					</Border>
 
 					<!-- Message Input -->
+					<!-- PasswordChar="•" -->
 					<Border Background="#242842" CornerRadius="12" Padding="20">
 						<StackPanel Spacing="15">
 							<TextBlock Text="Message Details" Classes="label"/>
@@ -137,7 +138,7 @@
 									<TextBlock Text="Encryption Password" Classes="label"/>
 									<TextBox Text="{Binding EncryptionPassword}"
                                              Watermark="Enter a strong password"
-                                             PasswordChar="•"/>
+                                             />
 								</StackPanel>
 								<StackPanel Spacing="5">
 									<TextBlock Text="New Video Name" Classes="label"/>

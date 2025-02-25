@@ -57,7 +57,7 @@
 			<StackPanel Margin="40,60" Spacing="40">
 				<!-- Header Section -->
 				<StackPanel Spacing="15">
-					<TextBlock Text="Video Steganography Hub"
+					<TextBlock Text="Video Steganography"
                              Classes="header-text"/>
 					<TextBlock Text="Secure your videos with hidden messages"
                              Classes="tagline"/>
