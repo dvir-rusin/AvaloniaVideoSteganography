@@ -50,6 +50,13 @@
 			<Setter Property="Foreground" Value="#8C91B6"/>
 			<Setter Property="HorizontalAlignment" Value="Center"/>
 		</Style>
+
+		<Style Selector="ProgressBar">
+			<Setter Property="Background" Value="#242842"/>
+			<Setter Property="Foreground" Value="#6D77E6"/>
+			<Setter Property="Height" Value="8"/>
+			<Setter Property="CornerRadius" Value="4"/>
+		</Style>
 	</UserControl.Styles>
 
 	<Grid>
@@ -100,7 +107,7 @@
 								<TextBox Text="{Binding DecryptionPassword}"
                                          Watermark="Enter your decryption password"
                                          />
-								<Button Content="Extract Message"
+								<Button Content="{Binding ExtractButtonText}"
                                         Command="{Binding ExtractMessageCommand}"
                                         Margin="0,10,0,0"
                                         HorizontalAlignment="Center"
@@ -108,6 +115,27 @@
 							</StackPanel>
 						</StackPanel>
 					</Border>
+
+					<!-- Processing Indicator -->
+					<StackPanel IsVisible="{Binding IsProcessing}" Spacing="5">
+						<TextBlock Text="{Binding ProcessingStatusText}"
+								  Foreground="#B8BCD2"
+								  HorizontalAlignment="Center"/>
+						<ProgressBar IsIndeterminate="True" Width="300"/>
+					</StackPanel>
+
+					<!-- Navigation -->
+					<StackPanel Orientation="Horizontal"
+                              HorizontalAlignment="Center"
+                              Spacing="10"
+                              Margin="0,10,0,0">
+						<Button Content="Play Video"
+                                Command="{Binding PlayVideoCommand}"
+                                Width="145"/>
+						<Button Content="Back to Home"
+                                Name="BackButton"
+                                Width="145"/>
+					</StackPanel>
 
 					<!-- Error Messages -->
 					<Border Background="#2A1E1E"
@@ -126,20 +154,8 @@
                                      AcceptsReturn="True"/>
 						</StackPanel>
 					</Border>
-
-					<!-- Navigation -->
-					<StackPanel Orientation="Horizontal"
-                              HorizontalAlignment="Center"
-                              Spacing="10"
-                              Margin="0,10,0,0">
-						<Button Content="Play Video"
-                                Command="{Binding PlayVideoCommand}"
-                                Width="145"/>
-						<Button Content="Back to Home"
-                                Name="BackButton"
-                                Width="145"/>
-					</StackPanel>
 				</StackPanel>
+				
 			</Border>
 		</ScrollViewer>
 	</Grid>

@@ -20,11 +20,21 @@ namespace AvaloniaLsbProject1.ViewModels
 
         [ObservableProperty]
         private string? errorMessage;
+
+        [ObservableProperty]
+        public bool isProcessing;
+
+        [ObservableProperty]
+        public string processingStatusText;
+
+        [ObservableProperty]
+        private string extractButtonText;
         public ExtractViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             ExtractMessageCommand = new AsyncRelayCommand(ExtractMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
+            extractButtonText = "Extract Message";
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
@@ -55,6 +65,13 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private async Task ExtractMessageAsync()
         {
+            if(IsProcessing)
+            {
+                return;
+            }
+            ProcessingStatusText = "Extracting Message";
+            ExtractButtonText = "Extracting Message";
+            IsProcessing = true;
             string projectPath = "C:\\AvaloniaVideoStenagraphy";
             string allFramesFolder = Path.Combine(projectPath, "AllFrames");
             string allFramesWithMessageFolder = Path.Combine(projectPath, "allFramesWithMessage");
@@ -83,6 +100,11 @@ namespace AvaloniaLsbProject1.ViewModels
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                IsProcessing = false;
+                ExtractButtonText = "Extract Message";
             }
                 
             
