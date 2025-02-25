@@ -11,6 +11,8 @@ using Xabe.FFmpeg;
 using System.Linq;
 using System.Threading;
 using Tmds.DBus.Protocol;
+using Avalonia.Media;
+using System.Text;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -46,12 +48,44 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string? duration;
 
+        [ObservableProperty]
+        private string estimatedCapacity;
+
+        [ObservableProperty] 
+        private double capacityUsagePercentage;
+
+        [ObservableProperty]
+        private string capacityUsageText;
+
+        [ObservableProperty]
+        private IBrush capacityColor;
+
+        [ObservableProperty]
+        private string messageLengthInfo;
+
+        [ObservableProperty]
+        public bool isProcessing;
+
+        [ObservableProperty]
+        public string processingStatusText;
+
+        [ObservableProperty]
+        private string embedButtonText;
+
         public EmbedViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
+            EmbedButtonText = "Embed Message";
+
         }
+
+        partial void OnMessageTextChanged(string? oldValue, string? newValue)
+        {
+            UpdateCapacityUsage();
+        }
+
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
 
@@ -64,10 +98,12 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             try
             {
+                ProcessingStatusText = "Analyzing video...";
+                IsProcessing = true;
                 // Use Xabe.FFmpeg to get video metadata
                 var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
                 var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
-
+                
                 if (videoStream != null)
                 {
                     Height = $"{videoStream.Height}";
@@ -80,10 +116,18 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     ErrorMessage = "No video stream found.";
                 }
+                long estimatedBytes = (((videoStream.Width * videoStream.Height) -21)*3/8) ; // minus 4 cuz last 4 pixel are for message validation minus 16 cuz of 16 byte iv and minus 1 cus null termainator =minus 21
+                //still need to calc possible padding for the message
+                EstimatedCapacity = FormatByteSize(estimatedBytes);
+                UpdateCapacityUsage();
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Error extracting video attributes: {ex.Message}";
+            }
+            finally
+            {
+                IsProcessing = false;
             }
         }
         private async Task SelectVideoAsync()
@@ -130,6 +174,11 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private async Task EmbeddMessageAsync()
         {
+            if (IsProcessing)
+            {
+                return;
+            }
+
             if (string.IsNullOrEmpty(MessageText) || string.IsNullOrEmpty(EncryptionPassword))
             {
                 ErrorMessage = "Message text or password is missing.";
@@ -141,6 +190,14 @@ namespace AvaloniaLsbProject1.ViewModels
                 ErrorMessage = "No video file selected. Please select a video file before embedding a message.";
                 return;
             }
+
+            // Clear previous messages
+            ErrorMessage = string.Empty;
+
+            // Set processing state
+            IsProcessing = true;
+            EmbedButtonText = "Processing...";
+            ProcessingStatusText = "Preparing video processing...";
 
             string messageText = MessageText;
             string password = EncryptionPassword;
@@ -249,14 +306,137 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     ErrorMessage = ex.Message;
                 }
+                finally
+                {
+                    IsProcessing = false;
+                    EmbedButtonText = "Embed Message";
+                }
             }
             else
             {
                 ErrorMessage = "allFramesWithMessageFolder does not exist";
             }
             
+            
         }
 
+        
+        private void UpdateCapacityUsage()
+        {
+            if (string.IsNullOrEmpty(EstimatedCapacity))
+            {
+                CapacityUsagePercentage = 0;
+                CapacityUsageText = "N/A";
+                CapacityColor = Brushes.Gray;
+                MessageLengthInfo = "0 chars";
+                return;
+            }
+
+            // Calculate size of data to embed
+            long dataSize = 0;
+
+            if (!string.IsNullOrEmpty(MessageText))
+            {
+                dataSize = Encoding.UTF8.GetByteCount(MessageText);
+                MessageLengthInfo = $"{MessageText.Length} chars ({FormatByteSize(dataSize)})";
+            }
+
+            //if (!string.IsNullOrEmpty(SelectedVideoPath))
+            //{
+            //    try
+            //    {
+            //        var fileInfo = new FileInfo(SelectedVideoPath);
+            //        dataSize = fileInfo.Length;
+            //        MessageLengthInfo = $"File: {FormatByteSize(dataSize)}";
+            //    }
+            //    catch
+            //    {
+            //        // Silently fail
+            //    }
+            //}
+
+            // Parse estimated capacity
+            if (TryParseByteSize(EstimatedCapacity, out long capacityInBytes) && capacityInBytes > 0)
+            {
+                // Calculate percentage
+                double percentage = (double)dataSize / capacityInBytes * 100;
+                CapacityUsagePercentage = Math.Min(percentage, 100);
+                CapacityUsageText = $"{dataSize:N0} / {capacityInBytes:N0} bytes ({percentage:F1}%)";
+
+                // Set color based on usage
+                if (percentage > 90)
+                    CapacityColor = Brushes.Red;
+                else if (percentage > 70)
+                    CapacityColor = Brushes.Orange;
+                else
+                    CapacityColor = Brushes.LightGreen;
+            }
+            else
+            {
+                CapacityUsagePercentage = 0;
+                CapacityUsageText = "Unknown capacity";
+                CapacityColor = Brushes.Gray;
+            }
+        }
+
+        private string FormatByteSize(long bytes)
+        {
+            string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
+            int order = 0;
+            double size = bytes;
+
+            while (size >= 1024 && order < suffixes.Length - 1)
+            {
+                order++;
+                size /= 1024;
+            }
+
+            return $"{size:0.##} {suffixes[order]}";
+        }
+        private bool TryParseByteSize(string formattedSize, out long bytes)
+        {
+            bytes = 0;
+
+            if (string.IsNullOrEmpty(formattedSize))
+                return false;
+
+            try
+            {
+                string[] parts = formattedSize.Split(' ');
+                if (parts.Length != 2)
+                    return false;
+
+                if (!double.TryParse(parts[0], out double value))
+                    return false;
+
+                string suffix = parts[1].ToUpperInvariant();
+
+                switch (suffix)
+                {
+                    case "B":
+                        bytes = (long)value;
+                        return true;
+                    case "KB":
+                        bytes = (long)(value * 1024);
+                        return true;
+                    case "MB":
+                        bytes = (long)(value * 1024 * 1024);
+                        return true;
+                    case "GB":
+                        bytes = (long)(value * 1024 * 1024 * 1024);
+                        return true;
+                    case "TB":
+                        bytes = (long)(value * 1024 * 1024 * 1024 * 1024);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
         private void DeleteDirectoryAndFiles(string allFramesWithMessageFolder, string allFramesFolder, string metaDataFile)
         {
             try

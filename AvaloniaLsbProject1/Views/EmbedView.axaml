@@ -52,6 +52,13 @@
 			<Setter Property="Foreground" Value="#8C91B6"/>
 			<Setter Property="HorizontalAlignment" Value="Center"/>
 		</Style>
+
+		<Style Selector="ProgressBar">
+			<Setter Property="Background" Value="#242842"/>
+			<Setter Property="Foreground" Value="#6D77E6"/>
+			<Setter Property="Height" Value="8"/>
+			<Setter Property="CornerRadius" Value="4"/>
+		</Style>
 	</UserControl.Styles>
 
 	<Grid>
@@ -117,7 +124,16 @@
 									<TextBlock Text="Duration" Foreground="#8C91B6"/>
 									<TextBlock Text="{Binding Duration}" Foreground="White"/>
 								</StackPanel>
+								
 							</UniformGrid>
+							<!-- Capacity Indicator -->
+							<StackPanel Spacing="5" IsVisible="{Binding !!SelectedVideoPath}">
+								<Grid ColumnDefinitions="*,Auto">
+									<TextBlock Text="Message Size Usage:" Foreground="#8C91B6"/>
+									<TextBlock Grid.Column="1" Text="{Binding CapacityUsageText}" Foreground="{Binding CapacityColor}"/>
+								</Grid>
+								<ProgressBar Value="{Binding CapacityUsagePercentage}" Maximum="100" />
+							</StackPanel>
 						</StackPanel>
 					</Border>
 
@@ -151,13 +167,21 @@
 
 					<!-- Action Buttons -->
 					<StackPanel Spacing="15" HorizontalAlignment="Center">
-						<Button Content="Embed Message"
+						<Button Content="{Binding EmbedButtonText}"
                                 Command="{Binding EmbeddMessageCommand}"
                                 Width="300"
                                 Height="45"
                                 FontSize="16"
                                 FontWeight="Bold"/>
-
+						
+						<!-- Processing Indicator -->
+						<StackPanel IsVisible="{Binding IsProcessing}" Spacing="5">
+							<TextBlock Text="{Binding ProcessingStatusText}"
+                                      Foreground="#B8BCD2"
+                                      HorizontalAlignment="Center"/>
+							<ProgressBar IsIndeterminate="True" Width="300"/>
+						</StackPanel>
+						
 						<StackPanel Orientation="Horizontal" Spacing="10">
 							<Button Content="Play Video"
                                     Command="{Binding PlayVideoCommand}"
