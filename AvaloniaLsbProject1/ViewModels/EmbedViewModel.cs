@@ -13,6 +13,9 @@ using System.Threading;
 using Tmds.DBus.Protocol;
 using Avalonia.Media;
 using System.Text;
+using Avalonia.Media.Imaging;
+using System.Drawing.Drawing2D;
+using Avalonia;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -72,12 +75,17 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string embedButtonText;
 
+        // New properties
+        [ObservableProperty]
+        private Bitmap thumbnailImage;
+
         public EmbedViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             EmbedButtonText = "Embed Message";
+            PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
 
         }
 
@@ -92,6 +100,8 @@ namespace AvaloniaLsbProject1.ViewModels
         public IAsyncRelayCommand EmbeddMessageCommand { get; }
 
         public IAsyncRelayCommand PlayVideoCommand { get; }
+
+        public IAsyncRelayCommand PreviewVideoCommand { get; }
 
         // Add method to extract video attributes
         private async Task LoadVideoAttributesAsync(string videoPath)
@@ -120,6 +130,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 //still need to calc possible padding for the message
                 EstimatedCapacity = FormatByteSize(estimatedBytes);
                 UpdateCapacityUsage();
+                await GenerateThumbnailAsync(videoPath);
             }
             catch (Exception ex)
             {
@@ -447,6 +458,55 @@ namespace AvaloniaLsbProject1.ViewModels
             }
             catch (Exception ex) {
                 ErrorMessage = ex.Message;
+            }
+        }
+
+        // New methods
+        private async Task GenerateThumbnailAsync(string videoPath)
+        {
+            string projectPath = "C:\\AvaloniaVideoStenagraphy";
+            try
+            {
+                string thumbnailPath = Path.Combine(projectPath, "temp_thumbnail.jpg");
+
+                // Use FFmpeg to extract a thumbnail
+                var conversion = FFmpeg.Conversions.New()
+                    .AddParameter($"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 -f image2 \"{thumbnailPath}\"");
+
+                await conversion.Start();
+
+                // Load the thumbnail
+                if (File.Exists(thumbnailPath))
+                {
+                    using (var fs = File.OpenRead(thumbnailPath))
+                    {
+                        ThumbnailImage = new Bitmap(fs);
+                        
+                        ThumbnailImage = ThumbnailImage.CreateScaledBitmap(new PixelSize(160, 90), BitmapInterpolationMode.HighQuality);
+                    }
+
+                    // Clean up
+                    try { File.Delete(thumbnailPath); } catch { }
+                }
+            }
+            catch
+            {
+                // Silently fail - thumbnail is not critical
+                ThumbnailImage = null;
+            }
+        }
+        private async Task PreviewVideoAsync()
+        {
+            if (!string.IsNullOrEmpty(SelectedVideoPath))
+            {
+                try
+                {
+                    HelperFunctions.PlayVideo(SelectedVideoPath);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Error previewing video: {ex.Message}";
+                }
             }
         }
         private async Task PlayVideoAsync()

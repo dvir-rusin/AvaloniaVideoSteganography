@@ -87,7 +87,7 @@
 					<Border Background="#242842" CornerRadius="12" Padding="20">
 						<StackPanel Spacing="15">
 							<TextBlock Text="Video Selection" Classes="label"/>
-							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+							<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto">
 								<Button Grid.Column="0"
                                         Content="Browse Video"
                                         Command="{Binding SelectVideoCommand}"/>
@@ -95,46 +95,79 @@
                                          Text="{Binding SelectedVideoPath}"
                                          IsReadOnly="True"
                                          Margin="10,0,0,0"/>
+								<Button Grid.Column="2"
+									   Content="Preview"
+									   Command="{Binding PreviewVideoCommand}"
+									   IsEnabled="{Binding !!SelectedVideoPath}"
+									   Margin="10,0,0,0"
+									   Width="100"/>
 							</Grid>
 						</StackPanel>
 					</Border>
 
-					<!-- Video Attributes -->
+					<!-- Video Attributes with Thumbnail -->
 					<Border Background="#242842" CornerRadius="12" Padding="20">
-						<StackPanel Spacing="15">
-							<TextBlock Text="Video Attributes" Classes="label"/>
-							<UniformGrid Columns="2" Rows="3">
-								<StackPanel Margin="5">
-									<TextBlock Text="Height" Foreground="#8C91B6"/>
-									<TextBlock Text="{Binding Height}" Foreground="White"/>
+						<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto" Margin="10">
+							<StackPanel Grid.Column="0" Spacing="15">
+								<TextBlock Text="Video Attributes" Classes="label"/>
+								<UniformGrid Columns="2" Rows="3">
+									<StackPanel Margin="5">
+										<TextBlock Text="Height" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding Height}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Width" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding Width}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Frame Rate" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding FrameRate}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Bit Rate" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding BitRate}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Duration" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding Duration}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Capacity" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding EstimatedCapacity}" Foreground="White"/>
+									</StackPanel>
+								</UniformGrid>
+
+								<!-- Capacity Indicator -->
+								<StackPanel Spacing="5" IsVisible="{Binding !!SelectedVideoPath}">
+									<Grid ColumnDefinitions="*,Auto">
+										<TextBlock Text="Message Size Usage:" Foreground="#8C91B6"/>
+										<TextBlock Grid.Column="1" Text="{Binding CapacityUsageText}" Foreground="{Binding CapacityColor}"/>
+									</Grid>
+									<ProgressBar Value="{Binding CapacityUsagePercentage}" Maximum="100" />
 								</StackPanel>
-								<StackPanel Margin="5">
-									<TextBlock Text="Width" Foreground="#8C91B6"/>
-									<TextBlock Text="{Binding Width}" Foreground="White"/>
-								</StackPanel>
-								<StackPanel Margin="5">
-									<TextBlock Text="Frame Rate" Foreground="#8C91B6"/>
-									<TextBlock Text="{Binding FrameRate}" Foreground="White"/>
-								</StackPanel>
-								<StackPanel Margin="5">
-									<TextBlock Text="Bit Rate" Foreground="#8C91B6"/>
-									<TextBlock Text="{Binding BitRate}" Foreground="White"/>
-								</StackPanel>
-								<StackPanel Margin="5" Grid.ColumnSpan="2">
-									<TextBlock Text="Duration" Foreground="#8C91B6"/>
-									<TextBlock Text="{Binding Duration}" Foreground="White"/>
-								</StackPanel>
-								
-							</UniformGrid>
-							<!-- Capacity Indicator -->
-							<StackPanel Spacing="5" IsVisible="{Binding !!SelectedVideoPath}">
-								<Grid ColumnDefinitions="*,Auto">
-									<TextBlock Text="Message Size Usage:" Foreground="#8C91B6"/>
-									<TextBlock Grid.Column="1" Text="{Binding CapacityUsageText}" Foreground="{Binding CapacityColor}"/>
-								</Grid>
-								<ProgressBar Value="{Binding CapacityUsagePercentage}" Maximum="100" />
 							</StackPanel>
-						</StackPanel>
+
+							<!-- Video Thumbnail Preview -->
+							<Border Grid.Column="1"
+									Width="160"
+									Height="90"
+									CornerRadius="8"
+									Background="#1A1E36"
+									IsVisible="{Binding !!SelectedVideoPath}">
+								<Panel>
+									<Image Source="{Binding ThumbnailImage}" Stretch="Uniform"
+										   IsVisible="{Binding ThumbnailImage, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+									<Border IsVisible="{Binding ThumbnailImage, Converter={x:Static ObjectConverters.IsNull}}"
+											Background="#1A1E36"
+											CornerRadius="8">
+										<TextBlock Text="No Preview"
+												  HorizontalAlignment="Center"
+												  VerticalAlignment="Center"
+												  Foreground="#8C91B6"/>
+									</Border>
+								</Panel>
+							</Border>
+						</Grid>
 					</Border>
 
 					<!-- Message Input -->

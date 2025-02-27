@@ -50,6 +50,13 @@
             <Setter Property="Foreground" Value="#8C91B6"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
+
+		<Style Selector="ProgressBar">
+			<Setter Property="Background" Value="#242842"/>
+			<Setter Property="Foreground" Value="#6D77E6"/>
+			<Setter Property="Height" Value="8"/>
+			<Setter Property="CornerRadius" Value="4"/>
+		</Style>
     </UserControl.Styles>
 
     <Grid>
@@ -78,7 +85,7 @@
                     <Border Background="#242842" CornerRadius="12" Padding="20">
                         <StackPanel Spacing="15">
                             <TextBlock Text="Video Selection" Classes="label"/>
-                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto">
                                 <Button Grid.Column="0"
                                         Content="Browse Video"
                                         Command="{Binding SelectVideoCommand}"/>
@@ -86,38 +93,70 @@
                                          Text="{Binding SelectedVideoPath}"
                                          IsReadOnly="True"
                                          Margin="10,0,0,0"/>
+								<Button Grid.Column="2"
+									   Content="Preview"
+									   Command="{Binding PreviewVideoCommand}"
+									   IsEnabled="{Binding !!SelectedVideoPath}"
+									   Margin="10,0,0,0"
+									   Width="100"/>
                             </Grid>
                         </StackPanel>
                     </Border>
 
-                    <!-- Video Attributes -->
-                    <Border Background="#242842" CornerRadius="12" Padding="20">
-                        <StackPanel Spacing="15">
-                            <TextBlock Text="Video Attributes" Classes="label"/>
-                            <UniformGrid Columns="2" Rows="3">
-                                <StackPanel Margin="5">
-                                    <TextBlock Text="Height" Foreground="#8C91B6"/>
-                                    <TextBlock Text="{Binding Height}" Foreground="White"/>
-                                </StackPanel>
-                                <StackPanel Margin="5">
-                                    <TextBlock Text="Width" Foreground="#8C91B6"/>
-                                    <TextBlock Text="{Binding Width}" Foreground="White"/>
-                                </StackPanel>
-                                <StackPanel Margin="5">
-                                    <TextBlock Text="Frame Rate" Foreground="#8C91B6"/>
-                                    <TextBlock Text="{Binding FrameRate}" Foreground="White"/>
-                                </StackPanel>
-                                <StackPanel Margin="5">
-                                    <TextBlock Text="Bit Rate" Foreground="#8C91B6"/>
-                                    <TextBlock Text="{Binding BitRate}" Foreground="White"/>
-                                </StackPanel>
-                                <StackPanel Margin="5" Grid.ColumnSpan="2">
-                                    <TextBlock Text="Duration" Foreground="#8C91B6"/>
-                                    <TextBlock Text="{Binding Duration}" Foreground="White"/>
-                                </StackPanel>
-                            </UniformGrid>
-                        </StackPanel>
-                    </Border>
+					<!-- Video Attributes with Thumbnail -->
+					<Border Background="#242842" CornerRadius="12" Padding="20">
+						<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto" Margin="10">
+							<StackPanel Grid.Column="0" Spacing="15">
+								<TextBlock Text="Video Attributes" Classes="label"/>
+								<UniformGrid Columns="2" Rows="3">
+									<StackPanel Margin="5">
+										<TextBlock Text="Height" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding Height}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Width" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding Width}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Frame Rate" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding FrameRate}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Bit Rate" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding BitRate}" Foreground="White"/>
+									</StackPanel>
+									<StackPanel Margin="5">
+										<TextBlock Text="Duration" Foreground="#8C91B6"/>
+										<TextBlock Text="{Binding Duration}" Foreground="White"/>
+									</StackPanel>
+									
+								</UniformGrid>
+
+								
+							</StackPanel>
+
+							<!-- Video Thumbnail Preview -->
+							<Border Grid.Column="1"
+									Width="160"
+									Height="90"
+									CornerRadius="8"
+									Background="#1A1E36"
+									IsVisible="{Binding !!SelectedVideoPath}">
+								<Panel>
+									<Image Source="{Binding ThumbnailImage}" Stretch="Uniform"
+										   IsVisible="{Binding ThumbnailImage, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+									<Border IsVisible="{Binding ThumbnailImage, Converter={x:Static ObjectConverters.IsNull}}"
+											Background="#1A1E36"
+											CornerRadius="8">
+										<TextBlock Text="No Preview"
+												  HorizontalAlignment="Center"
+												  VerticalAlignment="Center"
+												  Foreground="#8C91B6"/>
+									</Border>
+								</Panel>
+							</Border>
+						</Grid>
+					</Border>
 
                     <!-- Streaming Settings -->
                     <Border Background="#242842" CornerRadius="12" Padding="20">
@@ -140,13 +179,21 @@
 
                     <!-- Action Buttons -->
                     <StackPanel Spacing="15" HorizontalAlignment="Center">
-                        <Button Content="Start Stream"
+                        <Button Content="{Binding StreamButtonText}"
                                 Command="{Binding StreamVideoCommand}"
                                 Width="340"
                                 Height="45"
                                 FontSize="16"
                                 FontWeight="Bold"/>
 
+						<!-- Processing Indicator -->
+						<StackPanel IsVisible="{Binding IsProcessing}" Spacing="5">
+							<TextBlock Text="{Binding ProcessingStatusText}"
+                                      Foreground="#B8BCD2"
+                                      HorizontalAlignment="Center"/>
+							<ProgressBar IsIndeterminate="True" Width="300"/>
+						</StackPanel>
+						
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Button Content="Play Vid From Ip"
                                     Command="{Binding PlayVideoCommand}"

@@ -12,6 +12,8 @@ using AvaloniaLsbProject1.Services;
 using Xabe.FFmpeg;
 using System.Linq;
 using static Emgu.CV.DISOpticalFlow;
+using Avalonia.Media.Imaging;
+using Avalonia;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -46,12 +48,27 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private Process? ffmpegProcess; // Reference to the FFmpeg process for stopping
 
+        [ObservableProperty]
+        public bool isProcessing;
+
+        [ObservableProperty]
+        public string processingStatusText;
+
+        [ObservableProperty]
+        private string streamButtonText;
+
+        // New properties
+        [ObservableProperty]
+        private Bitmap thumbnailImage;
+
         public StreamVideoViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             StreamVideoCommand = new AsyncRelayCommand(StreamVideoAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             DownloadStreamCommand = new AsyncRelayCommand(DownloadStreamAsync);
+            PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
+            streamButtonText = "Start Stream";
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
@@ -59,6 +76,8 @@ namespace AvaloniaLsbProject1.ViewModels
         public IAsyncRelayCommand PlayVideoCommand { get; }
 
         public IAsyncRelayCommand DownloadStreamCommand { get; }
+
+        public IAsyncRelayCommand PreviewVideoCommand { get; }
 
         // Select a video file loads its attributes 
         private async Task SelectVideoAsync()
@@ -98,6 +117,8 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             try
             {
+                ProcessingStatusText = "Analyzing video...";
+                IsProcessing = true;
                 // Use Xabe.FFmpeg to get video metadata
                 var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
                 var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
@@ -114,10 +135,18 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     ErrorMessage = "No video stream found.";
                 }
+                long estimatedBytes = (((videoStream.Width * videoStream.Height) - 21) * 3 / 8); // minus 4 cuz last 4 pixel are for message validation minus 16 cuz of 16 byte iv and minus 1 cus null termainator =minus 21
+                //still need to calc possible padding for the message
+                
+                await GenerateThumbnailAsync(videoPath);
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Error extracting video attributes: {ex.Message}";
+            }
+            finally
+            {
+                IsProcessing = false;
             }
         }
 
@@ -135,6 +164,10 @@ namespace AvaloniaLsbProject1.ViewModels
                 return;
             }
 
+            // Set processing state
+            IsProcessing = true;
+            StreamButtonText = "Streaming...";
+            ProcessingStatusText = "Preparing Stream...";
             try
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe";
@@ -208,7 +241,53 @@ namespace AvaloniaLsbProject1.ViewModels
             }
         }
 
+        private async Task GenerateThumbnailAsync(string videoPath)
+        {
+            string projectPath = "C:\\AvaloniaVideoStenagraphy";
+            try
+            {
+                string thumbnailPath = Path.Combine(projectPath, "temp_thumbnail.jpg");
 
+                // Use FFmpeg to extract a thumbnail
+                var conversion = FFmpeg.Conversions.New()
+                    .AddParameter($"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 -f image2 \"{thumbnailPath}\"");
+
+                await conversion.Start();
+
+                // Load the thumbnail
+                if (File.Exists(thumbnailPath))
+                {
+                    using (var fs = File.OpenRead(thumbnailPath))
+                    {
+                        ThumbnailImage = new Bitmap(fs);
+
+                        ThumbnailImage = ThumbnailImage.CreateScaledBitmap(new PixelSize(160, 90), BitmapInterpolationMode.HighQuality);
+                    }
+
+                    // Clean up
+                    try { File.Delete(thumbnailPath); } catch { }
+                }
+            }
+            catch
+            {
+                // Silently fail - thumbnail is not critical
+                ThumbnailImage = null;
+            }
+        }
+        private async Task PreviewVideoAsync()
+        {
+            if (!string.IsNullOrEmpty(SelectedVideoPath))
+            {
+                try
+                {
+                    HelperFunctions.PlayVideo(SelectedVideoPath);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Error previewing video: {ex.Message}";
+                }
+            }
+        }
 
         private async Task PlayVideoAsync()
         {
