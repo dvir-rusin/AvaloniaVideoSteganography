@@ -342,7 +342,8 @@ namespace AvaloniaLsbProject1.ViewModels
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
                 string outputDirectory = @"C:\AvaloniaVideoStenagraphy"; // Desired output directory
-                string outputFile = Path.Combine(outputDirectory, "stream_capturefeb25.mp4"); // Combine directory and filename
+                string outputFileName = "stream_capture" + DateTime.Now.ToString("dd.MM_HH:mm:ss") + ".mp4";
+                string outputFile = Path.Combine(outputDirectory, outputFileName); // Combine directory and filename
                 string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t 2 \"{outputFile}\"";
 
 

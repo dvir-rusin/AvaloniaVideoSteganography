@@ -53,6 +53,7 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             _contentArea.Content = new Views.StreamVideoView();
             CurrentPage = page;
+            
         }
     }
 

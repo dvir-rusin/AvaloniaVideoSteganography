@@ -137,21 +137,23 @@
                                 Width="145"/>
 					</StackPanel>
 
-					<!-- Error Messages -->
-					<Border Background="#2A1E1E"
-                            BorderBrush="#FF4444"
+					<!-- Error and sucsses Messages FF6666 -->
+					<Border Background="{Binding Errorcolor}"
+                            BorderBrush="{Binding ErrorBoardercolor}"
                             BorderThickness="1"
                             CornerRadius="8"
                             IsVisible="{Binding !!ErrorMessage}">
 						<StackPanel Spacing="5" Margin="15">
-							<TextBlock Text="Error"
-                                      Foreground="#FF6666"
-                                      FontWeight="SemiBold"/>
+							<TextBlock Text="{Binding SucssesOrErorr}"
+                                      Foreground="{Binding SucssesOrErorrTextColor} "
+                                      FontWeight="SemiBold"
+									     IsVisible="{Binding !!ErrorMessage}"/>
 							<TextBox Text="{Binding ErrorMessage}"
                                      Background="Transparent"
                                      BorderThickness="0"
                                      IsReadOnly="True"
-                                     AcceptsReturn="True"/>
+                                     AcceptsReturn="True"
+									   IsVisible="{Binding !!ErrorMessage}"/>
 						</StackPanel>
 					</Border>
 				</StackPanel>

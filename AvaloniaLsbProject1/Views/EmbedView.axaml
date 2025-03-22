@@ -226,8 +226,8 @@
 					</StackPanel>
 
 					<!-- Error Messages -->
-					<Border Background="#2A1E1E"
-                            BorderBrush="#FF4444"
+					<Border Background="{Binding Errorcolor}"
+                            BorderBrush="{Binding ErrorBoardercolor}"
                             BorderThickness="1"
                             CornerRadius="8"
                             IsVisible="{Binding !!ErrorMessage}">

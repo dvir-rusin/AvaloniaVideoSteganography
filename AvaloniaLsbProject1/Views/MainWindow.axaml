@@ -5,7 +5,8 @@
         x:Class="AvaloniaLsbProject1.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Video Steganography"
-        Width="800" Height="600">
+        Width="800" Height="600"
+		  Icon="C:\Projects\gitGames\AvaloniaLsbProject1\AvaloniaLsbProject1\steganographyreactivedemo.ico">
 
 	<Window.Styles>
 		<Style Selector="MenuItem">
@@ -26,9 +27,7 @@
 			</Setter>
 		</Style>
 
-		<Style Selector="MenuItem.active">
-			<Setter Property="Background" Value="#2D3250"/>
-		</Style>
+		
 	</Window.Styles>
 
 	<Grid>

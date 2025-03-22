@@ -74,8 +74,9 @@ namespace AvaloniaLsbProject1.Services
         /// <param name="framesPath">Path to the folder containing the video frames.</param>
         /// <param name="outputFilePath">Path to save the reconstructed video file.</param>
         /// <param name="frameRate">Frame rate for the output video (e.g., 30).</param>
-        public static void ReconstructVideo(string framesPath, string outputFilePath, int frameRate)
+        public static string ReconstructVideo(string framesPath, string outputFilePath, int frameRate)
         {
+            string message;
             // Check for FFmpeg availability
             string ffmpegPath = "ffmpeg"; // Assumes ffmpeg is in system PATH
             string inputPattern = $"{framesPath}\\frame_%04d.png"; // Adjust for the frame naming format (e.g., frame_0001.png)
@@ -117,13 +118,14 @@ namespace AvaloniaLsbProject1.Services
 
                     process.WaitForExit();
 
-                    Console.WriteLine("Video reconstruction completed successfully.");
+                    message =  ("Video reconstruction completed successfully.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while reconstructing the video: {ex.Message}");
+                message = ($"An error occurred while reconstructing the video: {ex.Message}");
             }
+            return message;
 
         }
 
@@ -165,65 +167,8 @@ namespace AvaloniaLsbProject1.Services
             }
         }
 
-        public static void ReconstructVideoWithQuality(string framesFolder, string outputPath, double frameRate, int qualityFactor, string metadataSource = null)
-        {
-            // Create a temporary script file
-            string scriptPath = Path.Combine(Path.GetTempPath(), "ffmpeg_concat.txt");
-
-            try
-            {
-                // Get all frames and sort them
-                var frameFiles = Directory.GetFiles(framesFolder, "*.png")
-                                         .OrderBy(f => int.Parse(Path.GetFileNameWithoutExtension(f)))
-                                         .ToArray();
-
-                if (frameFiles.Length == 0)
-                {
-                    throw new Exception("No frames found in the specified folder.");
-                }
-
-                // Build FFmpeg command
-                var ffmpegArgs = $"-framerate {frameRate} -i \"{framesFolder}/%d.png\" -c:v libx264 -crf {qualityFactor} -pix_fmt yuv420p";
-
-                // Add metadata copying if specified
-                if (!string.IsNullOrEmpty(metadataSource))
-                {
-                    ffmpegArgs += $" -map_metadata 0 -movflags use_metadata_tags";
-                }
-
-                ffmpegArgs += $" \"{outputPath}\"";
-
-                // Execute FFmpeg command
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = "ffmpeg",
-                    Arguments = ffmpegArgs,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                };
-
-                using (var process = Process.Start(startInfo))
-                {
-                    process.WaitForExit();
-
-                    if (process.ExitCode != 0)
-                    {
-                        var error = process.StandardError.ReadToEnd();
-                        throw new Exception($"FFmpeg exited with code {process.ExitCode}: {error}");
-                    }
-                }
-            }
-            finally
-            {
-                // Clean up
-                if (File.Exists(scriptPath))
-                {
-                    File.Delete(scriptPath);
-                }
-            }
-        }
+        
+        
 
     }
 }

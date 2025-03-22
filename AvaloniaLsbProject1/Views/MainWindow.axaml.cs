@@ -19,6 +19,7 @@ namespace AvaloniaLsbProject1.Views
             // Load the HomeView as the initial content
             ContentArea.Content = new HomeView();
             DataContext = new MainWindowViewModel(ContentArea);
+            this.Icon = new WindowIcon("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\steganographyreactivedemo.ico");
 
 
         }

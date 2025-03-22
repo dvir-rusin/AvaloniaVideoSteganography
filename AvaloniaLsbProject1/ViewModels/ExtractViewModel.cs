@@ -6,6 +6,8 @@ using Avalonia.Controls;
 using AvaloniaLsbProject1.Views;
 using System.IO;
 using AvaloniaLsbProject1.Services;
+using Avalonia.Media;
+using System.Text.RegularExpressions;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -29,12 +31,33 @@ namespace AvaloniaLsbProject1.ViewModels
 
         [ObservableProperty]
         private string extractButtonText;
+
+        /// <summary>
+        /// color for error / sucess message
+        /// </summary>
+        [ObservableProperty] public IBrush? errorBoardercolor;
+
+        /// <summary>
+        /// color for error / sucess message
+        /// </summary>
+        [ObservableProperty] public IBrush? errorcolor;
+
+        [ObservableProperty] public IBrush? sucssesOrErorrTextColor;
+
+        [ObservableProperty] public string? sucssesOrErorr;
         public ExtractViewModel()
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             ExtractMessageCommand = new AsyncRelayCommand(ExtractMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             extractButtonText = "Extract Message";
+
+            // Initialize these properties with default values
+            errorBoardercolor = new SolidColorBrush(Color.Parse("#CCCCCC"));
+            errorcolor = new SolidColorBrush(Color.Parse("#000000"));
+            sucssesOrErorr = "None";       // Default status
+            sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));        // Black text
+
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
@@ -62,13 +85,15 @@ namespace AvaloniaLsbProject1.ViewModels
             }
 
         }
-
+        
+        
         private async Task ExtractMessageAsync()
         {
-            if(IsProcessing)
+            if (!ValidateInitialConditions())
             {
                 return;
             }
+           ErrorMessage = string.Empty;
             ProcessingStatusText = "Extracting Message";
             ExtractButtonText = "Extracting Message";
             IsProcessing = true;
@@ -93,13 +118,39 @@ namespace AvaloniaLsbProject1.ViewModels
                 
                 if (decryptionPassword != null)
                 {
-                    ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(NewVideoIframes, decryptionPassword);
-                    Directory.Delete(NewVideoIframes,true);
+                    // Create a local variable for sucssesOrErorr
+                    string localSuccessOrError = "None";
+
+                    // Make a copy of the brush references for modification
+                    IBrush localBorderBrush = new SolidColorBrush(Color.Parse("#CCCCCC"));
+                    IBrush localColorBrush = new SolidColorBrush(Color.Parse("#000000"));
+                    IBrush localSucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));
+
+                    // Call with local variables
+                    ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(
+                        NewVideoIframes,
+                        decryptionPassword,
+                        ref localBorderBrush,
+                        ref localColorBrush,
+                        ref localSuccessOrError,
+                        ref localSucssesOrErorrTextColor);
+
+                    // Update the ViewModel properties with the modified values
+                    ErrorBoardercolor = localBorderBrush;
+                    Errorcolor = localColorBrush;
+                    SucssesOrErorr = localSuccessOrError;
+                    SucssesOrErorrTextColor = localSucssesOrErorrTextColor;
+                    Directory.Delete(NewVideoIframes, true);
                 }
             }
             catch (Exception ex)
             {
+
                 ErrorMessage = ex.Message;
+                ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
+                Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));        // Dark red text
+                SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));        // Dark red text
+                SucssesOrErorr = "Error";
             }
             finally
             {
@@ -119,7 +170,44 @@ namespace AvaloniaLsbProject1.ViewModels
             else
             {
                 ErrorMessage = "CANT PLAY VIDEO selectedVideoPath is null";
+                ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
+                Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));        // Dark red text
+                SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));        // Dark red text
+                SucssesOrErorr = "Error";
             }
+        }
+
+        private bool ValidateInitialConditions()
+        {
+            if (IsProcessing)
+            {
+                return false;
+            }
+
+
+            if (string.IsNullOrEmpty(SelectedVideoPath) || string.IsNullOrEmpty(DecryptionPassword))
+            {
+                ErrorMessage = "Video path or password is missing.";
+                ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
+                Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));        // Dark red text
+                SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));        // Dark red text
+                SucssesOrErorr = "Error";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(SelectedVideoPath))
+            {
+                ErrorMessage = "No video file selected. Please select a video file before embedding a message.";
+                ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
+                Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));        // Dark red text
+                SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));        // Dark red text
+                SucssesOrErorr = "Error";
+                return false;
+            }
+
+           
+            ErrorMessage = string.Empty;
+            return true;
         }
 
     }
