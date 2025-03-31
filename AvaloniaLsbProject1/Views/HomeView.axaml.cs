@@ -8,6 +8,7 @@ namespace AvaloniaLsbProject1.Views
         public HomeView()
         {
             InitializeComponent();
+            
         }
 
         private void OnEmbedButtonClick(object sender, RoutedEventArgs e)

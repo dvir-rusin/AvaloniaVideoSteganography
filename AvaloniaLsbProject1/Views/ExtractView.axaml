@@ -106,6 +106,7 @@
 								<TextBlock Text="Password" Classes="label"/>
 								<TextBox Text="{Binding DecryptionPassword}"
                                          Watermark="Enter your decryption password"
+										 
                                          />
 								<Button Content="{Binding ExtractButtonText}"
                                         Command="{Binding ExtractMessageCommand}"

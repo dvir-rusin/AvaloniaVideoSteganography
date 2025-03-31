@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
@@ -21,11 +22,19 @@ namespace AvaloniaLsbProject1
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
                 // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 DisableAvaloniaDataAnnotationValidation();
                 // Initialize MainWindow without passing contentArea
-                desktop.MainWindow = new MainWindow();
+                var listener = new MainWindow("Listener");
+                
+                listener.Show();
+
+                var broadcaster = new MainWindow("Broadcaster");
+                broadcaster.Show();
+
+
             }
 
             base.OnFrameworkInitializationCompleted();

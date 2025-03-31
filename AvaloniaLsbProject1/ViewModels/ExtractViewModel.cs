@@ -45,7 +45,10 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty] public IBrush? sucssesOrErorrTextColor;
 
         [ObservableProperty] public string? sucssesOrErorr;
-        public ExtractViewModel()
+
+        public byte[]? SharedKey { get; }
+        public string? Role { get; }
+        public ExtractViewModel(byte[]? sharedKey,string role)
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             ExtractMessageCommand = new AsyncRelayCommand(ExtractMessageAsync);
@@ -57,7 +60,13 @@ namespace AvaloniaLsbProject1.ViewModels
             errorcolor = new SolidColorBrush(Color.Parse("#000000"));
             sucssesOrErorr = "None";       // Default status
             sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));        // Black text
+            SharedKey = sharedKey;
+            Role = role;
 
+            if (Role.Equals("Listener") )
+            {
+                decryptionPassword = Convert.ToBase64String(SharedKey!);
+            }
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
@@ -93,6 +102,7 @@ namespace AvaloniaLsbProject1.ViewModels
             {
                 return;
             }
+            
            ErrorMessage = string.Empty;
             ProcessingStatusText = "Extracting Message";
             ExtractButtonText = "Extracting Message";

@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Xabe.FFmpeg.Exceptions;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -17,10 +18,14 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private readonly ContentControl _contentArea;
 
-        public MainWindowViewModel(ContentControl contentArea)
+        private readonly byte[]? _sharedKey;
+        private readonly string _role;
+
+        public MainWindowViewModel(ContentControl contentArea, byte[]? sharedKey, string role)
         {
             _contentArea = contentArea;
-            
+            _sharedKey = sharedKey;
+            _role = role;
 
             NavigateToHomeCommand = new RelayCommand(_ => NavigateToHome("Home"));
             NavigateToEmbedCommand = new RelayCommand(_ => NavigateToEmbed("Embed"));
@@ -38,14 +43,14 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private void NavigateToEmbed(string page)
         {
-            _contentArea.Content = new Views.EmbedView();
+            _contentArea.Content = new Views.EmbedView(_sharedKey,_role);
             CurrentPage = page;
 
         }
 
         private void NavigateToExtract(string page)
         {
-            _contentArea.Content = new Views.ExtractView();
+            _contentArea.Content = new Views.ExtractView(_sharedKey, _role);
             CurrentPage = page;
         }
 

@@ -24,6 +24,7 @@ namespace AvaloniaLsbProject1.ViewModels
     /// </summary>
     public partial class EmbedViewModel : ObservableObject
     {
+        
         // Properties
 
         #region Video Input Properties
@@ -164,7 +165,10 @@ namespace AvaloniaLsbProject1.ViewModels
         /// Initializes a new instance of the <see cref="EmbedViewModel"/> class.
         /// Sets up commands and initializes default values.
         /// </summary>
-        public EmbedViewModel()
+         public byte[]? SharedKey { get; }
+
+        public string? Role {  get; }
+        public EmbedViewModel(byte[]? sharedKey,string role)
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
@@ -173,6 +177,13 @@ namespace AvaloniaLsbProject1.ViewModels
             EmbedButtonText = "Embed Message";
             errorBoardercolor = "#FF4444";
             errorcolor = "#2a1e1e";
+            SharedKey = sharedKey;
+            Role = role;
+
+            if (Role.Equals("Broadcaster"))
+            {
+                encryptionPassword = Convert.ToBase64String(SharedKey!);
+            }
         }
         #endregion
 

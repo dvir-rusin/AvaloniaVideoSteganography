@@ -6,12 +6,13 @@ namespace AvaloniaLsbProject1.Views
 {
     public partial class ExtractView : UserControl
     {
-        public ExtractView()
+        public ExtractView(byte[]? sharedKey,string role)
         {
             InitializeComponent();
-            DataContext = new ExtractViewModel();
+            DataContext = new ExtractViewModel(sharedKey,role);
             // Attach the Click event handler
             BackButton.Click += OnBackButtonClick;
+            
         }
 
         private void OnBackButtonClick(object sender, RoutedEventArgs e)

@@ -6,10 +6,10 @@ namespace AvaloniaLsbProject1.Views
 {
     public partial class EmbedView : UserControl
     {
-        public EmbedView()
+        public EmbedView(byte[]? sharedKey,string role)
         {
             InitializeComponent();
-            DataContext = new EmbedViewModel();
+            DataContext = new EmbedViewModel(sharedKey, role);
             // Attach the Click event handler
             BackButton.Click += OnBackButtonClick;
         }

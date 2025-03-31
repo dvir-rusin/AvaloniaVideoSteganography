@@ -1,19 +1,23 @@
-﻿using AvaloniaLsbProject1.Views;
+﻿using Avalonia;
+using Avalonia.Controls;
+using AvaloniaLsbProject1.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using AvaloniaLsbProject1.Views;
-using System.Runtime.InteropServices;
 using System.IO;
-using AvaloniaLsbProject1.Services;
-using Xabe.FFmpeg;
 using System.Linq;
-using static Emgu.CV.DISOpticalFlow;
-using Avalonia.Media.Imaging;
-using Avalonia;
+using System.Threading;
+using System.Threading.Tasks;
+using Xabe.FFmpeg;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using System.Text;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+
+using System.Net.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -46,7 +50,7 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string? duration;
 
-        private Process? ffmpegProcess; // Reference to the FFmpeg process for stopping
+        private Process? ffmpegProcess; // Reference to the FFmpeg process
 
         [ObservableProperty]
         public bool isProcessing;
@@ -57,9 +61,12 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string streamButtonText;
 
-        // New properties
+        // New property for thumbnail image.
         [ObservableProperty]
-        private Bitmap thumbnailImage;
+        private Avalonia.Media.Imaging.Bitmap thumbnailImage;
+
+        // Cancellation token for HTTPS server.
+        private CancellationTokenSource _serverCts = new CancellationTokenSource();
 
         public StreamVideoViewModel()
         {
@@ -69,17 +76,99 @@ namespace AvaloniaLsbProject1.ViewModels
             DownloadStreamCommand = new AsyncRelayCommand(DownloadStreamAsync);
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
             streamButtonText = "Start Stream";
+
+            // Start the HTTPS server in the background.
+            Task.Run(() => StartHttpsServerAsync(_serverCts.Token));
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
         public IAsyncRelayCommand StreamVideoCommand { get; }
         public IAsyncRelayCommand PlayVideoCommand { get; }
-
         public IAsyncRelayCommand DownloadStreamCommand { get; }
-
         public IAsyncRelayCommand PreviewVideoCommand { get; }
 
-        // Select a video file loads its attributes 
+        // HTTPS server with Basic Authentication for the /download endpoint.
+        private async Task StartHttpsServerAsync(CancellationToken cancellationToken)
+        {
+            var builder = WebApplication.CreateBuilder();
+
+            // Configure Kestrel to listen on HTTPS port 5001.
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(5001, listenOptions =>
+                {
+                    listenOptions.UseHttps();
+                });
+            });
+
+            var app = builder.Build();
+
+            // Custom middleware for Basic Authentication on /download.
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.StartsWithSegments("/download"))//https://localhost:5001/
+                {
+                    if (!context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+                    {
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsync("Missing Authorization Header");
+                        return;
+                    }
+
+                    var validCredentials = "user:password123";
+                    var expectedAuthHeader = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(validCredentials));
+
+                    if (authHeader != expectedAuthHeader)
+                    {
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsync("Invalid credentials");
+                        return;
+                    }
+                }
+                await next();
+            });
+
+            // Serve a simple HTML page with a download button.
+            app.MapGet("/", () =>
+            {
+                string htmlContent = @"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+    <title>Download Video</title>
+</head>
+<body>
+    <h1>Download Video</h1>
+    <button onclick=""window.location.href='/download'"">Download Video</button>
+</body>
+</html>";
+                return Results.Content(htmlContent, "text/html");
+            });
+
+            // Download endpoint: streams the selected video file.
+            app.MapGet("/download", async (HttpContext context) =>
+            {
+                string? videoPath = SelectedVideoPath;
+                if (string.IsNullOrEmpty(videoPath) || !File.Exists(videoPath))
+                {
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("Video not found.");
+                    return;
+                }
+
+                context.Response.ContentType = "video/mp4";
+                context.Response.Headers.ContentDisposition =
+                    $"attachment; filename=\"{Path.GetFileName(videoPath)}\"";
+
+                await using var stream = new FileStream(videoPath, FileMode.Open, FileAccess.Read);
+                await stream.CopyToAsync(context.Response.Body);
+            });
+
+            // Run the web server until cancellation is requested.
+            await app.RunAsync(cancellationToken);
+        }
+
         private async Task SelectVideoAsync()
         {
             try
@@ -89,18 +178,16 @@ namespace AvaloniaLsbProject1.ViewModels
                     Title = "Select a Video File",
                     Filters =
                     {
-                    new FileDialogFilter { Name = "Video Files", Extensions = { "mp4", "avi", "mkv", "mov", "wmv" } },
-                    //new FileDialogFilter { Name = "All Files", Extensions = { "*" } }
+                        new FileDialogFilter { Name = "Video Files", Extensions = { "mp4", "avi", "mkv", "mov", "wmv" } }
                     },
                     AllowMultiple = false
                 };
 
-                var result = await dialog.ShowAsync(MainWindow.Instance); // Replace with proper dialog handling
+                var result = await dialog.ShowAsync(MainWindow.Instance);
                 if (result?.Length > 0)
                 {
                     SelectedVideoPath = result[0];
                     await LoadVideoAttributesAsync(SelectedVideoPath);
-
                 }
                 else
                 {
@@ -119,7 +206,6 @@ namespace AvaloniaLsbProject1.ViewModels
             {
                 ProcessingStatusText = "Analyzing video...";
                 IsProcessing = true;
-                // Use Xabe.FFmpeg to get video metadata
                 var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
                 var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
 
@@ -135,9 +221,6 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     ErrorMessage = "No video stream found.";
                 }
-                long estimatedBytes = (((videoStream.Width * videoStream.Height) - 21) * 3 / 8); // minus 4 cuz last 4 pixel are for message validation minus 16 cuz of 16 byte iv and minus 1 cus null termainator =minus 21
-                //still need to calc possible padding for the message
-                
                 await GenerateThumbnailAsync(videoPath);
             }
             catch (Exception ex)
@@ -157,56 +240,41 @@ namespace AvaloniaLsbProject1.ViewModels
                 ErrorMessage = "Video path, multicast IP, or port is missing.";
                 return;
             }
-
             if (string.IsNullOrEmpty(Duration))
             {
-                ErrorMessage = "video artribute : Duration, is null.  ";
+                ErrorMessage = "Video attribute 'Duration' is null.";
                 return;
             }
 
-            // Set processing state
             IsProcessing = true;
             StreamButtonText = "Streaming...";
             ProcessingStatusText = "Preparing Stream...";
             try
             {
                 string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe";
-
                 string fileExtension = Path.GetExtension(SelectedVideoPath).ToLower();
-                //string arguments = $"-re -i \"{SelectedVideoPath}\" -c:v libx264rgb -t 2.2 -preset veryfast -qp 0 -pix_fmt bgr24 -f mpegts udp://{MulticastIP}:{Port}";
-                //string arguments = $" -re -i \"{SelectedVideoPath}\" -c:v libx264 -f mpegts udp://{MulticastIP}:{Port}";
                 string arguments;
 
-                // Configure streaming parameters based on file format
                 switch (fileExtension)
                 {
                     case ".mp4":
-                        // For MP4: Direct stream with minimal processing when possible
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 2.2 -f mpegts udp://{MulticastIP}:{Port}";
                         break;
-
                     case ".avi":
-                        // For AVI: Often needs transcoding due to container limitations
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
                         break;
-
                     case ".mkv":
-                        // For MKV: Try to copy video stream but normalize audio
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c:v copy -c:a aac -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
                         break;
-
                     case ".mov":
-                        // For MOV: Apple formats sometimes need specific handling
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
                         break;
-
                     default:
-                        // Generic approach for other formats - more conversion but more compatible
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 6 -c:a mp2 -b:a 128k -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                 }
-                
-                Process ffmpegProcess = new Process
+
+                var ffmpegProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -214,8 +282,7 @@ namespace AvaloniaLsbProject1.ViewModels
                         Arguments = arguments,
                         WorkingDirectory = Path.GetDirectoryName(ffmpegPath),
                         UseShellExecute = false,
-                        RedirectStandardOutput = false,
-                        RedirectStandardError = true,  // Redirect error stream
+                        RedirectStandardError = true,
                         CreateNoWindow = false
                     }
                 };
@@ -224,7 +291,6 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     if (!string.IsNullOrWhiteSpace(e.Data))
                     {
-                        // You can log this output or display it in your UI.
                         Debug.WriteLine(e.Data);
                     }
                 };
@@ -232,8 +298,6 @@ namespace AvaloniaLsbProject1.ViewModels
                 ffmpegProcess.Start();
                 ffmpegProcess.BeginErrorReadLine();
                 ErrorMessage = $"Streaming to {MulticastIP}:{Port}...";
-
-
             }
             catch (Exception ex)
             {
@@ -247,40 +311,33 @@ namespace AvaloniaLsbProject1.ViewModels
             try
             {
                 string thumbnailPath = Path.Combine(projectPath, "temp_thumbnail.jpg");
-
-                // Use FFmpeg to extract a thumbnail
                 var conversion = FFmpeg.Conversions.New()
                     .AddParameter($"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 -f image2 \"{thumbnailPath}\"");
-
                 await conversion.Start();
 
-                // Load the thumbnail
                 if (File.Exists(thumbnailPath))
                 {
                     using (var fs = File.OpenRead(thumbnailPath))
                     {
-                        ThumbnailImage = new Bitmap(fs);
-
-                        ThumbnailImage = ThumbnailImage.CreateScaledBitmap(new PixelSize(160, 90), BitmapInterpolationMode.HighQuality);
+                        ThumbnailImage = new Avalonia.Media.Imaging.Bitmap(fs);
+                        ThumbnailImage = ThumbnailImage.CreateScaledBitmap(new PixelSize(160, 90), Avalonia.Media.Imaging.BitmapInterpolationMode.HighQuality);
                     }
-
-                    // Clean up
                     try { File.Delete(thumbnailPath); } catch { }
                 }
             }
             catch
             {
-                // Silently fail - thumbnail is not critical
                 ThumbnailImage = null;
             }
         }
+
         private async Task PreviewVideoAsync()
         {
             if (!string.IsNullOrEmpty(SelectedVideoPath))
             {
                 try
                 {
-                    HelperFunctions.PlayVideo(SelectedVideoPath);
+                    Services.HelperFunctions.PlayVideo(SelectedVideoPath);
                 }
                 catch (Exception ex)
                 {
@@ -299,18 +356,16 @@ namespace AvaloniaLsbProject1.ViewModels
 
             try
             {
-                string ffplayPath = @"C:\ffmpeg\bin\ffplay.exe"; // Update with your FFplay path
+                string ffplayPath = @"C:\ffmpeg\bin\ffplay.exe";
                 string arguments = $"-i udp://{MulticastIP}:{Port}";
 
-                Process ffplayProcess = new Process
+                var ffplayProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = ffplayPath,
                         Arguments = arguments,
                         UseShellExecute = false,
-                        RedirectStandardOutput = false,
-                        RedirectStandardError = false,
                         CreateNoWindow = false
                     }
                 };
@@ -331,30 +386,27 @@ namespace AvaloniaLsbProject1.ViewModels
                 ErrorMessage = "Multicast IP or port is missing.";
                 return;
             }
-
             if (string.IsNullOrEmpty(Duration))
             {
-                ErrorMessage = "video artribute : Duration, is null.  ";
+                ErrorMessage = "Video attribute 'Duration' is null.";
                 return;
             }
 
             try
             {
-                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe"; // Update with your FFmpeg path
-                string outputDirectory = @"C:\AvaloniaVideoStenagraphy"; // Desired output directory
+                string ffmpegPath = @"C:\ffmpeg\bin\ffmpeg.exe";
+                string outputDirectory = @"C:\AvaloniaVideoStenagraphy";
                 string outputFileName = "stream_capture" + DateTime.Now.ToString("dd.MM_HH:mm:ss") + ".mp4";
-                string outputFile = Path.Combine(outputDirectory, outputFileName); // Combine directory and filename
+                string outputFile = Path.Combine(outputDirectory, outputFileName);
                 string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t 2 \"{outputFile}\"";
 
-
-                Process ffmpegProcess = new Process
+                var ffmpegProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = ffmpegPath,
                         Arguments = arguments,
                         UseShellExecute = false,
-                        RedirectStandardOutput = false,
                         RedirectStandardError = true,
                         CreateNoWindow = false
                     }
@@ -362,7 +414,7 @@ namespace AvaloniaLsbProject1.ViewModels
 
                 ffmpegProcess.Start();
                 ErrorMessage = $"Downloading stream to {outputFile} for 2 seconds...";
-                await ffmpegProcess.WaitForExitAsync(); // Wait for the process to finish
+                await ffmpegProcess.WaitForExitAsync();
                 ErrorMessage = "Stream download completed.";
             }
             catch (Exception ex)
@@ -370,6 +422,5 @@ namespace AvaloniaLsbProject1.ViewModels
                 ErrorMessage = $"Error downloading stream: {ex.Message}";
             }
         }
-
     }
 }
