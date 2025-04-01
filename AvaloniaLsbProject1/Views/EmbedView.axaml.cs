@@ -10,8 +10,22 @@ namespace AvaloniaLsbProject1.Views
         {
             InitializeComponent();
             DataContext = new EmbedViewModel(sharedKey, role);
+
+            // When the control is loaded, assign its parent window to the view model.
+            this.Loaded += OnLoaded;
+
             // Attach the Click event handler
             BackButton.Click += OnBackButtonClick;
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // Retrieve the parent window from VisualRoot and assign it to the view model.
+            if (DataContext is EmbedViewModel vm)
+            {
+
+                vm.ParentWindow = this.VisualRoot as Window;
+            }
         }
 
         private void OnBackButtonClick(object sender, RoutedEventArgs e)

@@ -14,6 +14,10 @@ using System.Text;
 using Avalonia.Media.Imaging;
 using Avalonia;
 using System.Text.RegularExpressions;
+using Tmds.DBus.Protocol;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -162,18 +166,30 @@ namespace AvaloniaLsbProject1.ViewModels
 
         #region Constructor
         /// <summary>
+        /// Gets the shared key used in the key exchange process.
+        /// </summary>
+        public byte[]? SharedKey { get; }
+
+        /// <summary>
+        /// Gets the role of the current instance.
+        /// </summary>
+        public string? Role { get; }
+
+        public Window? ParentWindow { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EmbedViewModel"/> class.
         /// Sets up commands and initializes default values.
         /// </summary>
-         public byte[]? SharedKey { get; }
-
-        public string? Role {  get; }
+        /// <param name="sharedKey">The shared key used for encryption.</param>
+        /// <param name="role">The role of the current user (e.g., "Broadcaster" or "Listener").</param>
         public EmbedViewModel(byte[]? sharedKey,string role)
         {
             SelectVideoCommand = new AsyncRelayCommand(SelectVideoAsync);
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
+
             EmbedButtonText = "Embed Message";
             errorBoardercolor = "#FF4444";
             errorcolor = "#2a1e1e";
@@ -200,6 +216,18 @@ namespace AvaloniaLsbProject1.ViewModels
         }
         #endregion
 
+        #region Configuration Helper
+        /// <summary>
+        /// Loads the project paths configuration from the JSON file.
+        /// </summary>
+        /// <returns>A <see cref="ProjectPathsConfig"/> instance with the configuration data.</returns>
+        private ProjectPathsConfig LoadProjectConfig()
+        {
+            // Adjust the JSON file path as needed.
+            return ProjectPathsLoader.LoadConfig("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Json\\projectPaths.json");
+        }
+        #endregion
+
         #region Video Selection and Metadata Methods
 
         /// <summary>
@@ -208,13 +236,16 @@ namespace AvaloniaLsbProject1.ViewModels
         /// <returns>A task representing the asynchronous operation.</returns>
         private async Task SelectVideoAsync()
         {
-            string projectPath = "C:\\AvaloniaVideoStenagraphy";
-            string metaDataFile = Path.Combine(projectPath, "MetaData.csv");
+            // Load configuration to retrieve the base project path and metadata file location.
+            var config = LoadProjectConfig();
+            string projectPath = config.BaseProjectPath;
+            string metaDataFile = Path.Combine(projectPath, config.Paths.MetaDataFile);
 
             try
             {
                 var dialog = CreateVideoFileDialog();
-                var result = await dialog.ShowAsync(MainWindow.Instance);
+                var result = await dialog.ShowAsync(ParentWindow);
+
 
                 if (result?.Length > 0)
                 {
@@ -345,9 +376,10 @@ namespace AvaloniaLsbProject1.ViewModels
             // Set up processing state
             InitializeProcessingState();
 
-            // Set up project paths
-            string projectPath = "C:\\AvaloniaVideoStenagraphy";
-            ProjectPaths paths = SetupProjectPaths(projectPath);
+            // Load configuration to set up project paths.
+            var config = LoadProjectConfig();
+            string projectPath = config.BaseProjectPath;
+            ProjectPaths paths = SetupProjectPaths(projectPath, config);
 
             try
             {
@@ -442,17 +474,15 @@ namespace AvaloniaLsbProject1.ViewModels
         );
 
         /// <summary>
-        /// Sets up project paths based on the specified project directory.
+        /// Sets up project paths based on the specified project directory and configuration.
         /// </summary>
-        /// <param name="projectPath">The base project directory.</param>
-        /// <returns>A <see cref="ProjectPaths"/> record containing relevant paths.</returns>
-        private ProjectPaths SetupProjectPaths(string projectPath)
+        private ProjectPaths SetupProjectPaths(string projectPath, ProjectPathsConfig config)
         {
             return new ProjectPaths(
                 ProjectPath: projectPath,
-                AllFramesFolder: Path.Combine(projectPath, "AllFrames"),
-                AllFramesWithMessageFolder: Path.Combine(projectPath, "allFramesWithMessage"),
-                MetaDataFile: Path.Combine(projectPath, "MetaData.csv"),
+                AllFramesFolder: Path.Combine(projectPath, config.Paths.AllFramesFolder),
+                AllFramesWithMessageFolder: Path.Combine(projectPath, config.Paths.AllFramesWithMessageFolder),
+                MetaDataFile: Path.Combine(projectPath, config.Paths.MetaDataFile),
                 NewVideo: Path.Combine(projectPath, videoNameAndFormat)
             );
         }
@@ -525,10 +555,45 @@ namespace AvaloniaLsbProject1.ViewModels
         private void ReconstructVideoAndCleanup(ProjectPaths paths)
         {
             ErrorMessage = Services.HelperFunctions.ReconstructVideo(paths.AllFramesWithMessageFolder, paths.NewVideo, 30);
-            
+            if(ErrorMessage.Equals ("Video reconstruction completed successfully.")&&encryptionPassword!=null)
+            {
+                VideoKeyStorage(paths.NewVideo, encryptionPassword);
+            }
             DeleteDirectoryAndFiles(paths.AllFramesWithMessageFolder, paths.AllFramesFolder, paths.MetaDataFile);
         }
 
+        private void VideoKeyStorage(string newVideoPath, string encryptionPassword)
+        {
+            // Define the storage file path. You can adjust this path if necessary.
+            string storageFile = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
+
+            // Load existing dictionary or create a new one.
+            Dictionary<string, string> videoKeyDict;
+            if (File.Exists(storageFile))
+            {
+                string json = File.ReadAllText(storageFile);
+                videoKeyDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json)
+                               ?? new Dictionary<string, string>();
+            }
+            else
+            {
+                videoKeyDict = new Dictionary<string, string>();
+            }
+
+            // Extract the video name from the new video path.
+            string videoName = Path.GetFileName(newVideoPath);
+
+            // Check if the video name already exists in the dictionary (as a value).
+            if (!videoKeyDict.ContainsValue(videoName))
+            {
+                // Add the encryption password as the key and video name as the value.
+                videoKeyDict[encryptionPassword] = videoName;
+
+                // Write the updated dictionary back to the JSON file.
+                string newJson = JsonConvert.SerializeObject(videoKeyDict, Formatting.Indented);
+                File.WriteAllText(storageFile, newJson);
+            }
+        }
         /// <summary>
         /// Handles exceptions by setting the error message and logging the error.
         /// </summary>
@@ -596,7 +661,9 @@ namespace AvaloniaLsbProject1.ViewModels
         /// <returns>A task representing the asynchronous operation.</returns>
         private async Task GenerateThumbnailAsync(string videoPath)
         {
-            string projectPath = "C:\\AvaloniaVideoStenagraphy";
+            // Load configuration to retrieve the base project path.
+            var config = LoadProjectConfig();
+            string projectPath = config.BaseProjectPath;
             try
             {
                 string thumbnailPath = Path.Combine(projectPath, "temp_thumbnail.png");

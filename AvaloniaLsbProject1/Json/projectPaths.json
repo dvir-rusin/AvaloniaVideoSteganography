@@ -1,0 +1,10 @@
+﻿{
+  "BaseProjectPath": "C:\\AvaloniaVideoStenagraphy",
+  "Paths": {
+    "AllFramesFolder": "AllFrames",
+    "AllFramesWithMessageFolder": "allFramesWithMessage",
+    "MetaDataFile": "MetaData.csv",
+    "NewVideoIframes": "NewVideoIframes",
+    "NewVideo": "{videoNameAndFormat}"
+  }
+}
