@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,12 +15,12 @@ using Xabe.FFmpeg;
 namespace AvaloniaLsbProject1.Services
 {
     internal class Extraction
-    { 
-    // Example usage of the ExtractIFrames function
-    //string inputFilePath = "C:/Users/user 2017/Videos/WireShark/ArcVideo_clip.ts";
-    //string outputDirectory = "C:/Users/user 2017/Videos/WireShark/LSBextractedFrames";
-
-        public static async Task ExtractAllFrames(string videoFilePath, string outputDirectory)
+    {
+        // Example usage of the ExtractIFrames function
+        //string inputFilePath = "C:/Users/user 2017/Videos/WireShark/ArcVideo_clip.ts";
+        //string outputDirectory = "C:/Users/user 2017/Videos/WireShark/LSBextractedFrames";
+        
+        public static async Task ExtractAllFrames(string videoFilePath, string outputDirectory,double FPS)
         {
             // Set the FFmpeg path if not already set
             FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Change to your FFmpeg path
@@ -34,7 +35,7 @@ namespace AvaloniaLsbProject1.Services
             // Create the conversion with input and output
             var conversion = FFmpeg.Conversions.New()
                .AddParameter($"-i \"{videoFilePath}\"") // Input file path
-               .AddParameter(" -vf fps=30") // Extract 30 frame per second (adjust as needed
+               .AddParameter($" -vf fps=\"{FPS}\"") // Extract 30 frame per second (adjust as needed
                .AddParameter("-vsync vfr")  // Avoid duplicate frames
                .SetOutput(outputPattern);
 
@@ -46,7 +47,7 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("All frames have been extracted and saved to the output directory.");
         }
 
-        public static async Task ExtractIFrames(string videoFilePath, string outputDirectory)
+        public  static async Task ExtractIFrames(string videoFilePath, string outputDirectory)
         {
             // Set the FFmpeg path if not already set
             FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Change to your FFmpeg path  
@@ -76,10 +77,18 @@ namespace AvaloniaLsbProject1.Services
             // Get the first image to read the message length
             string MESSAGE = "NULL";
 
-            //added delay so it does not look for an I frame not existed yet
-            Thread.Sleep(1000);
+            
             string firstFramePath = Directory.GetFiles(IframeDirectory, "*.png").FirstOrDefault();
             
+            for(int i = 0; firstFramePath == null&& i < 20;i++)
+            {
+                //added delay so it does not look for an I frame not existed yet
+                firstFramePath = Directory.GetFiles(IframeDirectory, "*.png").FirstOrDefault();
+                Thread.Sleep(50);
+                  
+            }
+
+           
             if (firstFramePath == null)
             {
                 MESSAGE = "No frames found in the directory.";

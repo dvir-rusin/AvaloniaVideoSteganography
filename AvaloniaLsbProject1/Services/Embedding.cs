@@ -6,7 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AvaloniaLsbProject1.Services; // Ensure this namespace contains ProjectPathsLoader and related classes
+using AvaloniaLsbProject1.Services;
+using AvaloniaLsbProject1.ViewModels; // Ensure this namespace contains ProjectPathsLoader and related classes
 
 namespace AvaloniaLsbProject1.Services
 {
@@ -52,7 +53,12 @@ namespace AvaloniaLsbProject1.Services
             string outputframesDirectrory,
             int[] IframesLocation,
             string text,
-            string password)
+            string password,
+            string duration,
+            string fps,
+            double seconds
+            
+            )
         {
             // Use default paths from JSON config if the provided paths are null or empty.
             if (string.IsNullOrEmpty(inputframesDirectory) || string.IsNullOrEmpty(outputframesDirectrory))
@@ -92,8 +98,41 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("Binary Length: " + binaryLength);
             int indexer = 0;
 
-            // Optional delay for testing purposes
-            Thread.Sleep(20000);
+            // Parse duration and fps values
+            
+            string fpsNumber = fps.Split(' ')[0];
+            double doubleFpsNumber = double.Parse(fpsNumber);
+
+            // Calculate the expected frame count
+            int expectedFrameCount = (int)Math.Round(doubleFpsNumber * seconds);
+
+            // Set the timeout duration in seconds (e.g., 30 seconds)
+            double timeoutSeconds = 30;
+            DateTime startTime = DateTime.Now;
+
+            // Continuously check until the expected number of PNG files exist
+            // Continuously check until the expected number of PNG files exist or timeout is reached
+            while (Directory.GetFiles(inputframesDirectory, "*.png").Length < expectedFrameCount)
+            {
+                // Check if the timeout has been reached
+                if ((DateTime.Now - startTime).TotalSeconds > timeoutSeconds)
+                {
+                    ErrorMessage = ("Timeout reached: expected PNG files were not extracted in time.");
+                    break;
+                }
+
+                // Sleep briefly to reduce CPU usage
+                Thread.Sleep(100);
+            }
+
+            if (Directory.GetFiles(inputframesDirectory, "*.png").Length >= expectedFrameCount)
+            {
+                ErrorMessage =("Expected PNG files have been extracted.");
+            }
+            else
+            {
+                ErrorMessage = ("Exiting due to timeout.");
+            }
 
             foreach (string filePath in Directory.GetFiles(inputframesDirectory, "*.png"))
             {

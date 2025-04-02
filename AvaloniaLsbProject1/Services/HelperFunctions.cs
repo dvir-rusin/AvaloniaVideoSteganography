@@ -74,7 +74,7 @@ namespace AvaloniaLsbProject1.Services
         /// <param name="framesPath">Path to the folder containing the video frames.</param>
         /// <param name="outputFilePath">Path to save the reconstructed video file.</param>
         /// <param name="frameRate">Frame rate for the output video (e.g., 30).</param>
-        public static string ReconstructVideo(string framesPath, string outputFilePath, int frameRate)
+        public static string ReconstructVideo(string framesPath, string outputFilePath, double frameRate)
         {
             string message;
             // Check for FFmpeg availability

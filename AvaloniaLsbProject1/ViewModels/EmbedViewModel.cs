@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using Tmds.DBus.Protocol;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Collections;
 
 
 namespace AvaloniaLsbProject1.ViewModels
@@ -177,6 +178,8 @@ namespace AvaloniaLsbProject1.ViewModels
 
         public Window? ParentWindow { get; set; }
 
+        public double seconds {  get; set; }    
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EmbedViewModel"/> class.
         /// Sets up commands and initializes default values.
@@ -189,13 +192,13 @@ namespace AvaloniaLsbProject1.ViewModels
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
-
+            videoNameAndFormat = "NewVideo2april.mp4";
             EmbedButtonText = "Embed Message";
             errorBoardercolor = "#FF4444";
             errorcolor = "#2a1e1e";
             SharedKey = sharedKey;
             Role = role;
-
+            
             if (Role.Equals("Broadcaster"))
             {
                 encryptionPassword = Convert.ToBase64String(SharedKey!);
@@ -339,7 +342,7 @@ namespace AvaloniaLsbProject1.ViewModels
             FrameRate = $"{videoStream.Framerate} fps";
             BitRate = $"{videoStream.Bitrate / 1000} kbps";
             Duration = mediaInfo.Duration.ToString(@"hh\:mm\:ss\.fff");
-
+            seconds = mediaInfo.Duration.TotalSeconds;
             long estimatedBytes = (((videoStream.Width * videoStream.Height) - 21) * 3 / 8);//-21 cuz 1 null byte, 4 byte at end for message indication and 16 bytes IV for AES encryption
             EstimatedCapacity = FormatByteSize(estimatedBytes);
             UpdateCapacityUsage();
@@ -387,7 +390,11 @@ namespace AvaloniaLsbProject1.ViewModels
                 CreateProjectDirectories(paths);
 
                 // Extract frames if necessary
-                await ExtractFramesIfNeeded(paths);
+
+                string numberPart = frameRate.Split(' ')[0];
+                double FrameRate = double.Parse(numberPart);
+
+                await ExtractFramesIfNeeded(paths, FrameRate);
 
                 // Embed message in frames
                 await EmbedMessageInFrames(paths);
@@ -502,13 +509,13 @@ namespace AvaloniaLsbProject1.ViewModels
         /// </summary>
         /// <param name="paths">The project paths containing the frames folder.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task ExtractFramesIfNeeded(ProjectPaths paths)
+        private async Task ExtractFramesIfNeeded(ProjectPaths paths,double FPS)
         {
             if (!string.IsNullOrEmpty(SelectedVideoPath) &&
                 Directory.GetFiles(paths.AllFramesFolder).Length == 0)
             {
                 await Task.Run(() =>
-                    Services.Extraction.ExtractAllFrames(SelectedVideoPath, paths.AllFramesFolder)
+                    Services.Extraction.ExtractAllFrames(SelectedVideoPath, paths.AllFramesFolder,FPS)
                 );
             }
         }
@@ -530,14 +537,17 @@ namespace AvaloniaLsbProject1.ViewModels
 
             Directory.CreateDirectory(paths.AllFramesWithMessageFolder);
 
-            Thread.Sleep(1000);//added timer to fix csv and wait function crashes 
+            
             ErrorMessage = "EMBEDDING MESSAGE IN FRAMES";
             ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(
                 paths.AllFramesFolder,
                 paths.AllFramesWithMessageFolder,
                 iframesLocation,
                 MessageText,
-                EncryptionPassword
+                EncryptionPassword,
+                Duration,
+                FrameRate,
+                seconds
             );
 
             string firstFramePath = Directory.GetFiles(paths.AllFramesWithMessageFolder, "*.png").FirstOrDefault();
@@ -554,7 +564,11 @@ namespace AvaloniaLsbProject1.ViewModels
         /// <param name="paths">The project paths used during processing.</param>
         private void ReconstructVideoAndCleanup(ProjectPaths paths)
         {
-            ErrorMessage = Services.HelperFunctions.ReconstructVideo(paths.AllFramesWithMessageFolder, paths.NewVideo, 30);
+           
+
+            string numberPart = frameRate.Split(' ')[0];
+            double FrameRate = double.Parse(numberPart);
+            ErrorMessage = Services.HelperFunctions.ReconstructVideo(paths.AllFramesWithMessageFolder, paths.NewVideo, FrameRate);
             if(ErrorMessage.Equals ("Video reconstruction completed successfully.")&&encryptionPassword!=null)
             {
                 VideoKeyStorage(paths.NewVideo, encryptionPassword);
@@ -850,9 +864,19 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             try
             {
-                Directory.Delete(allFramesWithMessageFolder, true);
-                Directory.Delete(allFramesFolder, true);
-                File.Delete(metaDataFile);
+                if (Directory.Exists(allFramesWithMessageFolder))
+                {
+                    Directory.Delete(allFramesWithMessageFolder, true);
+                }
+                if(Directory.Exists(allFramesFolder))
+                {
+                    Directory.Delete(allFramesFolder, true);
+                }
+                if (File.Exists(metaDataFile))
+                {
+                    File.Delete(metaDataFile);
+                }
+                    
             }
             catch (Exception ex)
             {
