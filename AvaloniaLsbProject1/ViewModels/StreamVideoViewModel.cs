@@ -77,8 +77,7 @@ namespace AvaloniaLsbProject1.ViewModels
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
             streamButtonText = "Start Stream";
 
-            // Start the HTTPS server in the background.
-            Task.Run(() => StartHttpsServerAsync(_serverCts.Token));
+            
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
@@ -88,86 +87,7 @@ namespace AvaloniaLsbProject1.ViewModels
         public IAsyncRelayCommand PreviewVideoCommand { get; }
 
         // HTTPS server with Basic Authentication for the /download endpoint.
-        private async Task StartHttpsServerAsync(CancellationToken cancellationToken)
-        {
-            var builder = WebApplication.CreateBuilder();
-
-            // Configure Kestrel to listen on HTTPS port 5001.
-            builder.WebHost.ConfigureKestrel(options =>
-            {
-                options.ListenAnyIP(5001, listenOptions =>
-                {
-                    listenOptions.UseHttps();
-                });
-            });
-
-            var app = builder.Build();
-
-            // Custom middleware for Basic Authentication on /download.
-            app.Use(async (context, next) =>
-            {
-                if (context.Request.Path.StartsWithSegments("/download"))//https://localhost:5001/
-                {
-                    if (!context.Request.Headers.TryGetValue("Authorization", out var authHeader))
-                    {
-                        context.Response.StatusCode = 401;
-                        await context.Response.WriteAsync("Missing Authorization Header");
-                        return;
-                    }
-
-                    var validCredentials = "user:password123";
-                    var expectedAuthHeader = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(validCredentials));
-
-                    if (authHeader != expectedAuthHeader)
-                    {
-                        context.Response.StatusCode = 401;
-                        await context.Response.WriteAsync("Invalid credentials");
-                        return;
-                    }
-                }
-                await next();
-            });
-
-            // Serve a simple HTML page with a download button.
-            app.MapGet("/", () =>
-            {
-                string htmlContent = @"
-<!DOCTYPE html>
-<html lang='en'>
-<head>
-    <meta charset='utf-8' />
-    <title>Download Video</title>
-</head>
-<body>
-    <h1>Download Video</h1>
-    <button onclick=""window.location.href='/download'"">Download Video</button>
-</body>
-</html>";
-                return Results.Content(htmlContent, "text/html");
-            });
-
-            // Download endpoint: streams the selected video file.
-            app.MapGet("/download", async (HttpContext context) =>
-            {
-                string? videoPath = SelectedVideoPath;
-                if (string.IsNullOrEmpty(videoPath) || !File.Exists(videoPath))
-                {
-                    context.Response.StatusCode = 404;
-                    await context.Response.WriteAsync("Video not found.");
-                    return;
-                }
-
-                context.Response.ContentType = "video/mp4";
-                context.Response.Headers.ContentDisposition =
-                    $"attachment; filename=\"{Path.GetFileName(videoPath)}\"";
-
-                await using var stream = new FileStream(videoPath, FileMode.Open, FileAccess.Read);
-                await stream.CopyToAsync(context.Response.Body);
-            });
-
-            // Run the web server until cancellation is requested.
-            await app.RunAsync(cancellationToken);
-        }
+        
 
         private async Task SelectVideoAsync()
         {

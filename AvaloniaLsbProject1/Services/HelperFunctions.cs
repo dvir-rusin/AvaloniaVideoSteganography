@@ -86,6 +86,9 @@ namespace AvaloniaLsbProject1.Services
             //string arguments = $"-framerate {frameRate} -i \"{inputPattern}\" -c:v ffv1 \"{outputFilePath}\"";
             //"/C ffmpeg -i C:\\VideoSteganography\\allCombinedFrames\\%06d.bmp -pix_fmt bgr24 -c:v libx264rgb -preset veryslow -qp 0 C:\\VideoSteganography\\stegovideo.avi";
             //string arguments = $"-framerate {frameRate} -i \"{inputPattern}\" -c:v copy \"{outputFilePath}\"";
+
+            //-qp 0 option tells ffmpeg to use a quantizer of 0, which means no compression loss
+            //-pix_fmt bgr24 ensures that the pixel format remains unchanged
             string arguments = $"-framerate {frameRate} -i \"{inputPattern}\" -pix_fmt bgr24 -c:v libx264rgb -preset veryfast -qp 0 \"{outputFilePath}\"";
 
 

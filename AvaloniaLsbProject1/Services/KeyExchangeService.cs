@@ -18,7 +18,7 @@ public static class KeyExchangeService
     /// <returns>A task that represents the asynchronous read operation. The task result contains the received data as a byte array.</returns>
     public static async Task<byte[]> ListenAsync(int port)
     {
-        TcpListener listener = new(IPAddress.Loopback, port);
+        TcpListener listener = new(IPAddress.Loopback, port);//loopback 127.0.0.1
         listener.Start();
 
         using var client = await listener.AcceptTcpClientAsync();

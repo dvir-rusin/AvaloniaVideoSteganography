@@ -180,8 +180,6 @@ namespace AvaloniaLsbProject1.ViewModels
 
                 if (decryptionPassword != null)
                 {
-                    string DoubleframeRate = "29.6";
-                    int FrameRate = (int)double.Parse(DoubleframeRate);
                     // Prepare local variables for status updates.
                     string localSuccessOrError = "None";
                     IBrush localBorderBrush = new SolidColorBrush(Color.Parse("#CCCCCC"));

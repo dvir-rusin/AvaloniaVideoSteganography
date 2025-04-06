@@ -7,7 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AvaloniaLsbProject1.Services;
-using AvaloniaLsbProject1.ViewModels; // Ensure this namespace contains ProjectPathsLoader and related classes
+using AvaloniaLsbProject1.ViewModels;
+using Xabe.FFmpeg; // Ensure this namespace contains ProjectPathsLoader and related classes
 
 namespace AvaloniaLsbProject1.Services
 {
@@ -112,13 +113,14 @@ namespace AvaloniaLsbProject1.Services
 
             // Continuously check until the expected number of PNG files exist
             // Continuously check until the expected number of PNG files exist or timeout is reached
-            while (Directory.GetFiles(inputframesDirectory, "*.png").Length < expectedFrameCount)
+            bool exit = false;//bool exit to exit while loop
+            while (exit==false && Directory.GetFiles(inputframesDirectory, "*.png").Length < expectedFrameCount)
             {
                 // Check if the timeout has been reached
                 if ((DateTime.Now - startTime).TotalSeconds > timeoutSeconds)
                 {
                     ErrorMessage = ("Timeout reached: expected PNG files were not extracted in time.");
-                    break;
+                     exit = true;
                 }
 
                 // Sleep briefly to reduce CPU usage
@@ -134,42 +136,35 @@ namespace AvaloniaLsbProject1.Services
                 ErrorMessage = ("Exiting due to timeout.");
             }
 
-            foreach (string filePath in Directory.GetFiles(inputframesDirectory, "*.png"))
-            {
-                bool isEmpty = false;
-                bool messageComplete = false;
-                int messageIndex = 0;
-                bool isNumberInFile = false;
+            string[] filePaths = Directory.GetFiles(inputframesDirectory, "*.png");
 
+            Parallel.ForEach(filePaths, filePath =>
+            {
                 int numberInFile = HelperFunctions.extractNumberFromFilePath(filePath);
+                bool isIFrame = IframesLocation.Contains(numberInFile);
+
                 using (Bitmap bitmap = new Bitmap(filePath))
                 {
-                    for (int i = indexer; isNumberInFile != true && i < IframesLocation.Length; i++)
+                    if (isIFrame)
                     {
-                        if (numberInFile == IframesLocation.ElementAt(i))
-                        {
-                            isNumberInFile = true;
-                            indexer++;
-                        }
-                    }
-                    if (isNumberInFile == true)
-                    {
+                        bool messageComplete = false;
+                        int messageIndex = 0;
+                        // Process pixels to embed the message
                         for (int y = 0; y < bitmap.Height && !messageComplete; y++)
                         {
                             for (int x = 0; x < bitmap.Width && !messageComplete; x++)
                             {
                                 Color pixelColor = bitmap.GetPixel(x, y);
-
                                 int r = pixelColor.R, g = pixelColor.G, b = pixelColor.B;
 
                                 r = EmbedBitInColorChannel(r, binaryEncryptedMessage, ref messageIndex);
                                 g = EmbedBitInColorChannel(g, binaryEncryptedMessage, ref messageIndex);
                                 b = EmbedBitInColorChannel(b, binaryEncryptedMessage, ref messageIndex);
 
+                                // When message embedding is complete, mark the frame
                                 if (messageIndex >= binaryEncryptedMessage.Length)
                                 {
                                     messageComplete = true;
-                                    // Create an indication for message presence using four specific pixels
                                     bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
                                     bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
                                     bitmap.SetPixel(bitmap.Width - 3, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
@@ -177,15 +172,23 @@ namespace AvaloniaLsbProject1.Services
                                 }
 
                                 bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
-                                Console.WriteLine("bitmap has been saved with the number: " + numberInFile);
                             }
                         }
+                        Console.WriteLine("Processed I-frame: " + numberInFile);
+                    }
+                    else
+                    {
+                        // For non-I-frames, simply proceed without embedding.
+                        Console.WriteLine("Copying non I-frame: " + numberInFile);
                     }
 
+                    // Save every processed frame so you can recreate the video later
                     string outputFilePath = Path.Combine(outputframesDirectrory, Path.GetFileName(filePath));
                     bitmap.Save(outputFilePath, System.Drawing.Imaging.ImageFormat.Png);
                 }
-            }
+            });
+
+
 
             string firstFramePath = Directory.GetFiles(outputframesDirectrory, "*.png").FirstOrDefault();
             if (firstFramePath == null)

@@ -193,7 +193,7 @@
 									<TextBlock Text="New Video Name" Classes="label"/>
 									<TextBox Text="{Binding VideoNameAndFormat}"
                                              Watermark="NewVideo.mp4"
-											/>
+											 />
 								</StackPanel>
 							</StackPanel>
 						</StackPanel>

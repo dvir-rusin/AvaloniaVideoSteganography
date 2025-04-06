@@ -149,8 +149,8 @@ namespace AvaloniaLsbProject1.Services
             System.Drawing.Color pixelColor;
             string HiddenMsg = "null";
             bool DoesContainMessage = true;
-
-            for (int i = 1;i<=4;i++)
+            bool exit = false;
+            for (int i = 1;i<=4&& exit==false; i++)
             {
                 int r =frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1).R;
                 int g = frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1).G;
@@ -162,11 +162,11 @@ namespace AvaloniaLsbProject1.Services
                     // Extraction failed with some error
                     DisplayErrorMessage(ref ErrorBoarderColor, ref ErrorColor, ref sucssesOrErorr, ref SucssesOrErorrTextColor);
 
-                    break;
+                    exit=true;
                 }
             }
-            
-            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && DoesContainMessage; i++)
+            exit = false;
+            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && DoesContainMessage&&exit==false; i++)
             {
                 int x = i % frameBitmap.Width;
                 int y = i / frameBitmap.Width;
@@ -180,7 +180,7 @@ namespace AvaloniaLsbProject1.Services
                     if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
                     {
                         HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
-                        break;
+                        exit = true;
                     }
 
                 }
