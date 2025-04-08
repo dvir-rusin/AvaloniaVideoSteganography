@@ -154,6 +154,7 @@
                                      BorderThickness="0"
                                      IsReadOnly="True"
                                      AcceptsReturn="True"
+									 Height="60"
 									   IsVisible="{Binding !!ErrorMessage}"/>
 						</StackPanel>
 					</Border>

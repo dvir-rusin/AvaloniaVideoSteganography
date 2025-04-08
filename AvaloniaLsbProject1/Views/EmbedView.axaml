@@ -226,18 +226,25 @@
 						</StackPanel>
 					</StackPanel>
 
-					<!-- Error Messages -->
+					<!-- Error and sucsses Messages FF6666 -->
 					<Border Background="{Binding Errorcolor}"
                             BorderBrush="{Binding ErrorBoardercolor}"
                             BorderThickness="1"
                             CornerRadius="8"
                             IsVisible="{Binding !!ErrorMessage}">
-						<TextBox Text="{Binding ErrorMessage}"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 IsReadOnly="True"
-                                 AcceptsReturn="True"
-                                 Margin="10"/>
+						<StackPanel Spacing="5" Margin="15">
+							<TextBlock Text="{Binding SucssesOrErorr}"
+                                      Foreground="{Binding SucssesOrErorrTextColor} "
+                                      FontWeight="SemiBold"
+									     IsVisible="{Binding !!ErrorMessage}"/>
+							<TextBox Text="{Binding ErrorMessage}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+									 Height="60"
+									   IsVisible="{Binding !!ErrorMessage}"/>
+						</StackPanel>
 					</Border>
 				</StackPanel>
 			</Border>

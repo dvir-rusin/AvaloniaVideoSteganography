@@ -70,14 +70,9 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("All I-frames have been extracted and saved to the output directory.");
         }
 
-        public static string ExtractMessageFromIFrames(string IframeDirectory,string password, ref IBrush errorBoarder , ref IBrush ErrorColor , ref string sucssesOrErorr, ref IBrush SucssesOrErorrTextColor)
+        public static string ExtractMessageFromIFrames(string IframeDirectory,string password , ref string sucssesOrErorr)
         {
            
-            Console.WriteLine("Extracting message from frames...");
-            // Get the first image to read the message length
-            string MESSAGE = "NULL";
-
-            
             string firstFramePath = Directory.GetFiles(IframeDirectory, "*.png").FirstOrDefault();
             
             for(int i = 0; firstFramePath == null&& i < 20;i++)
@@ -91,86 +86,73 @@ namespace AvaloniaLsbProject1.Services
            
             if (firstFramePath == null)
             {
-                MESSAGE = "No frames found in the directory.";
-                Console.WriteLine("-exiting-");
-                return MESSAGE;
+                sucssesOrErorr = "Error";
+                return "No frames found in the specified folder.";
             }
 
-            foreach (string filePath in Directory.GetFiles(IframeDirectory, "*.png"))
+            try
             {
-               
-                string message;
-                Bitmap frameBitmap = new Bitmap(filePath);
-                using (frameBitmap)
+                foreach (string filePath in Directory.GetFiles(IframeDirectory, "*.png"))
                 {
-                    //int messageLength = GetMessageLength(frameBitmap);
-                    //Console.WriteLine("msglen:" + messageLength);
-                    MESSAGE = GetHiddenMessage(frameBitmap,password, ref errorBoarder, ref ErrorColor, ref sucssesOrErorr, ref SucssesOrErorrTextColor);
-                    MESSAGE = ("Hidden Message: " + MESSAGE);
+
+                    string message;
+                    Bitmap frameBitmap = new Bitmap(filePath);
+                    using (frameBitmap)
+                    {
+                        string result = GetHiddenMessage(frameBitmap, password, ref sucssesOrErorr);
+
+                        // If we successfully extracted a message, return it
+                        if (sucssesOrErorr == "Success")
+                        {
+                            return result;
+                        }
+                    }
+
                 }
-                return MESSAGE;
+                // If we checked all frames but found no message
+                sucssesOrErorr = "Error";
+                return "No valid message found in any of the video frames.";
             }
-            return MESSAGE;
+
+            catch (Exception ex)
+            {
+                sucssesOrErorr = "Error";
+                return $"Error extracting message: {ex.Message}";
+            }
+            
 
         }
 
-        private static void DisplayErrorMessage(ref IBrush ErrorBoarderColor,
-            ref IBrush ErrorColor,
-            ref string sucssesOrErorr,
-            ref IBrush SucssesOrErorrTextColor)
-        {
-            ErrorBoarderColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#FF4444")); // Red border
-            ErrorColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#2a1e1e")); // Dark red text
-            SucssesOrErorrTextColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#FF4444")); // Dark red text
-            sucssesOrErorr = "Error";
-        }
-        private static void DisplaySuccessMessage(ref IBrush ErrorBoarderColor,
-            ref IBrush ErrorColor,
-            ref string sucssesOrErorr,
-            ref IBrush SucssesOrErorrTextColor)
-        {
-            ErrorBoarderColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#44FF44")); // Green border
-            ErrorColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#1e2a1e")); // Dark green text
-            SucssesOrErorrTextColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#44FF44")); // Dark green text
-            sucssesOrErorr = "Success";
-        }
+        
 
-        private static string GetHiddenMessage
-            (Bitmap frameBitmap,
-            string password,
-            ref IBrush ErrorBoarderColor , 
-            ref IBrush ErrorColor, 
-            ref string sucssesOrErorr, 
-            ref IBrush SucssesOrErorrTextColor)
+        private static string GetHiddenMessage(Bitmap frameBitmap,string password,ref string sucssesOrErorr)
         {
 
             StringBuilder binaryMessage = new StringBuilder();
             int messageBitsExtracted = 0;
             System.Drawing.Color pixelColor;
             string HiddenMsg = "null";
-            bool DoesContainMessage = true;
+            bool doesContainMessage = true;
             bool exit = false;
-            for (int i = 1;i<=4&& exit==false; i++)
+
+            // Check if the frame contains a message by examining marker pixels
+            for (int i = 1;i<=4&& !exit; i++)
             {
-                int r =frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1).R;
-                int g = frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1).G;
-                int b = frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1).B;
+                
                 if (frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(254, 1, 1))
                 {
-                    DoesContainMessage = false;
-                    HiddenMsg = "this video does not contain a message ";
-                    // Extraction failed with some error
-                    DisplayErrorMessage(ref ErrorBoarderColor, ref ErrorColor, ref sucssesOrErorr, ref SucssesOrErorrTextColor);
-
-                    exit=true;
+                    doesContainMessage = false;
+                    sucssesOrErorr = "Error";
+                    return "This video does not contain a message";
                 }
             }
-            exit = false;
-            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && DoesContainMessage&&exit==false; i++)
+            
+            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && doesContainMessage && !exit; i++)
             {
                 int x = i % frameBitmap.Width;
                 int y = i / frameBitmap.Width;
                 pixelColor = frameBitmap.GetPixel(x, y);
+
                 // Extract the LSB from each color channel
                 binaryMessage.Append((pixelColor.R & 1) == 1 ? "1" : "0");
                 messageBitsExtracted++;
@@ -184,32 +166,40 @@ namespace AvaloniaLsbProject1.Services
                     }
 
                 }
-
-                binaryMessage.Append((pixelColor.G & 1) == 1 ? "1" : "0");
-                messageBitsExtracted++;
-                if (messageBitsExtracted % 8 == 0)
+                if(!exit)
                 {
-                    HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
-                    if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
+                    // Extract LSB from Green channel
+                    binaryMessage.Append((pixelColor.G & 1) == 1 ? "1" : "0");
+                    messageBitsExtracted++;
+                    if (messageBitsExtracted % 8 == 0)
                     {
-                        HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
-                        break;
-                    }
+                        HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
+                        if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
+                        {
+                            HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
+                            exit = true;
+                        }
 
+                    }
                 }
 
-                binaryMessage.Append((pixelColor.B & 1) == 1 ? "1" : "0");
-                messageBitsExtracted++;
-                if (messageBitsExtracted % 8 == 0)
+                if (!exit)
                 {
-                    HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
-                    if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
+                    // Extract LSB from Blue channel
+                    binaryMessage.Append((pixelColor.B & 1) == 1 ? "1" : "0");
+                    messageBitsExtracted++;
+                    if (messageBitsExtracted % 8 == 0)
                     {
-                        HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
-                        break;
-                    }
+                        HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
+                        if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
+                        {
+                            HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
+                            exit = true;
+                        }
 
+                    }
                 }
+                    
 
             }
             //binary message still includes the /0 at the end the one that was removed from each hidden message if statement 
@@ -219,7 +209,7 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("\nEnter the custom key to decrypt:");
             string inputKey = password; // Read the custom key from the user for decryption
             string decrypted = "this video does not contain a message ";
-            if (DoesContainMessage == true)
+            if (doesContainMessage == true)
             {
                 try
                 {
@@ -228,16 +218,19 @@ namespace AvaloniaLsbProject1.Services
                     decrypted = EncryptionAes.Decrypt(HiddenMsg, inputKey);
                     Console.WriteLine($"Decrypted Text: {decrypted}");
                     // Successful extraction
-                    DisplaySuccessMessage(ref ErrorBoarderColor,ref ErrorColor, ref sucssesOrErorr,ref SucssesOrErorrTextColor);  
+                    sucssesOrErorr = "Success";
+                    return decrypted;
+                    
                 }
                 catch
                 {
                     // Handle decryption failure (e.g., incorrect custom key)
-                    decrypted = ("Decryption failed. Check your custom key.");
-                    DisplayErrorMessage(ref ErrorBoarderColor, ref ErrorColor, ref sucssesOrErorr, ref SucssesOrErorrTextColor);
+                    sucssesOrErorr = "Error";
+                    return "Decryption failed. Check your custom key.";
+
                 }
             }
-            return decrypted;
+            return "This video does not contain a message";
             //string extractedMessage = lsbExtractIFramesProject.HelperFunctions.BinaryToString(binaryMessage.ToString());
             //Console.WriteLine($"Extracted Message: {extractedMessage}");
 

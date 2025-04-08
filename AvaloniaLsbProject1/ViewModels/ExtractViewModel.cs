@@ -100,6 +100,48 @@ namespace AvaloniaLsbProject1.ViewModels
 
         #endregion
 
+        #region Message Status Helper Methods
+
+        /// <summary>
+        /// Displays an error message with red styling.
+        /// </summary>
+        /// <param name="message">The error message to display.</param>
+        private void DisplayErrorMessage(string message)
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444")); // Red border
+            Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e")); // Dark red text
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444")); // Dark red text
+            SucssesOrErorr = "Error";
+            ErrorMessage = message;
+        }
+
+        /// <summary>
+        /// Displays a success message with green styling.
+        /// </summary>
+        /// <param name="message">The success message to display.</param>
+        private void DisplaySuccessMessage(string message)
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#44FF44")); // Green border
+            Errorcolor = new SolidColorBrush(Color.Parse("#1e2a1e")); // Dark green text
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#44FF44")); // Dark green text
+            SucssesOrErorr = "Success";
+            ErrorMessage = message;
+        }
+
+        /// <summary>
+        /// Resets the message display to default state.
+        /// </summary>
+        private void ResetMessageDisplay()
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#CCCCCC"));
+            Errorcolor = new SolidColorBrush(Color.Parse("#000000"));
+            SucssesOrErorr = "None";
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));
+            ErrorMessage = null;
+        }
+
+        #endregion
+
         #region Configuration Helper
 
         /// <summary>
@@ -136,6 +178,7 @@ namespace AvaloniaLsbProject1.ViewModels
             if (result?.Length > 0)
             {
                 SelectedVideoPath = result[0];
+                ResetMessageDisplay(); // Reset any previous error/success messages
             }
         }
 
@@ -149,26 +192,41 @@ namespace AvaloniaLsbProject1.ViewModels
         /// </summary>
         private async Task ExtractMessageAsync()
         {
-            if (!ValidateInitialConditions())
+            string result = ValidateInitialConditions();
+            if (result.Equals("Currently Processing."))
             {
+                DisplayErrorMessage(result);
+                return;
+            }
+            if (result.Equals("Video path or password is missing."))
+            {
+                DisplayErrorMessage(result);
+                return;
+            }
+            if (result.Equals("No video file selected. Please select a video file before extracting a message."))
+            {
+                DisplayErrorMessage(result);
                 return;
             }
 
-            ErrorMessage = string.Empty;
+            ResetMessageDisplay();
             ProcessingStatusText = "Extracting Message";
             ExtractButtonText = "Extracting Message";
             IsProcessing = true;
 
-            // Load configuration for project paths.
-            var config = LoadProjectConfig();
-            string projectPath = config.BaseProjectPath;
-            string allFramesFolder = Path.Combine(projectPath, config.Paths.AllFramesFolder);
-            string allFramesWithMessageFolder = Path.Combine(projectPath, config.Paths.AllFramesWithMessageFolder);
-            string metaDataFile = Path.Combine(projectPath, config.Paths.MetaDataFile);
-            string newVideoIframes = Path.Combine(projectPath, config.Paths.NewVideoIframes);
+            
+            //string allFramesFolder = Path.Combine(projectPath, config.Paths.AllFramesFolder);
+            //string allFramesWithMessageFolder = Path.Combine(projectPath, config.Paths.AllFramesWithMessageFolder);
+            //string metaDataFile = Path.Combine(projectPath, config.Paths.MetaDataFile);
+           
 
             try
             {
+                // Load configuration for project paths.
+                var config = LoadProjectConfig();
+                string projectPath = config.BaseProjectPath;
+                string newVideoIframes = Path.Combine(projectPath, config.Paths.NewVideoIframes);
+                
                 // Ensure the folder for new video I-frames exists.
                 if (!Directory.Exists(newVideoIframes))
                 {
@@ -180,26 +238,24 @@ namespace AvaloniaLsbProject1.ViewModels
 
                 if (decryptionPassword != null)
                 {
-                    // Prepare local variables for status updates.
-                    string localSuccessOrError = "None";
-                    IBrush localBorderBrush = new SolidColorBrush(Color.Parse("#CCCCCC"));
-                    IBrush localColorBrush = new SolidColorBrush(Color.Parse("#000000"));
-                    IBrush localSucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));
+                    // Status tracking variable
+                    string status = "None";
 
-                    // Extract the hidden message from the frames.
-                    ErrorMessage = Services.Extraction.ExtractMessageFromIFrames(
-                        newVideoIframes,
-                        decryptionPassword,
-                        ref localBorderBrush,
-                        ref localColorBrush,
-                        ref localSuccessOrError,
-                        ref localSucssesOrErorrTextColor);
+                    // Extract message from I - frames
+                 result = Services.Extraction.ExtractMessageFromIFrames(
+                    newVideoIframes,
+                    decryptionPassword,
+                    ref status);
 
-                    // Update view model properties with the result.
-                    ErrorBoardercolor = localBorderBrush;
-                    Errorcolor = localColorBrush;
-                    sucssesOrErorr = localSuccessOrError;
-                    sucssesOrErorrTextColor = localSucssesOrErorrTextColor;
+                    // Display appropriate message based on status
+                    if (status == "Success")
+                    {
+                        DisplaySuccessMessage(result);
+                    }
+                    else
+                    {
+                        DisplayErrorMessage(result);
+                    }
 
                     // Clean up by deleting the I-frames directory.
                     Directory.Delete(newVideoIframes, true);
@@ -207,11 +263,7 @@ namespace AvaloniaLsbProject1.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
-                errorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
-                errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));
-                sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));
-                sucssesOrErorr = "Error";
+                DisplayErrorMessage($"Error extracting message: {ex.Message}");
             }
             finally
             {
@@ -251,35 +303,25 @@ namespace AvaloniaLsbProject1.ViewModels
         /// Validates initial conditions required for message extraction.
         /// </summary>
         /// <returns>True if conditions are met; otherwise, false.</returns>
-        private bool ValidateInitialConditions()
+        private string ValidateInitialConditions()
         {
             if (IsProcessing)
             {
-                return false;
+                return "Currently Processing.";
             }
 
             if (string.IsNullOrEmpty(SelectedVideoPath) || string.IsNullOrEmpty(decryptionPassword))
             {
-                ErrorMessage = "Video path or password is missing.";
-                errorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
-                errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));
-                sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));
-                sucssesOrErorr = "Error";
-                return false;
+                return "Video path or password is missing.";
             }
 
             if (string.IsNullOrEmpty(SelectedVideoPath))
             {
-                ErrorMessage = "No video file selected. Please select a video file before extracting a message.";
-                errorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444"));
-                errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e"));
-                sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444"));
-                sucssesOrErorr = "Error";
-                return false;
+                return "No video file selected. Please select a video file before extracting a message.";
             }
 
-            ErrorMessage = string.Empty;
-            return true;
+            ErrorMessage = null;
+            return "";
         }
 
         #endregion

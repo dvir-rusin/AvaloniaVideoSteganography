@@ -86,10 +86,7 @@
 			<!-- Main Content Area -->
 			<ContentControl x:Name="ContentArea">
 				<ContentControl>
-					<PageSlide Duration="0.2"
-                              Orientation="Horizontal"
-                              SlideInEasing="CubicEaseOut"
-                              SlideOutEasing="CubicEaseIn"/>
+					
 				</ContentControl>
 			</ContentControl>
 		</DockPanel>

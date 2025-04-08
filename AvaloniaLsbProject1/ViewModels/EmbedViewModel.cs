@@ -133,14 +133,18 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty] private string? videoNameAndFormat;
 
         /// <summary>
-        /// color for error / sucess message
+        /// Gets or sets the border brush used for error/success messages.
         /// </summary>
-        [ObservableProperty] private string? errorBoardercolor;
+        [ObservableProperty] public IBrush? errorBoardercolor;
 
         /// <summary>
-        /// color for error / sucess message
+        /// Gets or sets the text color used for error/success messages.
         /// </summary>
-        [ObservableProperty] private string? errorcolor;
+        [ObservableProperty] public IBrush? errorcolor;
+
+        [ObservableProperty] public IBrush? sucssesOrErorrTextColor;
+
+        [ObservableProperty] public string? sucssesOrErorr;
         #endregion
 
         #region Commands
@@ -194,8 +198,11 @@ namespace AvaloniaLsbProject1.ViewModels
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
             videoNameAndFormat = "NewVideo2april.mp4";
             EmbedButtonText = "Embed Message";
-            errorBoardercolor = "#FF4444";
-            errorcolor = "#2a1e1e";
+            // Initialize default colors and status.
+            errorBoardercolor = new SolidColorBrush(Color.Parse("#CCCCCC"));
+            errorcolor = new SolidColorBrush(Color.Parse("#000000"));
+            sucssesOrErorr = "None";
+            sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));
             SharedKey = sharedKey;
             Role = role;
             
@@ -206,6 +213,48 @@ namespace AvaloniaLsbProject1.ViewModels
         }
         #endregion
 
+
+        #region Message Status Helper Methods
+
+        /// <summary>
+        /// Displays an error message with red styling.
+        /// </summary>
+        /// <param name="message">The error message to display.</param>
+        private void DisplayErrorMessage(string message)
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444")); // Red border
+            Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e")); // Dark red text
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444")); // Dark red text
+            SucssesOrErorr = "Error";
+            ErrorMessage = message;
+        }
+
+        /// <summary>
+        /// Displays a success message with green styling.
+        /// </summary>
+        /// <param name="message">The success message to display.</param>
+        private void DisplaySuccessMessage(string message)
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#44FF44")); // Green border
+            Errorcolor = new SolidColorBrush(Color.Parse("#1e2a1e")); // Dark green text
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#44FF44")); // Dark green text
+            SucssesOrErorr = "Success";
+            ErrorMessage = message;
+        }
+
+        /// <summary>
+        /// Resets the message display to default state.
+        /// </summary>
+        private void ResetMessageDisplay()
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#CCCCCC"));
+            Errorcolor = new SolidColorBrush(Color.Parse("#000000"));
+            SucssesOrErorr = "None";
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));
+            ErrorMessage = null;
+        }
+
+        #endregion
         #region Partial Methods
         /// <summary>
         /// Partial method triggered when the message text changes.
@@ -253,15 +302,16 @@ namespace AvaloniaLsbProject1.ViewModels
                 if (result?.Length > 0)
                 {
                     await ProcessSelectedVideo(result[0], metaDataFile);
+                    ResetMessageDisplay(); // Reset any previous error/success messages
                 }
                 else
                 {
-                    ErrorMessage = "No video file was selected.";
+                    DisplayErrorMessage("No video file was selected.");
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error selecting video: {ex.Message}";
+                DisplayErrorMessage($"Error selecting video: {ex.Message}") ;
             }
         }
 
@@ -317,12 +367,12 @@ namespace AvaloniaLsbProject1.ViewModels
                 }
                 else
                 {
-                    ErrorMessage = "No video stream found.";
+                    DisplayErrorMessage("No video stream found.");
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error extracting video attributes: {ex.Message}";
+                DisplayErrorMessage($"Error extracting video attributes: {ex.Message}");
             }
             finally
             {
@@ -427,30 +477,30 @@ namespace AvaloniaLsbProject1.ViewModels
 
             if (string.IsNullOrEmpty(MessageText) || string.IsNullOrEmpty(EncryptionPassword))
             {
-                ErrorMessage = "Message text or password is missing.";
+                DisplayErrorMessage("Message text or password is missing.");
                 return false;
             }
 
             if (string.IsNullOrEmpty(SelectedVideoPath))
             {
-                ErrorMessage = "No video file selected. Please select a video file before embedding a message.";
+                DisplayErrorMessage("No video file selected. Please select a video file before embedding a message.");
                 return false;
             }
 
             string pattern = @"^.+\.(mp4|mkv|avi)$";
             if (string.IsNullOrEmpty(videoNameAndFormat))
             {
-                ErrorMessage = "the new video name is null";
+                DisplayErrorMessage("the new video name is null");
                 return false;
             }
             else if (!Regex.IsMatch(videoNameAndFormat, pattern))
             {
-                ErrorMessage = "The video name must end with LOWER CASED .mp4, .mkv, or .avi";
+                DisplayErrorMessage("The video name must end with LOWER CASED .mp4, .mkv, or .avi");
                 return false;
             } 
 
 
-            ErrorMessage = string.Empty;
+            ErrorMessage = null;
             return true;
         }
 
@@ -553,7 +603,7 @@ namespace AvaloniaLsbProject1.ViewModels
             string firstFramePath = Directory.GetFiles(paths.AllFramesWithMessageFolder, "*.png").FirstOrDefault();
             if (firstFramePath == null)
             {
-                ErrorMessage = "No frames found in allFramesWithMessageFolder directory.";
+                DisplayErrorMessage("No frames found in allFramesWithMessageFolder directory.");
                 throw new InvalidOperationException("No frames created during embedding");
             }
         }
@@ -571,7 +621,13 @@ namespace AvaloniaLsbProject1.ViewModels
             ErrorMessage = Services.HelperFunctions.ReconstructVideo(paths.AllFramesWithMessageFolder, paths.NewVideo, FrameRate);
             if(ErrorMessage.Equals ("Video reconstruction completed successfully.")&&encryptionPassword!=null)
             {
+                // Store the encryption password and video name in the JSON file.
                 VideoKeyStorage(paths.NewVideo, encryptionPassword);
+                DisplaySuccessMessage("Video reconstruction completed successfully.");
+            }
+            else
+            {
+                DisplayErrorMessage(ErrorMessage);
             }
             DeleteDirectoryAndFiles(paths.AllFramesWithMessageFolder, paths.AllFramesFolder, paths.MetaDataFile);
         }
@@ -644,7 +700,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage = $"Error previewing video: {ex.Message}";
+                     DisplayErrorMessage($"Error previewing video: {ex.Message}");
                 }
             }
         }
@@ -661,7 +717,7 @@ namespace AvaloniaLsbProject1.ViewModels
             }
             else
             {
-                ErrorMessage = "CANT PLAY VIDEO selectedVideoPath is null";
+                DisplayErrorMessage("CANT PLAY VIDEO selectedVideoPath is null");
             }
         }
         #endregion
@@ -880,7 +936,7 @@ namespace AvaloniaLsbProject1.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
+                DisplayErrorMessage(ex.Message);
             }
         }
         #endregion

@@ -121,7 +121,7 @@ namespace AvaloniaLsbProject1.Services
 
                     process.WaitForExit();
 
-                    message =  ("Video reconstruction completed successfully.");
+                    message =  "Video reconstruction completed successfully.";
                 }
             }
             catch (Exception ex)

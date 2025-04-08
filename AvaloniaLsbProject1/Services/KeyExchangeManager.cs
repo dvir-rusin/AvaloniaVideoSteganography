@@ -93,7 +93,7 @@ namespace AvaloniaLsbProject1.Services
 
             // Convert the shared secret to a byte array (unsigned, big‑endian).
             byte[] sharedSecretBytes = sharedSecret.ToByteArray(isUnsigned: true, isBigEndian: true);
-
+            
             // Derive a 32-byte shared key by hashing the shared secret with SHA256.
             using (SHA256 sha256 = SHA256.Create())
             {

@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 using System.Net.Http;
 using Microsoft.AspNetCore.Hosting;
+using Avalonia.Media;
 
 namespace AvaloniaLsbProject1.ViewModels
 {
@@ -65,8 +66,19 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private Avalonia.Media.Imaging.Bitmap thumbnailImage;
 
-        // Cancellation token for HTTPS server.
-        private CancellationTokenSource _serverCts = new CancellationTokenSource();
+        /// <summary>
+        /// Gets or sets the border brush used for error/success messages.
+        /// </summary>
+        [ObservableProperty] public IBrush? errorBoardercolor;
+
+        /// <summary>
+        /// Gets or sets the text color used for error/success messages.
+        /// </summary>
+        [ObservableProperty] public IBrush? errorcolor;
+
+        [ObservableProperty] public IBrush? sucssesOrErorrTextColor;
+
+        [ObservableProperty] public string? sucssesOrErorr;
 
         public StreamVideoViewModel()
         {
@@ -77,7 +89,13 @@ namespace AvaloniaLsbProject1.ViewModels
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
             streamButtonText = "Start Stream";
 
-            
+            // Initialize default colors and status.
+            errorBoardercolor = new SolidColorBrush(Color.Parse("#CCCCCC"));
+            errorcolor = new SolidColorBrush(Color.Parse("#000000"));
+            sucssesOrErorr = "None";
+            sucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#000000"));
+
+
         }
 
         public IAsyncRelayCommand SelectVideoCommand { get; }
@@ -111,7 +129,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 }
                 else
                 {
-                    ErrorMessage = "No video file was selected.";
+                    DisplayErrorMessage("No video file was selected.");
                 }
             }
             catch (Exception ex)
@@ -139,13 +157,13 @@ namespace AvaloniaLsbProject1.ViewModels
                 }
                 else
                 {
-                    ErrorMessage = "No video stream found.";
+                    DisplayErrorMessage("No video stream found.");
                 }
                 await GenerateThumbnailAsync(videoPath);
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error extracting video attributes: {ex.Message}";
+                DisplayErrorMessage($"Error extracting video attributes: {ex.Message}") ;
             }
             finally
             {
@@ -157,16 +175,17 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             if (string.IsNullOrEmpty(SelectedVideoPath) || string.IsNullOrEmpty(MulticastIP) || string.IsNullOrEmpty(Port))
             {
-                ErrorMessage = "Video path, multicast IP, or port is missing.";
+                DisplayErrorMessage("Video path, multicast IP, or port is missing.");
                 return;
             }
             if (string.IsNullOrEmpty(Duration))
             {
-                ErrorMessage = "Video attribute 'Duration' is null.";
+                DisplayErrorMessage("Video attribute 'Duration' is null.");
                 return;
             }
 
             IsProcessing = true;
+            ErrorMessage = null;
             StreamButtonText = "Streaming...";
             ProcessingStatusText = "Preparing Stream...";
             try
@@ -217,11 +236,13 @@ namespace AvaloniaLsbProject1.ViewModels
 
                 ffmpegProcess.Start();
                 ffmpegProcess.BeginErrorReadLine();
-                ErrorMessage = $"Streaming to {MulticastIP}:{Port}...";
+                // Update view model properties with the result.
+                DisplaySuccessMessage($"Streaming to {MulticastIP}:{Port}...");
+
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error streaming video: {ex.Message}";
+                DisplayErrorMessage($"Error streaming video: {ex.Message}");
             }
         }
 
@@ -261,7 +282,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage = $"Error previewing video: {ex.Message}";
+                    DisplayErrorMessage($"Error previewing video: {ex.Message}");
                 }
             }
         }
@@ -270,7 +291,7 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             if (string.IsNullOrEmpty(MulticastIP) || string.IsNullOrEmpty(Port))
             {
-                ErrorMessage = "Multicast IP or port is missing.";
+                DisplayErrorMessage("Multicast IP or port is missing.");
                 return;
             }
 
@@ -291,24 +312,27 @@ namespace AvaloniaLsbProject1.ViewModels
                 };
 
                 ffplayProcess.Start();
-                ErrorMessage = $"Playing video from {MulticastIP}:{Port}...";
+                DisplaySuccessMessage($"Playing video from {MulticastIP}:{Port}...");
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error playing video: {ex.Message}";
+                DisplayErrorMessage($"Error playing video: {ex.Message}");
             }
         }
 
         private async Task DownloadStreamAsync()
         {
+            ErrorMessage = null;
             if (string.IsNullOrEmpty(MulticastIP) || string.IsNullOrEmpty(Port))
             {
-                ErrorMessage = "Multicast IP or port is missing.";
+                
+                DisplayErrorMessage("Multicast IP or port is missing.");
                 return;
             }
             if (string.IsNullOrEmpty(Duration))
             {
-                ErrorMessage = "Video attribute 'Duration' is null.";
+                
+                DisplayErrorMessage("Video attribute 'Duration' is null.");
                 return;
             }
 
@@ -333,14 +357,32 @@ namespace AvaloniaLsbProject1.ViewModels
                 };
 
                 ffmpegProcess.Start();
-                ErrorMessage = $"Downloading stream to {outputFile} for 2 seconds...";
+                DisplaySuccessMessage($"Downloading stream to {outputFile} for 2 seconds...");
                 await ffmpegProcess.WaitForExitAsync();
-                ErrorMessage = "Stream download completed.";
+                DisplaySuccessMessage("Stream download completed.");
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error downloading stream: {ex.Message}";
+                DisplayErrorMessage($"Error downloading stream: {ex.Message}");
             }
+        }
+
+        private void DisplayErrorMessage(string message)
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#FF4444")); // Red border
+            Errorcolor = new SolidColorBrush(Color.Parse("#2a1e1e")); // Dark red text
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#FF4444")); // Dark red text
+            SucssesOrErorr = "Error";
+            ErrorMessage = message;
+        }
+
+        private void DisplaySuccessMessage(string message)
+        {
+            ErrorBoardercolor = new SolidColorBrush(Color.Parse("#44FF44")); // Green border
+            Errorcolor = new SolidColorBrush(Color.Parse("#1e2a1e")); // Dark green text
+            SucssesOrErorrTextColor = new SolidColorBrush(Color.Parse("#44FF44")); // Dark green text
+            SucssesOrErorr = "Success";
+            ErrorMessage = message;
         }
     }
 }
