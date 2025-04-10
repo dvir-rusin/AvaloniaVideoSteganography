@@ -74,12 +74,13 @@ namespace AvaloniaLsbProject1.Services
         /// <param name="framesPath">Path to the folder containing the video frames.</param>
         /// <param name="outputFilePath">Path to save the reconstructed video file.</param>
         /// <param name="frameRate">Frame rate for the output video (e.g., 30).</param>
-        public static string ReconstructVideo(string framesPath, string outputFilePath, double frameRate)
+        public static string ReconstructVideo(string framesPath, string outputFilePath, double frameRate,int[] iFramesLocations)
         {
             string message;
             // Check for FFmpeg availability
             string ffmpegPath = "ffmpeg"; // Assumes ffmpeg is in system PATH
             string inputPattern = $"{framesPath}\\frame_%04d.png"; // Adjust for the frame naming format (e.g., frame_0001.png)
+            string arguments;
 
             // FFmpeg command to reconstruct and compress video
             //string arguments = $"-framerate {frameRate} -i \"{inputPattern}\" -c:v libx264  -qp 0 -preset ultrafast -an -x264-params \"intra-refresh=0:intra-block-copy=1\" \"{outputFilePath}\"";
@@ -89,7 +90,31 @@ namespace AvaloniaLsbProject1.Services
 
             //-qp 0 option tells ffmpeg to use a quantizer of 0, which means no compression loss
             //-pix_fmt bgr24 ensures that the pixel format remains unchanged
-            string arguments = $"-framerate {frameRate} -i \"{inputPattern}\" -pix_fmt bgr24 -c:v libx264rgb -preset veryfast -qp 0 \"{outputFilePath}\"";
+
+            //last worked on 
+            //string arguments = $"-framerate {frameRate} -i \"{inputPattern}\" -pix_fmt bgr24 -c:v libx264rgb -preset veryfast -qp 0 \"{outputFilePath}\"";
+
+            if (iFramesLocations != null && iFramesLocations.Length > 0)
+            {
+                // Adjust for the off-by-one issue by subtracting 1 from each frame number
+                var adjustedFrames = iFramesLocations.Select(frameNum => Math.Max(0, frameNum - 1)).ToArray();
+
+                // Build an expression that will be true when n (current frame) equals any of our target frames
+                // Format: eq(n,1)+eq(n,50)+eq(n,100) etc.
+                var frameExpressions = adjustedFrames.Select(frameNum => $"eq(n,{frameNum})");
+                string keyframeExpr = string.Join("+", frameExpressions);
+
+                // Use the expression format for force_key_frames
+                arguments = $"-framerate {frameRate} -i \"{inputPattern}\" " +
+                           $"-c:v libx264rgb -preset ultrafast -qp 0 -pix_fmt bgr24 " +
+                           $"-force_key_frames \"expr:{keyframeExpr}\" " +
+                           $"\"{outputFilePath}\"";
+            }
+            else
+            {
+                arguments = $"-framerate {frameRate} -i \"{inputPattern}\" " +
+                           $"-c:v libx264 -preset ultrafast -qp 0 \"{outputFilePath}\"";
+            }
 
 
 

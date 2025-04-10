@@ -447,10 +447,10 @@ namespace AvaloniaLsbProject1.ViewModels
                 await ExtractFramesIfNeeded(paths, FrameRate);
 
                 // Embed message in frames
-                await EmbedMessageInFrames(paths);
+                int[] iframesLocation = await EmbedMessageInFrames(paths);
 
                 // Reconstruct video
-                ReconstructVideoAndCleanup(paths);
+                ReconstructVideoAndCleanup(paths, iframesLocation);
             }
             catch (Exception ex)
             {
@@ -575,20 +575,25 @@ namespace AvaloniaLsbProject1.ViewModels
         /// </summary>
         /// <param name="paths">The project paths used during embedding.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task EmbedMessageInFrames(ProjectPaths paths)
+        private async Task<int[]> EmbedMessageInFrames(ProjectPaths paths)
         {
+            // Check that the metadata file exists
             if (!File.Exists(paths.MetaDataFile))
             {
                 ErrorMessage = "MetaData file does not exist";
-                return;
+                return null;
             }
 
+            // Extract I-frame locations
             int[] iframesLocation = await Services.Extraction.GetIFrameLocations(paths.MetaDataFile);
 
+            // Create output directory if it does not exist
             Directory.CreateDirectory(paths.AllFramesWithMessageFolder);
 
-            
+            // Logging message to indicate embedding started
             ErrorMessage = "EMBEDDING MESSAGE IN FRAMES";
+
+            // Embed the message in the frames
             ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(
                 paths.AllFramesFolder,
                 paths.AllFramesWithMessageFolder,
@@ -600,25 +605,29 @@ namespace AvaloniaLsbProject1.ViewModels
                 seconds
             );
 
+            // Ensure that at least one frame has been created
             string firstFramePath = Directory.GetFiles(paths.AllFramesWithMessageFolder, "*.png").FirstOrDefault();
             if (firstFramePath == null)
             {
                 DisplayErrorMessage("No frames found in allFramesWithMessageFolder directory.");
                 throw new InvalidOperationException("No frames created during embedding");
             }
+
+            // Return the array of I-frame locations for use in reconstruction
+            return iframesLocation;
         }
 
         /// <summary>
         /// Reconstructs the video from frames and performs cleanup of temporary files and directories.
         /// </summary>
         /// <param name="paths">The project paths used during processing.</param>
-        private void ReconstructVideoAndCleanup(ProjectPaths paths)
+        private void ReconstructVideoAndCleanup(ProjectPaths paths,int[] iFramesLocations)
         {
            
 
             string numberPart = frameRate.Split(' ')[0];
             double FrameRate = double.Parse(numberPart);
-            ErrorMessage = Services.HelperFunctions.ReconstructVideo(paths.AllFramesWithMessageFolder, paths.NewVideo, FrameRate);
+            ErrorMessage = Services.HelperFunctions.ReconstructVideo(paths.AllFramesWithMessageFolder, paths.NewVideo, FrameRate,iFramesLocations);
             if(ErrorMessage.Equals ("Video reconstruction completed successfully.")&&encryptionPassword!=null)
             {
                 // Store the encryption password and video name in the JSON file.
