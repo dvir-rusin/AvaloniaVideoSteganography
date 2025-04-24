@@ -645,7 +645,7 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             // Define the storage file path. You can adjust this path if necessary.
             string storageFile = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
-
+            string MasterPath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\MasterKey.txt";
             // Load existing dictionary or create a new one.
             Dictionary<string, string> videoKeyDict;
             if (File.Exists(storageFile))
@@ -661,12 +661,15 @@ namespace AvaloniaLsbProject1.ViewModels
 
             // Extract the video name from the new video path.
             string videoName = Path.GetFileName(newVideoPath);
+            var storedHash = File.ReadAllText(MasterPath);
 
             // Check if the video name already exists in the dictionary (as a value).
-            if (!videoKeyDict.ContainsValue(videoName))
+            var Encryptedname = EncryptionAes.Encrypt(videoName, storedHash);
+            var Encryptedpass = EncryptionAes.Encrypt(encryptionPassword, storedHash);
+            if (!videoKeyDict.ContainsValue(Encryptedname))
             {
                 // Add the encryption password as the key and video name as the value.
-                videoKeyDict[encryptionPassword] = videoName;
+                videoKeyDict[Encryptedpass] = Encryptedname;
 
                 // Write the updated dictionary back to the JSON file.
                 string newJson = JsonConvert.SerializeObject(videoKeyDict, Formatting.Indented);

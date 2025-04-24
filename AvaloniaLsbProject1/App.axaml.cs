@@ -35,7 +35,7 @@ namespace AvaloniaLsbProject1
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var config = ProjectPathsLoader.LoadConfig("Json/projectPaths.json");
+                var config = ProjectPathsLoader.LoadConfig("C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json");
                 string projectPath = config.BaseProjectPath;
                 ProjectPaths paths = SetupProjectPaths(projectPath, config);
 

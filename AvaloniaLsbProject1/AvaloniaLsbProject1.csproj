@@ -44,10 +44,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Json\projectPaths.json">
+		<None Update="C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Json\VideoKeyStorage.json">
+		<None Update="C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

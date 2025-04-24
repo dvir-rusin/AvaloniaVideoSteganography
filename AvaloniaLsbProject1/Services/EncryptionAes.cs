@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -95,6 +96,64 @@ namespace AvaloniaLsbProject1.Services
                 }
             }
         }
-    
+
+        /// <summary>
+        /// One-time utility function to encrypt an existing video key storage file
+        /// Use this when migrating from plaintext to encrypted storage
+        /// </summary>
+        /// <param name="masterPassword">Master password to use for encryption</param>
+        /// <returns>True if encryption was successful</returns>
+        public static bool EncryptExistingVideoKeyStorage(string masterPassword)
+        {
+            string storagePath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
+
+            try
+            {
+                // Check if file exists
+                if (!File.Exists(storagePath))
+                {
+                    return false;
+                }
+
+                // Load existing dictionary with plaintext entries
+                string json = File.ReadAllText(storagePath);
+                var plaintextDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json)
+                                 ?? new Dictionary<string, string>();
+
+                // Create new dictionary for encrypted entries
+                var encryptedDict = new Dictionary<string, string>();
+
+                // Encrypt each entry
+                foreach (var entry in plaintextDict)
+                {
+                    string videoName = entry.Key;
+                    string password = entry.Value;
+
+                    // Encrypt both values
+                    string encryptedName = EncryptionAes.Encrypt(videoName, masterPassword);
+                    string encryptedPassword = EncryptionAes.Encrypt(password, masterPassword);
+
+                    // Add to new dictionary
+                    encryptedDict[encryptedName] = encryptedPassword;
+                }
+
+                // Create backup of original file
+                string backupPath = storagePath + ".backup";
+                File.Copy(storagePath, backupPath, true);
+
+                // Save encrypted dictionary back to the same file
+                string encryptedJson = JsonConvert.SerializeObject(encryptedDict, Formatting.Indented);
+                File.WriteAllText(storagePath, encryptedJson);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log error if needed
+                Console.WriteLine($"Error encrypting storage: {ex.Message}");
+                return false;
+            }
+        }
+
     }
 }

@@ -25,8 +25,8 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty] public string? successOrError;
         [ObservableProperty] public string? errorMessage;
 
-        private const string MasterPath = "Json/MasterKey.txt";
-        private const string StoragePath = "Json/VideoKeyStorage.json";
+        private const string MasterPath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\MasterKey.txt";
+        private const string StoragePath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
         
         [ObservableProperty] private bool isMasterKeySet;
         [ObservableProperty] private bool isUnlocked;
@@ -102,14 +102,15 @@ namespace AvaloniaLsbProject1.ViewModels
                 if (storedHash != ComputeHash(MasterPassword))
                     throw new CryptographicException("Wrong password");
 
+                // Use the stored hash as the encryption/decryption key
+                //bool worked = EncryptionAes.EncryptExistingVideoKeyStorage(storedHash);
+
                 // Decrypt every entry
                 var list = new ObservableCollection<VideoEntry>();
                 foreach (var kv in _encryptedStore)
                 {
-                    //var name = EncryptionAes.Decrypt(kv.Key, MasterPassword);
-                    //var pwd = EncryptionAes.Decrypt(kv.Value, MasterPassword);
-                    var name = kv.Key;
-                    var pwd = kv.Value;
+                    var name = EncryptionAes.Decrypt(kv.Key, storedHash);
+                    var pwd = EncryptionAes.Decrypt(kv.Value, storedHash);
                     list.Add(new VideoEntry { VideoName = name, Password = pwd });
                 }
                 IsUnlocked = true;

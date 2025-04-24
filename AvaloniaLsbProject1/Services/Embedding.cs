@@ -26,7 +26,7 @@ namespace AvaloniaLsbProject1.Services
         private static (string inputFramesDirectory, string outputFramesDirectory) GetDefaultPaths()
         {
             // Load the configuration from the JSON file (adjust the path as needed)
-            var config = ProjectPathsLoader.LoadConfig("Json/projectPaths.json");
+            var config = ProjectPathsLoader.LoadConfig("C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json");
             string basePath = config.BaseProjectPath;
             string inputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesFolder);
             string outputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesWithMessageFolder);
