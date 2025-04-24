@@ -9,11 +9,14 @@
 	<!-- Application Resources -->
 	<Application.Resources>
 		<!-- Register the PageToColorConverter -->
-		<styles:PageToColorConverter x:Key="PageToColorConverter"/>
+		
 	</Application.Resources>
 
 	<Application.Styles>
 		<!-- Include your global styles -->
+		
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+
 		<StyleInclude Source="avares://AvaloniaLsbProject1/Styles/Styles.axaml"/>
 		<!-- Include FluentTheme (or any other theme) -->
 		<FluentTheme />

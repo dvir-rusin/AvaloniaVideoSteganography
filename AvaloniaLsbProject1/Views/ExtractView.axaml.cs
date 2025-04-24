@@ -6,6 +6,14 @@ namespace AvaloniaLsbProject1.Views
 {
     public partial class ExtractView : UserControl
     {
+
+        public ExtractView()
+            : this(null, "Designer")
+        {
+            if (Design.IsDesignMode)
+                return;
+        }
+
         public ExtractView(byte[]? sharedKey,string role)
         {
             InitializeComponent();

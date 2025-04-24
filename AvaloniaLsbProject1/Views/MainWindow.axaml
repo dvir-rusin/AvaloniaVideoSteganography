@@ -61,24 +61,19 @@
                               Spacing="10">
 						<MenuItem Header="🏠 Home"
                                   Command="{Binding NavigateToHomeCommand}"
-                                  Classes.active="{Binding CurrentPage, 
-                                    Converter={StaticResource PageToColorConverter}, 
-                                    ConverterParameter=Home}"/>
+                                  />
 						<MenuItem Header="🔒 Embed Message"
                                   Command="{Binding NavigateToEmbedCommand}"
-                                  Classes.active="{Binding CurrentPage, 
-                                    Converter={StaticResource PageToColorConverter}, 
-                                    ConverterParameter=Embed}"/>
+                                  />
 						<MenuItem Header="🔓 Extract Message"
                                   Command="{Binding NavigateToExtractCommand}"
-                                  Classes.active="{Binding CurrentPage, 
-                                    Converter={StaticResource PageToColorConverter}, 
-                                    ConverterParameter=Extract}"/>
+                                  />
 						<MenuItem Header="📺 Stream Video"
                                   Command="{Binding NavigateToStreamCommand}"
-                                  Classes.active="{Binding CurrentPage, 
-                                    Converter={StaticResource PageToColorConverter}, 
-                                    ConverterParameter=Stream}"/>
+                                  />
+						<MenuItem Header="📚 Library"
+          Command="{Binding NavigateToLibraryCommand}" />
+
 					</StackPanel>
 				</StackPanel>
 			</Border>

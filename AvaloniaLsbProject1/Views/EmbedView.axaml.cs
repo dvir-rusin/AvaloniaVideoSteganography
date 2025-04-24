@@ -6,6 +6,15 @@ namespace AvaloniaLsbProject1.Views
 {
     public partial class EmbedView : UserControl
     {
+
+        
+        public EmbedView()
+            : this(null, "Designer")
+        {
+            // skip runtime wiring when in the XAML previewer
+            if (Design.IsDesignMode)
+                return;
+        }
         public EmbedView(byte[]? sharedKey,string role)
         {
             InitializeComponent();

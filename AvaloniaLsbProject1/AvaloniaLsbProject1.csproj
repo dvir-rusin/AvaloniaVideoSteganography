@@ -1,33 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Models\" />
+		<AvaloniaResource Include="Assets\**" />
+		<Content Include="steganographyreactivedemo.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-    <PackageReference Include="CsvHelper" Version="33.0.1" />
-    <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
-    <PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
-    <PackageReference Include="Xabe.FFmpeg.Downloader" Version="5.2.6" />
-  </ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Core Avalonia packages—all aligned to 11.2.8 -->
+		<PackageReference Include="Avalonia"                       Version="11.2.8" />
+		<PackageReference Include="Avalonia.Desktop"               Version="11.2.8" />
+		<PackageReference Include="Avalonia.Themes.Fluent"         Version="11.2.8" />
+		<PackageReference Include="Avalonia.Fonts.Inter"          Version="11.2.8" />
+		<PackageReference Include="Avalonia.Diagnostics"           Version="11.2.8">
+			<IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+		</PackageReference>
+
+		<!-- DataGrid support -->
+		<PackageReference Include="Avalonia.Controls.DataGrid"     Version="11.2.8" />
+
+		<!-- MVVM Toolkit and JSON -->
+		<PackageReference Include="CommunityToolkit.Mvvm"          Version="8.2.1" />
+		<PackageReference Include="Newtonsoft.Json"                Version="13.0.3" />
+
+		<!-- Other dependencies -->
+		<PackageReference Include="CsvHelper"                      Version="33.0.1" />
+		<PackageReference Include="Emgu.CV"                        Version="4.10.0.5680" />
+		<PackageReference Include="System.Drawing.Common"          Version="9.0.0" />
+		<PackageReference Include="Xabe.FFmpeg"                    Version="6.0.1" />
+		<PackageReference Include="Xabe.FFmpeg.Downloader"         Version="6.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Json\projectPaths.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Json\VideoKeyStorage.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

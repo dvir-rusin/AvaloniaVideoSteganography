@@ -21,6 +21,8 @@ namespace AvaloniaLsbProject1.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+
+       
         /// <summary>
         /// Gets the current instance of the MainWindow.
         /// </summary>
@@ -46,10 +48,27 @@ namespace AvaloniaLsbProject1.Views
         /// </summary>
         public KeyExchangeManager KeyExchange { get; }
 
+        public record ProjectPaths(
+           string ProjectPath,
+           string AllFramesFolder,
+           string AllFramesWithMessageFolder,
+           string MetaDataFile
+
+       );
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MainWindow"/> class with the specified role.
         /// </summary>
         /// <param name="role">The role of the window ("Listener" or "Broadcaster").</param>
+        /// 
+
+        /// friendly ctor
+        public MainWindow()
+            : this("Designer")
+        {
+            if (Design.IsDesignMode)
+                return;
+        }
         public MainWindow(string role)
         {
             Instance = this; // Set the static instance for use elsewhere
@@ -75,7 +94,15 @@ namespace AvaloniaLsbProject1.Views
             var config = LoadProjectConfig();
             string projectPath = config.BaseProjectPath;
 
-            CheckForDeletedVideosInProjectPath(projectPath);
+            //this works on plain text needs to be changed to work on the encrypted text or delete manually
+            //CheckForDeletedVideosInProjectPath(projectPath);
+
+            ProjectPaths paths = SetupProjectPaths(projectPath, config);
+
+            DeleteDirectoryAndFiles(allFramesFolder: paths.AllFramesFolder,
+                allFramesWithMessageFolder: paths.AllFramesWithMessageFolder,
+                metaDataFile: paths.MetaDataFile
+            );
 
         }
 
@@ -84,6 +111,47 @@ namespace AvaloniaLsbProject1.Views
             // Adjust the JSON file path as necessary.
             return ProjectPathsLoader.LoadConfig("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Json\\projectPaths.json");
         }
+
+        private ProjectPaths SetupProjectPaths(string projectPath, ProjectPathsConfig config)
+        {
+            return new ProjectPaths(
+                projectPath,
+                Path.Combine(projectPath, config.Paths.AllFramesFolder),
+                Path.Combine(projectPath, config.Paths.AllFramesWithMessageFolder),
+                Path.Combine(projectPath, config.Paths.MetaDataFile)
+
+
+            );
+        }
+
+        #region Cleanup Methods
+
+        /// <summary>
+        /// Deletes temporary directories and files used during video processing.
+        /// </summary>
+        /// <param name="allFramesWithMessageFolder">The directory containing frames with embedded messages.</param>
+        /// <param name="allFramesFolder">The directory containing all extracted frames.</param>
+        /// <param name="metaDataFile">The metadata file path.</param>
+        private void DeleteDirectoryAndFiles(string allFramesWithMessageFolder, string allFramesFolder, string metaDataFile)
+        {
+            
+                if (Directory.Exists(allFramesWithMessageFolder))
+                {
+                    Directory.Delete(allFramesWithMessageFolder, true);
+                }
+                if (Directory.Exists(allFramesFolder))
+                {
+                    Directory.Delete(allFramesFolder, true);
+                }
+                if (File.Exists(metaDataFile))
+                {
+                    File.Delete(metaDataFile);
+                }
+
+            
+            
+        }
+        #endregion
 
 
         public void CheckForDeletedVideosInProjectPath(string projectPath)

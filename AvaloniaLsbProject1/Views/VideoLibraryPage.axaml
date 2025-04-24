@@ -1,0 +1,83 @@
+<!-- File: Views/VideoLibraryPage.axaml -->
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
+    x:Class="AvaloniaLsbProject1.Views.VideoLibraryPage"
+    x:DataType="vm:VideoLibraryViewModel">
+
+	<Grid Margin="20">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<!-- 1) Feedback banner -->
+		<Border Grid.Row="0"
+				Background="{Binding ErrorColor}"
+				BorderBrush="{Binding ErrorBorderColor}"
+				BorderThickness="1"
+				CornerRadius="8"
+				Padding="10"
+				IsVisible="{Binding !!ErrorMessage}">
+			<StackPanel Spacing="5">
+				<TextBlock Text="{Binding SuccessOrError}"
+						   Foreground="{Binding SuccessOrErrorTextColor}"
+						   FontWeight="SemiBold"
+						   IsVisible="{Binding !!ErrorMessage}" />
+				<TextBox Text="{Binding ErrorMessage}"
+						 Background="Transparent"
+						 BorderThickness="0"
+						 IsReadOnly="True"
+						 AcceptsReturn="True"
+						 Height="60"
+						 IsVisible="{Binding !!ErrorMessage}" />
+			</StackPanel>
+		</Border>
+
+		<!-- 2) Create Master Password -->
+		<StackPanel Grid.Row="1"
+					IsVisible="{Binding IsMasterKeyNotSet}"
+					Spacing="10">
+			<TextBlock Text="Create Master Password" Classes="label"/>
+			<TextBox Text="{Binding NewMasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					 PasswordChar="●"
+					 Watermark="Enter new master password"/>
+			<Button Content="Set Password"
+					Command="{Binding SetMasterPasswordCommand}"
+					Width="140"/>
+		</StackPanel>
+
+		<!-- 3) Unlock existing key -->
+		<StackPanel Grid.Row="2"
+					IsVisible="{Binding IsMasterKeySet}"
+					Spacing="10">
+			<TextBlock Text="Enter Master Password" Classes="label"/>
+			<TextBox Text="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					 PasswordChar="●"
+					 Watermark="Enter master password"/>
+			<Button Content="Unlock"
+					Command="{Binding EnterMasterPasswordCommand}"
+					Width="100"/>
+		</StackPanel>
+
+		<!-- 4) Decrypted Library Table -->
+		<Border Grid.Row="3"
+				IsVisible="{Binding IsUnlocked}"
+				Background="#242842"
+				CornerRadius="8"
+				Padding="20">
+			<DataGrid ItemsSource="{Binding VideoEntries}"
+					  AutoGenerateColumns="False"
+					  HeadersVisibility="Column"
+					  IsReadOnly="True">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="Video Name" Binding="{Binding VideoName}"/>
+					<DataGridTextColumn Header="Password"   Binding="{Binding Password}"/>
+				</DataGrid.Columns>
+			</DataGrid>
+		</Border>
+	</Grid>
+</UserControl>
