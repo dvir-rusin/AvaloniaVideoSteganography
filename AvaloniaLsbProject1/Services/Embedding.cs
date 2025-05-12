@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AvaloniaLsbProject1.Services;
 using AvaloniaLsbProject1.ViewModels;
+// remove this message
 using Xabe.FFmpeg; // Ensure this namespace contains ProjectPathsLoader and related classes
 
 namespace AvaloniaLsbProject1.Services
@@ -26,6 +27,7 @@ namespace AvaloniaLsbProject1.Services
         private static (string inputFramesDirectory, string outputFramesDirectory) GetDefaultPaths()
         {
             // Load the configuration from the JSON file (adjust the path as needed)
+            //make this relative
             var config = ProjectPathsLoader.LoadConfig("C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json");
             string basePath = config.BaseProjectPath;
             string inputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesFolder);
@@ -52,9 +54,12 @@ namespace AvaloniaLsbProject1.Services
         public static string EmbedMessageInFramesTestInVideo(
             string inputframesDirectory,
             string outputframesDirectrory,
+            //why use a primative array
             int[] IframesLocation,
             string text,
+            //is the password hashed?
             string password,
+            // why are the duration and fps strings
             string duration,
             string fps,
             double seconds
@@ -68,7 +73,7 @@ namespace AvaloniaLsbProject1.Services
                 inputframesDirectory = defaultPaths.inputFramesDirectory;
                 outputframesDirectrory = defaultPaths.outputFramesDirectory;
             }
-
+            //why create this string when its only used for returning an error?
             string ErrorMessage;
             Console.WriteLine("Enter text to encrypt:");
             string UserInputMessage = text; // Read the plaintext input from the user
@@ -106,7 +111,7 @@ namespace AvaloniaLsbProject1.Services
 
             // Calculate the expected frame count
             int expectedFrameCount = (int)Math.Round(doubleFpsNumber * seconds);
-
+            //this is a gpt comment
             // Set the timeout duration in seconds (e.g., 30 seconds)
             double timeoutSeconds = 30;
             DateTime startTime = DateTime.Now;
@@ -119,6 +124,7 @@ namespace AvaloniaLsbProject1.Services
                 // Check if the timeout has been reached
                 if ((DateTime.Now - startTime).TotalSeconds > timeoutSeconds)
                 {
+                    //The error message will be erased by the new ones because the exit will occur in the while loop
                     ErrorMessage = ("Timeout reached: expected PNG files were not extracted in time.");
                      exit = true;
                 }
@@ -164,6 +170,7 @@ namespace AvaloniaLsbProject1.Services
                                 // When message embedding is complete, mark the frame
                                 if (messageIndex >= binaryEncryptedMessage.Length)
                                 {
+                                    // mark it true only after setting the pixels, and do it in a try and catch
                                     messageComplete = true;
                                     bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
                                     bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
