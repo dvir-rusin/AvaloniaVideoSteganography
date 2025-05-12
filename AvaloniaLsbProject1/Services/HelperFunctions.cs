@@ -96,12 +96,38 @@ namespace AvaloniaLsbProject1.Services
 
             if (iFramesLocations != null && iFramesLocations.Length > 0)
             {
-                // Adjust for the off-by-one issue by subtracting 1 from each frame number
+                /// <summary>
+                /// Adjusts frame indices from 1-based to 0-based (as required by FFmpeg),
+                /// while ensuring no negative indices are included.
+                /// </summary>
+                /// <remarks>
+                /// FFmpeg expects 0-based frame numbers for its force_key_frames expression.
+                /// If any frameNum is 0 or less, it will be clamped to 0.
+                /// </remarks>
                 var adjustedFrames = iFramesLocations.Select(frameNum => Math.Max(0, frameNum - 1)).ToArray();
 
-                // Build an expression that will be true when n (current frame) equals any of our target frames
-                // Format: eq(n,1)+eq(n,50)+eq(n,100) etc.
+                /// <summary>
+                /// Builds an expression for FFmpeg's -force_key_frames option,
+                /// where each frame is marked as a forced keyframe using the eq(n,frameNum) format.
+                /// </summary>
+                /// <example>
+                /// For frames [0, 50, 100], the result will be:
+                ///     eq(n,0)+eq(n,50)+eq(n,100)
+                /// </example>
+                /// <remarks>
+                /// This expression will be passed to FFmpeg to ensure that the specified frames
+                /// become I-frames (keyframes) during encoding.
+                /// </remarks>
                 var frameExpressions = adjustedFrames.Select(frameNum => $"eq(n,{frameNum})");
+
+
+                /// <summary>
+                /// Joins all FFmpeg frame expressions with '+' to create a single valid
+                /// -force_key_frames expression for use in the FFmpeg command.
+                /// </summary>
+                /// <example>
+                /// Resulting string: "eq(n,0)+eq(n,50)+eq(n,100)"
+                /// </example>
                 string keyframeExpr = string.Join("+", frameExpressions);
 
                 // Use the expression format for force_key_frames

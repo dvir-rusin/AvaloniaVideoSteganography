@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AvaloniaLsbProject1.Services;
 using AvaloniaLsbProject1.ViewModels;
-using Xabe.FFmpeg; // Ensure this namespace contains ProjectPathsLoader and related classes
+using Xabe.FFmpeg; 
 
 namespace AvaloniaLsbProject1.Services
 {
@@ -26,7 +26,14 @@ namespace AvaloniaLsbProject1.Services
         private static (string inputFramesDirectory, string outputFramesDirectory) GetDefaultPaths()
         {
             // Load the configuration from the JSON file (adjust the path as needed)
-            var config = ProjectPathsLoader.LoadConfig("C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json");
+            //var config = ProjectPathsLoader.LoadConfig("C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json");
+            
+            var configFilePath = Path.Combine(AppContext.BaseDirectory, "Json", "projectPaths.json");
+
+            // Now load the JSON → this gives you a ProjectPathsLoader.Config object
+            var config = ProjectPathsLoader.LoadConfig(configFilePath);
+
+            // Pull out the base project folder and sub-folders from that config object
             string basePath = config.BaseProjectPath;
             string inputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesFolder);
             string outputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesWithMessageFolder);
@@ -49,7 +56,7 @@ namespace AvaloniaLsbProject1.Services
         /// <param name="text">The plaintext message to be embedded.</param>
         /// <param name="password">The password used for AES encryption of the message.</param>
         /// <returns>A string indicating success or an error message.</returns>
-        public static string EmbedMessageInFramesTestInVideo(
+        public static string EmbedMessageInFramesInVideo(
             string inputframesDirectory,
             string outputframesDirectrory,
             int[] IframesLocation,
@@ -69,10 +76,9 @@ namespace AvaloniaLsbProject1.Services
                 outputframesDirectrory = defaultPaths.outputFramesDirectory;
             }
 
-            string ErrorMessage;
-            Console.WriteLine("Enter text to encrypt:");
+            
+            
             string UserInputMessage = text; // Read the plaintext input from the user
-
             string UserPassword = password; // Get the user-provided custom key
 
             // Encrypt the plaintext using the custom key
@@ -81,8 +87,8 @@ namespace AvaloniaLsbProject1.Services
 
             if (!Directory.Exists(inputframesDirectory))
             {
-                ErrorMessage = "EmbedMessageInFramesTestInVideo function message: inputframesDirectory does not exist";
-                return ErrorMessage;
+                return "EmbedMessageInFramesTestInVideo function message: inputframesDirectory does not exist";
+                
             }
 
             // Append a null character to indicate the end of the message
@@ -94,9 +100,7 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("ORIGINAL binaryMessage: " + binaryEncryptedMessage);
             Console.WriteLine("Message : " + HelperFunctions.BinaryToString(binaryEncryptedMessage));
 
-            // Convert the binary length to a 12-bit binary string
-            string binaryLength = Convert.ToString(binaryEncryptedMessage.Length, 2).PadLeft(12, '0');
-            Console.WriteLine("Binary Length: " + binaryLength);
+            
             int indexer = 0;
 
             // Parse duration and fps values
@@ -107,84 +111,123 @@ namespace AvaloniaLsbProject1.Services
             // Calculate the expected frame count
             int expectedFrameCount = (int)Math.Round(doubleFpsNumber * seconds);
 
-            // Set the timeout duration in seconds (e.g., 30 seconds)
+            
             double timeoutSeconds = 30;
             DateTime startTime = DateTime.Now;
 
             // Continuously check until the expected number of PNG files exist
             // Continuously check until the expected number of PNG files exist or timeout is reached
-            bool exit = false;//bool exit to exit while loop
-            while (exit==false && Directory.GetFiles(inputframesDirectory, "*.png").Length < expectedFrameCount)
+            while ( Directory.GetFiles(inputframesDirectory, "*.png").Length < expectedFrameCount)
             {
                 // Check if the timeout has been reached
                 if ((DateTime.Now - startTime).TotalSeconds > timeoutSeconds)
                 {
-                    ErrorMessage = ("Timeout reached: expected PNG files were not extracted in time.");
-                     exit = true;
+                    return ("Timeout reached: expected PNG files were not extracted in time.");
+                     
                 }
 
-                // Sleep briefly to reduce CPU usage
+                // Sleep to reduce cpu usage
                 Thread.Sleep(100);
             }
+
+
+            //used to debug
+            string ErrorMessage;
+            #if debug
 
             if (Directory.GetFiles(inputframesDirectory, "*.png").Length >= expectedFrameCount)
             {
                 ErrorMessage =("Expected PNG files have been extracted.");
             }
-            else
+
+            #endif
+
+            if (Directory.GetFiles(inputframesDirectory, "*.png").Length < expectedFrameCount)
             {
-                ErrorMessage = ("Exiting due to timeout.");
+                return ("Exiting due to timeout.");
             }
 
             string[] filePaths = Directory.GetFiles(inputframesDirectory, "*.png");
 
             Parallel.ForEach(filePaths, filePath =>
             {
-                int numberInFile = HelperFunctions.extractNumberFromFilePath(filePath);
-                bool isIFrame = IframesLocation.Contains(numberInFile);
-
-                using (Bitmap bitmap = new Bitmap(filePath))
+                try
                 {
-                    if (isIFrame)
+                    int numberInFile = HelperFunctions.extractNumberFromFilePath(filePath);
+                    bool isIFrame = IframesLocation.Contains(numberInFile);
+
+                    using (Bitmap bitmap = new Bitmap(filePath))
                     {
-                        bool messageComplete = false;
-                        int messageIndex = 0;
-                        // Process pixels to embed the message
-                        for (int y = 0; y < bitmap.Height && !messageComplete; y++)
+                        if (isIFrame)
                         {
-                            for (int x = 0; x < bitmap.Width && !messageComplete; x++)
+                            bool messageComplete = false;
+                            int messageIndex = 0;
+                            int w = bitmap.Width;
+                            int h = bitmap.Height;
+                            // Process pixels to embed the message
+                            for (int y = 0; y < bitmap.Height && !messageComplete; y++)
                             {
-                                Color pixelColor = bitmap.GetPixel(x, y);
-                                int r = pixelColor.R, g = pixelColor.G, b = pixelColor.B;
-
-                                r = EmbedBitInColorChannel(r, binaryEncryptedMessage, ref messageIndex);
-                                g = EmbedBitInColorChannel(g, binaryEncryptedMessage, ref messageIndex);
-                                b = EmbedBitInColorChannel(b, binaryEncryptedMessage, ref messageIndex);
-
-                                // When message embedding is complete, mark the frame
-                                if (messageIndex >= binaryEncryptedMessage.Length)
+                                for (int x = 0; x < bitmap.Width && !messageComplete; x++)
                                 {
-                                    messageComplete = true;
-                                    bitmap.SetPixel(bitmap.Width - 1, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
-                                    bitmap.SetPixel(bitmap.Width - 2, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
-                                    bitmap.SetPixel(bitmap.Width - 3, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
-                                    bitmap.SetPixel(bitmap.Width - 4, bitmap.Height - 1, Color.FromArgb(254, 1, 1));
+                                    // Is this one of the 4 signature pixels?
+                                    bool isSignaturePixel =
+                                        (x == w - 1 && y == h - 1) ||
+                                        (x == w - 2 && y == h - 1) ||
+                                        (x == w - 3 && y == h - 1) ||
+                                        (x == w - 4 && y == h - 1);
+
+                                    if (!isSignaturePixel)
+                                    {
+                                        Color pixelColor = bitmap.GetPixel(x, y);
+                                        int r = pixelColor.R, g = pixelColor.G, b = pixelColor.B;
+
+                                        r = EmbedBitInColorChannel(r, binaryEncryptedMessage, ref messageIndex);
+                                        g = EmbedBitInColorChannel(g, binaryEncryptedMessage, ref messageIndex);
+                                        b = EmbedBitInColorChannel(b, binaryEncryptedMessage, ref messageIndex);
+
+                                        try
+                                        {
+                                            bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
+                                            if (messageIndex >= binaryEncryptedMessage.Length)
+                                            {
+                                                messageComplete = true;
+                                            }
+                                       
+                                        }
+                                        catch (ArgumentOutOfRangeException ex)
+                                        {
+                                            Console.WriteLine($"Error at ({x},{y}): {ex.Message}");
+                                            break;
+                                        }
+                                    }
+                                
+                                
                                 }
-
-                                bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
                             }
+                            // once done, whether messageComplete or loops exhausted, paint the 4‐pixel signature:
+                            if (messageComplete)
+                            {
+                                bitmap.SetPixel(w - 1, h - 1, Color.FromArgb(254, 1, 1));
+                                bitmap.SetPixel(w - 2, h - 1, Color.FromArgb(1, 254, 1));
+                                bitmap.SetPixel(w - 3, h - 1, Color.FromArgb(1, 1, 254));
+                                bitmap.SetPixel(w - 4, h - 1, Color.FromArgb(1, 1, 1));
+                            }
+                            Console.WriteLine("Processed I-frame: " + numberInFile);
                         }
-                        Console.WriteLine("Processed I-frame: " + numberInFile);
-                    }
-                    else
-                    {
-                        // For non-I-frames, simply proceed without embedding.
-                        Console.WriteLine("Copying non I-frame: " + numberInFile);
-                    }
+                        else
+                        {
+                            // For non-I-frames, simply proceed without embedding.
+                            Console.WriteLine("Copying non I-frame: " + numberInFile);
+                        }
 
-                    // Save every processed frame so you can recreate the video later
-                    string outputFilePath = Path.Combine(outputframesDirectrory, Path.GetFileName(filePath));
-                    bitmap.Save(outputFilePath, System.Drawing.Imaging.ImageFormat.Png);
+                        // Save every processed frame so you can recreate the video later
+                        string outputFilePath = Path.Combine(outputframesDirectrory, Path.GetFileName(filePath));
+                        bitmap.Save(outputFilePath, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unhandled error while processing {filePath}: {ex.Message}");
                 }
             });
 
@@ -193,14 +236,14 @@ namespace AvaloniaLsbProject1.Services
             string firstFramePath = Directory.GetFiles(outputframesDirectrory, "*.png").FirstOrDefault();
             if (firstFramePath == null)
             {
-                ErrorMessage = "No frames found in allFramesWithMessageFolder directory.";
+                return "No frames found in allFramesWithMessageFolder directory.";
             }
             else
             {
-                ErrorMessage = "Message embedded in all frames.";
+               return "Message embedded in all frames.";
             }
 
-            return ErrorMessage;
+            
         }
 
         /// <summary>

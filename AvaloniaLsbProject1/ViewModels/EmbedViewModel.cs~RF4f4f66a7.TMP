@@ -594,7 +594,7 @@ namespace AvaloniaLsbProject1.ViewModels
             ErrorMessage = "EMBEDDING MESSAGE IN FRAMES";
 
             // Embed the message in the frames
-            ErrorMessage = Services.Embedding.EmbedMessageInFramesInVideo(
+            ErrorMessage = Services.Embedding.EmbedMessageInFramesTestInVideo(
                 paths.AllFramesFolder,
                 paths.AllFramesWithMessageFolder,
                 iframesLocation,

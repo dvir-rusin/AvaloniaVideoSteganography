@@ -105,7 +105,8 @@ namespace AvaloniaLsbProject1.Services
         /// <returns>True if encryption was successful</returns>
         public static bool EncryptExistingVideoKeyStorage(string masterPassword)
         {
-            string storagePath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
+            // Build relative path to VideoKeyStorage.json inside the Json folder
+            string storagePath = Path.Combine(AppContext.BaseDirectory, "Json", "VideoKeyStorage.json");
 
             try
             {

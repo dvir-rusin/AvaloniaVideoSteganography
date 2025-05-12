@@ -16,13 +16,11 @@ namespace AvaloniaLsbProject1.Services
 {
     internal class Extraction
     {
-        // Example usage of the ExtractIFrames function
-        //string inputFilePath = "C:/Users/user 2017/Videos/WireShark/ArcVideo_clip.ts";
-        //string outputDirectory = "C:/Users/user 2017/Videos/WireShark/LSBextractedFrames";
+       
         
         public static async Task ExtractAllFrames(string videoFilePath, string outputDirectory,double FPS)
         {
-            // Set the FFmpeg path if not already set
+
             FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Change to your FFmpeg path
 
             // Define the output pattern for frame images
@@ -47,12 +45,12 @@ namespace AvaloniaLsbProject1.Services
             Console.WriteLine("All frames have been extracted and saved to the output directory.");
         }
 
-        public  static async Task ExtractIFrames(string videoFilePath, string outputDirectory)
+        public static async Task ExtractIFrames(string videoFilePath, string outputDirectory)
         {
-            // Set the FFmpeg path if not already set
-            FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Change to your FFmpeg path  
 
-            // Define the output pattern for frame images
+            FFmpeg.SetExecutablesPath("C:/ffmpeg/bin");   
+
+            // output pattern for frame images
             string outputPattern = Path.Combine(outputDirectory, "frame_%04d.png");
 
             // Create the conversion with input and output
@@ -96,8 +94,8 @@ namespace AvaloniaLsbProject1.Services
                 {
 
                     string message;
-                    Bitmap frameBitmap = new Bitmap(filePath);
-                    using (frameBitmap)
+                    
+                    using (Bitmap frameBitmap = new Bitmap(filePath))
                     {
                         string result = GetHiddenMessage(frameBitmap, password, ref sucssesOrErorr);
 
@@ -130,110 +128,94 @@ namespace AvaloniaLsbProject1.Services
 
             StringBuilder binaryMessage = new StringBuilder();
             int messageBitsExtracted = 0;
-            System.Drawing.Color pixelColor;
-            string HiddenMsg = "null";
-            bool doesContainMessage = true;
+            string hiddenMessage = "null";
+            bool containsMessage = true;
             bool exit = false;
 
             // Check if the frame contains a message by examining marker pixels
-            for (int i = 1;i<=4&& !exit; i++)
-            {
-                
-                if (frameBitmap.GetPixel(frameBitmap.Width - i, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(254, 1, 1))
-                {
-                    doesContainMessage = false;
-                    sucssesOrErorr = "Error";
-                    return "This video does not contain a message";
-                }
-            }
             
-            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && doesContainMessage && !exit; i++)
+                
+            if (
+                (frameBitmap.GetPixel(frameBitmap.Width - 1, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(254, 1, 1))
+                && (frameBitmap.GetPixel(frameBitmap.Width - 2, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 254, 1))
+                    && (frameBitmap.GetPixel(frameBitmap.Width - 3, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 1, 254))
+                && (frameBitmap.GetPixel(frameBitmap.Width - 4, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 1, 1))
+            )
+            {
+                containsMessage = false;
+                sucssesOrErorr = "Error";
+                return "This video does not contain a message";
+            }
+
+
+
+            // Start reading the pixels
+            for (int i = 0; i < frameBitmap.Width * frameBitmap.Height && containsMessage && !exit; i++)
             {
                 int x = i % frameBitmap.Width;
                 int y = i / frameBitmap.Width;
-                pixelColor = frameBitmap.GetPixel(x, y);
+                System.Drawing.Color pixelColor = frameBitmap.GetPixel(x, y);
 
-                // Extract the LSB from each color channel
-                binaryMessage.Append((pixelColor.R & 1) == 1 ? "1" : "0");
-                messageBitsExtracted++;
-                if (messageBitsExtracted % 8 == 0)
+                // Extract LSBs from each color channel using a switch
+                for (int channel = 0; channel < 3 && !exit; channel++) // 0 = R, 1 = G, 2 = B
                 {
-                    HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
-                    if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
-                    {
-                        HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
-                        exit = true;
-                    }
-
-                }
-                if(!exit)
-                {
-                    // Extract LSB from Green channel
-                    binaryMessage.Append((pixelColor.G & 1) == 1 ? "1" : "0");
+                    int bit = ExtractBitFromPixel(pixelColor, channel);
+                    binaryMessage.Append(bit == 1 ? "1" : "0");
                     messageBitsExtracted++;
+
                     if (messageBitsExtracted % 8 == 0)
                     {
-                        HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
-                        if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
+                        hiddenMessage = HelperFunctions.BinaryToString(binaryMessage.ToString());
+
+                        if (NullCheck(hiddenMessage, messageBitsExtracted))
                         {
-                            HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
+                            hiddenMessage = hiddenMessage.Remove(hiddenMessage.Length - 1); // remove \0
                             exit = true;
                         }
-
                     }
                 }
-
-                if (!exit)
-                {
-                    // Extract LSB from Blue channel
-                    binaryMessage.Append((pixelColor.B & 1) == 1 ? "1" : "0");
-                    messageBitsExtracted++;
-                    if (messageBitsExtracted % 8 == 0)
-                    {
-                        HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
-                        if (NullCheck(HiddenMsg, messageBitsExtracted) == true)
-                        {
-                            HiddenMsg = HiddenMsg.Remove(HiddenMsg.Length - 1);
-                            exit = true;
-                        }
-
-                    }
-                }
-                    
-
             }
-            //binary message still includes the /0 at the end the one that was removed from each hidden message if statement 
-            Console.WriteLine("Binary Message: " + binaryMessage);
-            //HiddenMsg = HelperFunctions.BinaryToString(binaryMessage.ToString());
 
-            Console.WriteLine("\nEnter the custom key to decrypt:");
-            string inputKey = password; // Read the custom key from the user for decryption
-            string decrypted = "this video does not contain a message ";
-            if (doesContainMessage == true)
+            #if debug
+            Console.WriteLine("Binary Message: " + binaryMessage);
+            #endif
+
+            string decrypted = "This video does not contain a message.";
+            if (containsMessage)
             {
                 try
                 {
-                    decrypted = "this video contains a message was unable to decrypt ";
-                    // Attempt to decrypt the ciphertext with the user-provided key
-                    decrypted = EncryptionAes.Decrypt(HiddenMsg, inputKey);
+                    decrypted = "This video contains a message but was unable to decrypt it.";
+                    decrypted = EncryptionAes.Decrypt(hiddenMessage, password);
                     Console.WriteLine($"Decrypted Text: {decrypted}");
-                    // Successful extraction
                     sucssesOrErorr = "Success";
                     return decrypted;
-                    
                 }
                 catch
                 {
-                    // Handle decryption failure (e.g., incorrect custom key)
                     sucssesOrErorr = "Error";
                     return "Decryption failed. Check your custom key.";
-
                 }
             }
-            return "This video does not contain a message";
-            //string extractedMessage = lsbExtractIFramesProject.HelperFunctions.BinaryToString(binaryMessage.ToString());
-            //Console.WriteLine($"Extracted Message: {extractedMessage}");
 
+            return "This video does not contain a message.";
+        }
+
+        /// <summary>
+        /// Extracts the LSB from a specific color channel of a pixel.
+        /// </summary>
+        /// <param name="color">The pixel color.</param>
+        /// <param name="channel">0 = R, 1 = G, 2 = B</param>
+        /// <returns>0 or 1 depending on the LSB.</returns>
+        private static int ExtractBitFromPixel(System.Drawing.Color color, int channel)
+        {
+            return channel switch
+            {
+                0 => color.R & 1, // Red
+                1 => color.G & 1, // Green
+                2 => color.B & 1, // Blue
+                _ => throw new ArgumentOutOfRangeException(nameof(channel), "Invalid color channel index")
+            };
         }
 
         //this functions prints the last 4 pixels of the image
@@ -315,54 +297,37 @@ namespace AvaloniaLsbProject1.Services
         }
 
 
-        
+
 
 
         public static async Task<int[]> GetIFrameLocations(string metadataFile)
         {
-            List<int> iFrameLocations = new List<int>();
-            int retryCount = 5; // Number of retries
-            int delay = 500;    // Delay in milliseconds between retries
+            int retryCount = 5;
+            int delay = 500;
 
             for (int attempt = 1; attempt <= retryCount; attempt++)
             {
                 try
                 {
-                    // Read the metadata file line by line
                     string[] lines = await File.ReadAllLinesAsync(metadataFile);
+                    List<int> iFrameLocations = new List<int>();
 
                     for (int i = 0; i < lines.Length; i++)
                     {
-                        // Each line should correspond to a frame's pict_type
                         string frameType = lines[i].Trim();
-
-                        // Check if the frame type is "I"  or "I," (for CSV format)
-                        if (frameType == "I,")
+                        if (frameType == "I" || frameType == "I,")
                         {
-                            // Add the frame number to the array (1-based indexing)
-                            iFrameLocations.Add(i + 1);
-                        }
-                        else if (frameType == "I")
-                        {
-                            // Add the frame number to the array (1-based indexing)
                             iFrameLocations.Add(i + 1);
                         }
                     }
 
-                    // Output the locations for debugging purposes
-                    Console.Write($"I-Frame Locations: {string.Join(", ", iFrameLocations)}");
-                    break; // Exit the loop if successful
+                    Console.WriteLine($"I-Frame Locations: {string.Join(", ", iFrameLocations)}");
+                    return iFrameLocations.ToArray();
                 }
                 catch (IOException ex) when (ex.Message.Contains("being used by another process"))
                 {
                     Console.WriteLine($"Attempt {attempt}/{retryCount}: File is in use. Retrying in {delay}ms...");
                     await Task.Delay(delay);
-
-                    if (attempt == retryCount)
-                    {
-                        Console.WriteLine($"Error reading metadata file after {retryCount} attempts: {ex.Message}");
-                        return Array.Empty<int>();
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -371,8 +336,10 @@ namespace AvaloniaLsbProject1.Services
                 }
             }
 
-            return iFrameLocations.ToArray();
+            Console.WriteLine($"Failed to read metadata file after {retryCount} attempts.");
+            return Array.Empty<int>();
         }
+
 
 
     }
