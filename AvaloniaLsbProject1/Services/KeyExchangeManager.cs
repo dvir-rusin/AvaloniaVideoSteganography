@@ -11,7 +11,7 @@ namespace AvaloniaLsbProject1.Services
     public class KeyExchangeManager
     {
         // Diffie–Hellman parameters:
-        // A 256-bit prime (for demonstration purposes; in practice, choose a much larger safe prime)
+        // 2048 bit prime
         private readonly BigInteger _prime;
         // A generator; here we use 2.
         private readonly BigInteger _generator;

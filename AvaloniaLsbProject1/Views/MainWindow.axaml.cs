@@ -81,8 +81,7 @@ namespace AvaloniaLsbProject1.Views
             // Load the HomeView as the initial content
             ContentArea.Content = new HomeView();
 
-            // Set the window icon.
-            this.Icon = new WindowIcon("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\steganographyreactivedemo.ico");
+            this.Icon = new WindowIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "steganographyreactivedemo.ico"));
 
             // Call async initializer when the window has loaded.
             Loaded += async (_, _) =>

@@ -6,7 +6,8 @@
         x:DataType="vm:MainWindowViewModel"
         Title="Video Steganography"
         Width="800" Height="600"
-		  Icon="C:\Projects\gitGames\AvaloniaLsbProject1\AvaloniaLsbProject1\steganographyreactivedemo.ico">
+		  Icon="avares://AvaloniaLsbProject1/Assets/steganographyreactivedemo.ico"
+>
 
 	<Window.Styles>
 		<Style Selector="MenuItem">

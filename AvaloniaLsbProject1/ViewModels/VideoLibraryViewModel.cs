@@ -25,9 +25,11 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty] public string? successOrError;
         [ObservableProperty] public string? errorMessage;
 
-        private const string MasterPath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\MasterKey.txt";
-        private const string StoragePath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
-        
+        private static readonly string BasePath = Path.Combine(AppContext.BaseDirectory, "Json");
+        private static readonly string MasterPath = Path.Combine(BasePath, "MasterKey.txt");
+        private static readonly string StoragePath = Path.Combine(BasePath, "VideoKeyStorage.json");
+
+
         [ObservableProperty] private bool isMasterKeySet;
         [ObservableProperty] private bool isUnlocked;
         [ObservableProperty] private string newMasterPassword;
@@ -77,8 +79,28 @@ namespace AvaloniaLsbProject1.ViewModels
             return Convert.ToBase64String(bytes);
         }
 
+        private (bool isValid, string errorMessage) ValidatePassword(string password)
+        {
+            if (password.Length < 8)
+                return (false, "Password must be at least 8 characters long.");
+            if (!password.Any(char.IsUpper))
+                return (false, "Password must contain at least one uppercase letter.");
+            if (!password.Any(char.IsSymbol) && !password.Any(char.IsPunctuation))
+                return (false, "Password must contain at least one symbol (e.g. !, @, #, etc.).");
+
+            return (true, string.Empty);
+        }
+
+
         private void SetMasterKey()
         {
+            var (isValid, error) = ValidatePassword(NewMasterPassword);
+            if (!isValid)
+            {
+                DisplayErrorMessage(error);
+                return;
+            }
+
             // ensure folder exists
             Directory.CreateDirectory(Path.GetDirectoryName(MasterPath)!);
 
@@ -95,6 +117,13 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private void UnlockWithKey()
         {
+            var (isValid, error) = ValidatePassword(MasterPassword);
+            if (!isValid)
+            {
+                DisplayErrorMessage(error);
+                return;
+            }
+
             try
             {
                 // Read the *hash* and compare with hash of entered password
