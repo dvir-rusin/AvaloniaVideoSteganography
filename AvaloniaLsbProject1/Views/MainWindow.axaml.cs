@@ -90,7 +90,8 @@ namespace AvaloniaLsbProject1.Views
                 await PerformKeyExchangeAsync();
                 DataContext = new MainWindowViewModel(ContentArea, KeyExchange.SharedKey, Role);
             };
-            // Load configuration for project paths.
+            // Load configuration for project
+            // s.
             var config = LoadProjectConfig();
             string projectPath = config.BaseProjectPath;
 
@@ -108,9 +109,13 @@ namespace AvaloniaLsbProject1.Views
 
         private ProjectPathsConfig LoadProjectConfig()
         {
-            // Adjust the JSON file path as necessary.
-            return ProjectPathsLoader.LoadConfig("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Json\\projectPaths.json");
+            // Load the JSON config from the 'Json' folder relative to the application's base directory
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Json", "projectPaths.json");
+            return ProjectPathsLoader.LoadConfig(configPath);
+
+
         }
+
 
         private ProjectPaths SetupProjectPaths(string projectPath, ProjectPathsConfig config)
         {
@@ -131,7 +136,8 @@ namespace AvaloniaLsbProject1.Views
         /// </summary>
         /// <param name="allFramesWithMessageFolder">The directory containing frames with embedded messages.</param>
         /// <param name="allFramesFolder">The directory containing all extracted frames.</param>
-        /// <param name="metaDataFile">The metadata file path.</param>
+        /// <param name="metaDataFile">The metadata file 
+        /// .</param>
         private void DeleteDirectoryAndFiles(string allFramesWithMessageFolder, string allFramesFolder, string metaDataFile)
         {
             
@@ -156,8 +162,9 @@ namespace AvaloniaLsbProject1.Views
 
         public void CheckForDeletedVideosInProjectPath(string projectPath)
         {
-            // Define the storage file path.
-            string storageFile = "C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Json\\VideoKeyStorage.json";
+            // Define the storage file path (relative to the executable directory)
+            string storageFile = Path.Combine(AppContext.BaseDirectory, "Json", "VideoKeyStorage.json");
+
 
             // If the storage file doesn't exist, there's nothing to check.
             if (!File.Exists(storageFile))

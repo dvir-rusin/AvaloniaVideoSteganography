@@ -150,8 +150,9 @@ namespace AvaloniaLsbProject1.ViewModels
         /// <returns>A <see cref="ProjectPathsConfig"/> instance containing configuration data.</returns>
         private ProjectPathsConfig LoadProjectConfig()
         {
-            // Adjust the JSON file path as necessary.
-            return ProjectPathsLoader.LoadConfig("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Json\\projectPaths.json");
+            // Load the configuration file from the 'Json' folder relative to the app's base directory
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Json", "projectPaths.json");
+            return ProjectPathsLoader.LoadConfig(configPath);
         }
 
         #endregion
@@ -188,7 +189,8 @@ namespace AvaloniaLsbProject1.ViewModels
 
         /// <summary>
         /// Extracts the message from the selected video.
-        /// Uses project paths from the JSON configuration instead of hardcoded paths.
+        /// Uses project 
+        /// s from the JSON configuration instead of hardcoded paths.
         /// </summary>
         private async Task ExtractMessageAsync()
         {

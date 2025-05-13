@@ -275,9 +275,11 @@ namespace AvaloniaLsbProject1.ViewModels
         /// <returns>A <see cref="ProjectPathsConfig"/> instance with the configuration data.</returns>
         private ProjectPathsConfig LoadProjectConfig()
         {
-            // Adjust the JSON file path as needed.
-            return ProjectPathsLoader.LoadConfig("C:\\Projects\\gitGames\\AvaloniaLsbProject1\\AvaloniaLsbProject1\\Json\\projectPaths.json");
+            // Load the config file from the Json folder relative to the executable directory
+            string configPath = Path.Combine(AppContext.BaseDirectory, "Json", "projectPaths.json");
+            return ProjectPathsLoader.LoadConfig(configPath);
         }
+
         #endregion
 
         #region Video Selection and Metadata Methods
@@ -644,8 +646,9 @@ namespace AvaloniaLsbProject1.ViewModels
         private void VideoKeyStorage(string newVideoPath, string encryptionPassword)
         {
             // Define the storage file path. You can adjust this path if necessary.
-            string storageFile = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\VideoKeyStorage.json";
-            string MasterPath = "C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\MasterKey.txt";
+            string storageFile = Path.Combine(AppContext.BaseDirectory, "Json", "VideoKeyStorage.json");
+            string MasterPath = Path.Combine(AppContext.BaseDirectory, "Json", "MasterKey.txt");
+
             // Load existing dictionary or create a new one.
             Dictionary<string, string> videoKeyDict;
             if (File.Exists(storageFile))

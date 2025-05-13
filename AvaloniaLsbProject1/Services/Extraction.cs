@@ -21,7 +21,8 @@ namespace AvaloniaLsbProject1.Services
         public static async Task ExtractAllFrames(string videoFilePath, string outputDirectory,double FPS)
         {
 
-            FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Change to your FFmpeg path
+            FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Change to your FFmpeg
+                                                        // 
 
             // Define the output pattern for frame images
             if (!Directory.Exists(outputDirectory))
@@ -137,9 +138,9 @@ namespace AvaloniaLsbProject1.Services
                 
             if (
                 (frameBitmap.GetPixel(frameBitmap.Width - 1, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(254, 1, 1))
-                && (frameBitmap.GetPixel(frameBitmap.Width - 2, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 254, 1))
-                    && (frameBitmap.GetPixel(frameBitmap.Width - 3, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 1, 254))
-                && (frameBitmap.GetPixel(frameBitmap.Width - 4, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 1, 1))
+                || (frameBitmap.GetPixel(frameBitmap.Width - 2, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 254, 1))
+                    || (frameBitmap.GetPixel(frameBitmap.Width - 3, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 1, 254))
+                || (frameBitmap.GetPixel(frameBitmap.Width - 4, frameBitmap.Height - 1) != System.Drawing.Color.FromArgb(1, 1, 1))
             )
             {
                 containsMessage = false;
