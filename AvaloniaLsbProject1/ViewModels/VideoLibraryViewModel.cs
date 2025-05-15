@@ -37,12 +37,17 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private ObservableCollection<VideoEntry> videoEntries
             = new();
+        [ObservableProperty] private string currentPassword;
+        [ObservableProperty] private string newChangedPassword;
+        public ICommand ChangeMasterPasswordCommand { get; }
+
         public bool IsMasterKeyNotSet => !IsMasterKeySet;
 
         private Dictionary<string, string> _encryptedStore = new();
 
         public ICommand SetMasterPasswordCommand { get; }
         public ICommand EnterMasterPasswordCommand { get; }
+
 
         public VideoLibraryViewModel()
         {
@@ -62,6 +67,9 @@ namespace AvaloniaLsbProject1.ViewModels
 
             // 3) Preload encrypted JSON (no UI update yet)
             LoadEncryptedFromJson();
+            ChangeMasterPasswordCommand = new RelayCommand(ChangeMasterPassword);
+
+
         }
 
         partial void OnIsMasterKeySetChanged(bool value)
@@ -157,6 +165,7 @@ namespace AvaloniaLsbProject1.ViewModels
             }
         }
 
+
         private void LoadEncryptedFromJson()
         {
             if (!File.Exists(StoragePath))
@@ -167,6 +176,58 @@ namespace AvaloniaLsbProject1.ViewModels
                 .DeserializeObject<Dictionary<string, string>>(json)
                 ?? new Dictionary<string, string>();
         }
+
+        private void ChangeMasterPassword(object? _)
+        {
+            try
+            {
+                var storedHash = File.ReadAllText(MasterPath);
+                var currentHash = ComputeHash(CurrentPassword);
+
+                if (storedHash != currentHash)
+                {
+                    DisplayErrorMessage("Current master password is incorrect.");
+                    return;
+                }
+
+                var (isValid, error) = ValidatePassword(NewChangedPassword);
+                if (!isValid)
+                {
+                    DisplayErrorMessage(error);
+                    return;
+                }
+
+                var decryptedList = new Dictionary<string, string>();
+                foreach (var kv in _encryptedStore)
+                {
+                    var name = EncryptionAes.Decrypt(kv.Key, currentHash);
+                    var pwd = EncryptionAes.Decrypt(kv.Value, currentHash);
+                    decryptedList[name] = pwd;
+                }
+
+                var newHash = ComputeHash(NewChangedPassword);
+                var reEncrypted = decryptedList.ToDictionary(
+                    kv => EncryptionAes.Encrypt(kv.Key, newHash),
+                    kv => EncryptionAes.Encrypt(kv.Value, newHash));
+
+                File.WriteAllText(StoragePath, JsonConvert.SerializeObject(reEncrypted, Formatting.Indented));
+                File.WriteAllText(MasterPath, newHash);
+                _encryptedStore = reEncrypted;
+
+                VideoEntries = new ObservableCollection<VideoEntry>(
+                    decryptedList.Select(kv => new VideoEntry { VideoName = kv.Key, Password = kv.Value }));
+
+                CurrentPassword = string.Empty;
+                NewChangedPassword = string.Empty;
+
+                DisplaySuccessMessage("Master password changed successfully!");
+            }
+            catch (Exception ex)
+            {
+                DisplayErrorMessage($"Error: {ex.Message}");
+            }
+        }
+
 
         private void DisplayErrorMessage(string message)
         {

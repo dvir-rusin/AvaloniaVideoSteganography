@@ -50,18 +50,36 @@
 					Width="140"/>
 		</StackPanel>
 
-		<!-- 3) Unlock existing key -->
 		<StackPanel Grid.Row="2"
-					IsVisible="{Binding IsMasterKeySet}"
-					Spacing="10">
-			<TextBlock Text="Enter Master Password" Classes="label"/>
-			<TextBox Text="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-					 PasswordChar="●"
-					 Watermark="Enter master password"/>
-			<Button Content="Unlock"
-					Command="{Binding EnterMasterPasswordCommand}"
-					Width="100"/>
+            Spacing="20">
+
+			<!-- Unlock existing key -->
+			<StackPanel IsVisible="{Binding IsMasterKeySet}" Spacing="10">
+				<TextBlock Text="Enter Master Password" Classes="label"/>
+				<TextBox Text="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						 PasswordChar="●"
+						 Watermark="Enter master password"/>
+				<Button Content="Unlock"
+						Command="{Binding EnterMasterPasswordCommand}"
+						Width="100"/>
+			</StackPanel>
+
+			<!-- Change master password -->
+			<StackPanel IsVisible="{Binding IsUnlocked}" Spacing="10">
+				<TextBlock Text="Change Master Password" Classes="label"/>
+				<TextBox Text="{Binding CurrentPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						 PasswordChar="●"
+						 Watermark="Enter current master password"/>
+				<TextBox Text="{Binding NewChangedPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						 PasswordChar="●"
+						 Watermark="Enter new master password"/>
+				<Button Content="Change Password"
+						Command="{Binding ChangeMasterPasswordCommand}"
+						Width="160"/>
+			</StackPanel>
+
 		</StackPanel>
+
 
 		<!-- 4) Decrypted Library Table -->
 		<Border Grid.Row="3"

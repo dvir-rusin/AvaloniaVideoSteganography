@@ -395,7 +395,8 @@ namespace AvaloniaLsbProject1.ViewModels
             BitRate = $"{videoStream.Bitrate / 1000} kbps";
             Duration = mediaInfo.Duration.ToString(@"hh\:mm\:ss\.fff");
             seconds = mediaInfo.Duration.TotalSeconds;
-            long estimatedBytes = (((videoStream.Width * videoStream.Height) - 21) * 3 / 8);//-21 cuz 1 null byte, 4 byte at end for message indication and 16 bytes IV for AES encryption
+            // -146 - ( 1 null byte, 2 byte( end for message indication (12 bits)), 16 bytes IV, 127 padding (worst case sanerio))
+            long estimatedBytes = (((videoStream.Width * videoStream.Height) - 146) * 3 / 8);
             EstimatedCapacity = FormatByteSize(estimatedBytes);
             UpdateCapacityUsage();
 

@@ -4,35 +4,39 @@ using System.Security.Cryptography;
 using System.Globalization;
 namespace AvaloniaLsbProject1.Services
 {
-    /// <summary>
-    /// Manages the Diffie–Hellman key exchange using a custom implementation.
-    /// This version creates a 32‑byte (256‑bit) shared key.
-    /// </summary>
+    // <summary>
+    // Manages the Diffie–Hellman key exchange using a custom implementation.
+    // This version creates a 32‑byte (256‑bit) shared key.
+    // </summary>
     public class KeyExchangeManager
     {
         // Diffie–Hellman parameters:
+
         // 2048 bit prime
         private readonly BigInteger _prime;
-        // A generator; here we use 2.
+
+        // A generator : 2
         private readonly BigInteger _generator;
-        // Our randomly generated private key.
+
+        // randomly generated private key
         private readonly BigInteger _privateKey;
-        // Our computed public key.
+
+        //32 byte public key
         private readonly BigInteger _publicKey;
 
-        /// <summary>
-        /// Gets the public key of the local party as a big‑endian byte array.
-        /// </summary>
+        // <summary>
+        // Gets the public key of the local party as a big‑endian byte array
+        // </summary>
         public byte[] PublicKey { get; }
 
-        /// <summary>
-        /// Gets the derived shared key (32 bytes) after performing key exchange.
-        /// </summary>
+        // <summary>
+        // Gets the derived shared key (32 bytes) after performing key exchange.
+        // </summary>
         public byte[]? SharedKey { get; private set; }
 
-        /// <summary>
+        // <summary>
         /// Initializes a new instance of the <see cref="KeyExchangeManager"/> class.
-        /// </summary>
+        // </summary>
         public KeyExchangeManager()
         {
             // Example 2048 -bit prime
@@ -54,7 +58,7 @@ namespace AvaloniaLsbProject1.Services
     NumberStyles.AllowHexSpecifier);
             _generator = 2;
 
-            // Generate a random 256-bit private key.
+            // Generate a random 256 bit private key.
             _privateKey = GeneratePrivateKey();
 
             // Compute public key: (generator^privateKey mod prime)
@@ -64,9 +68,9 @@ namespace AvaloniaLsbProject1.Services
             PublicKey = _publicKey.ToByteArray(isUnsigned: true, isBigEndian: true);
         }
 
-        /// <summary>
-        /// Generates a random 256-bit private key.
-        /// </summary>
+        // <summary>
+        // Generates a random 256 bit private key.
+        // </summary>
         private BigInteger GeneratePrivateKey()
         {
             byte[] bytes = new byte[32]; // 32 bytes = 256 bits
@@ -78,10 +82,10 @@ namespace AvaloniaLsbProject1.Services
             return new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
         }
 
-        /// <summary>
-        /// Generates the shared key using the provided public key from the remote party.
-        /// The shared secret is computed as (otherPublicKey^privateKey mod prime) and then hashed with SHA256.
-        /// </summary>
+        // <summary>
+        // Generates the shared key using the provided public key from the remote party.
+        // The shared secret is computed as (otherPublicKey^privateKey mod prime) and then hashed with SHA256.
+        // </summary>
         /// <param name="otherPublicKeyBytes">The public key bytes received from the other party.</param>
         public void GenerateSharedKey(byte[] otherPublicKeyBytes)
         {
