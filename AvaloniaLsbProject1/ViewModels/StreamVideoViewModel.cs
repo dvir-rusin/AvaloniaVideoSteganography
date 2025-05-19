@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
 using Avalonia.Media;
+using System.ComponentModel.Design;
 
 
 namespace AvaloniaLsbProject1.ViewModels
@@ -163,6 +164,7 @@ namespace AvaloniaLsbProject1.ViewModels
 
         private async Task StreamVideoAsync()
         {
+            int durationInSeconds;
             if (string.IsNullOrEmpty(SelectedVideoPath) || string.IsNullOrEmpty(MulticastIP) || string.IsNullOrEmpty(Port))
             {
                 DisplayErrorMessage("Video path, multicast IP, or port is missing.");
@@ -173,6 +175,21 @@ namespace AvaloniaLsbProject1.ViewModels
                 DisplayErrorMessage("Video attribute 'Duration' is null.");
                 return;
             }
+            if (int.TryParse(Duration.ToString(), out int parsedDuration) && parsedDuration > 5)
+            {
+                 durationInSeconds = 5;
+            }
+            else if( parsedDuration <= 5 && parsedDuration>=2)
+            {
+                 durationInSeconds = parsedDuration-1;
+            }
+            else
+            {
+                DisplayErrorMessage("duration value is too little");
+                return;
+            }
+
+
 
             IsProcessing = true;
             ErrorMessage = null;
@@ -188,28 +205,28 @@ namespace AvaloniaLsbProject1.ViewModels
                 {
                     //arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 2.2 -f mpegts udp://{MulticastIP}:{Port}";
                     case ".mp4":
-                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 5.2 -f mpegts udp://{MulticastIP}:{Port}"; 
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t  \"{durationInSeconds}\" -f mpegts udp://{MulticastIP}:{Port}"; 
                         break;
                     case ".avi":
                         //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
                         // Use uncompressed rawvideo for LSB-safe streaming
-                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 5.2 -f mpegts udp://{MulticastIP}:{Port}";
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \"{durationInSeconds}\" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                     case ".mkv":
                         //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v copy -c:a aac -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
                         // Use rawvideo in MKV container for LSB-safe streaming
                         //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v rawvideo -pix_fmt rgb24 -allow_raw_vfw 1 -t 4.2 -f matroska udp://{MulticastIP}:{Port}";
-                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 5.2 -f mpegts udp://{MulticastIP}:{Port}";
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \"{durationInSeconds}\" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                     case ".mov":
                         //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
                         // MOV also supports rawvideo; use this for LSB safety
-                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 5.2 -f mpegts udp://{MulticastIP}:{Port}";
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \" {durationInSeconds} \" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                     default:
                         //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 6 -c:a mp2 -b:a 128k -f mpegts udp://{MulticastIP}:{Port}";
                         // Fallback: safe general-purpose rawvideo
-                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 5.2 -f mpegts udp://{MulticastIP}:{Port}";
+                        arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \" {durationInSeconds} \" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                 }
 
@@ -346,8 +363,8 @@ namespace AvaloniaLsbProject1.ViewModels
                 string outputDirectory = @"C:\AvaloniaVideoStenagraphy";
                 string outputFileName = "stream_capture" + DateTime.Now.ToString("dd.MM_HH.mm.ss") + ".mp4";
                 string outputFile = Path.Combine(outputDirectory, outputFileName);
-                // Set a fixed recording duration (10 seconds)
-                int recordingDuration = 4; // in seconds
+                //fixed recording duration 4 seconds
+                int recordingDuration = 4;
                 string arguments = $"-i udp://{MulticastIP}:{Port} -c copy -t {recordingDuration} \"{outputFile}\"";
                 var ffmpegProcess = new Process
                 {

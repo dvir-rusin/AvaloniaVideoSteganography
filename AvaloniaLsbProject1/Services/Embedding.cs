@@ -26,14 +26,13 @@ namespace AvaloniaLsbProject1.Services
         private static (string inputFramesDirectory, string outputFramesDirectory) GetDefaultPaths()
         {
             // Load the configuration from the JSON file (adjust the path as needed)
-            //var config = ProjectPathsLoader.LoadConfig("C:\\\\Projects\\\\gitGames\\\\AvaloniaLsbProject1\\\\AvaloniaLsbProject1\\\\Json\\\\projectPaths.json");
             
             var configFilePath = Path.Combine(AppContext.BaseDirectory, "Json", "projectPaths.json");
 
-            // Now load the JSON → this gives you a ProjectPathsLoader.Config object
+            // loadding the JSON ,this gives ProjectPathsLoader.Config object
             var config = ProjectPathsLoader.LoadConfig(configFilePath);
 
-            // Pull out the base project folder and sub-folders from that config object
+            // Pull out the base project folder and sub folders from that config object
             string basePath = config.BaseProjectPath;
             string inputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesFolder);
             string outputFramesDirectory = Path.Combine(basePath, config.Paths.AllFramesWithMessageFolder);
@@ -79,7 +78,7 @@ namespace AvaloniaLsbProject1.Services
             
             
             string UserInputMessage = text; // Read the plaintext input from the user
-            string UserPassword = password; // Get the user-provided custom key
+            string UserPassword = password; // Get the user provided custom key
 
             // Encrypt the plaintext using the custom key
             string EncryptedMessage = EncryptionAes.Encrypt(UserInputMessage, UserPassword);

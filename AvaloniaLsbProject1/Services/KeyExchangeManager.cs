@@ -5,41 +5,37 @@ using System.Globalization;
 namespace AvaloniaLsbProject1.Services
 {
     // <summary>
-    // Manages the Diffie–Hellman key exchange using a custom implementation.
-    // This version creates a 32‑byte (256‑bit) shared key.
+    // Diffie–Hellman key exchange implementation.
+    // 32‑byte (256‑bit) shared key.
     // </summary>
     public class KeyExchangeManager
     {
-        // Diffie–Hellman parameters:
 
         // 2048 bit prime
-        private readonly BigInteger _prime;
+        private readonly BigInteger prime;
 
         // A generator : 2
-        private readonly BigInteger _generator;
+        private readonly BigInteger generator;
 
         // randomly generated private key
-        private readonly BigInteger _privateKey;
+        private readonly BigInteger privateKey;
 
         //32 byte public key
-        private readonly BigInteger _publicKey;
+        private readonly BigInteger publicKey;
 
         // <summary>
-        // Gets the public key of the local party as a big‑endian byte array
+        // Gets the public key as a big endian byte array
         // </summary>
         public byte[] PublicKey { get; }
 
         // <summary>
-        // Gets the derived shared key (32 bytes) after performing key exchange.
+        // 32 bytes of shared key
         // </summary>
         public byte[]? SharedKey { get; private set; }
 
-        // <summary>
-        /// Initializes a new instance of the <see cref="KeyExchangeManager"/> class.
-        // </summary>
         public KeyExchangeManager()
         {
-            // Example 2048 -bit prime
+            // 2048 -bit prime to see visually 
 
             /*
             FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1
@@ -53,19 +49,21 @@ namespace AvaloniaLsbProject1.Services
             E39E772C 180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9
             DE2BCBF6 95581718 3995497C EA956AE5 15D22618 98FA0510
             15728E5A 8AACAA68 FFFFFFFF FFFFFFFF
-                */
-            _prime = BigInteger.Parse("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF",
+            */
+
+            prime = BigInteger.Parse("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF",
     NumberStyles.AllowHexSpecifier);
-            _generator = 2;
+
+            generator = 2;
 
             // Generate a random 256 bit private key.
-            _privateKey = GeneratePrivateKey();
+            privateKey = GeneratePrivateKey();
 
             // Compute public key: (generator^privateKey mod prime)
-            _publicKey = BigInteger.ModPow(_generator, _privateKey, _prime);
+            publicKey = BigInteger.ModPow(generator, privateKey, prime);
 
-            // Export the public key as an unsigned big‑endian byte array.
-            PublicKey = _publicKey.ToByteArray(isUnsigned: true, isBigEndian: true);
+            // Export the public key as an unsigned big endian byte array.
+            PublicKey = publicKey.ToByteArray(isUnsigned: true, isBigEndian: true);
         }
 
         // <summary>
@@ -73,12 +71,12 @@ namespace AvaloniaLsbProject1.Services
         // </summary>
         private BigInteger GeneratePrivateKey()
         {
-            byte[] bytes = new byte[32]; // 32 bytes = 256 bits
+            byte[] bytes = new byte[32]; 
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(bytes);
             }
-            // Create a BigInteger from the byte array (unsigned, big‑endian).
+            // Create a BigInteger from the byte array (unsigned, big endian).
             return new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
         }
 
@@ -93,7 +91,7 @@ namespace AvaloniaLsbProject1.Services
             BigInteger otherPublicKey = new BigInteger(otherPublicKeyBytes, isUnsigned: true, isBigEndian: true);
 
             // Compute the shared secret: (otherPublicKey)^privateKey mod prime.
-            BigInteger sharedSecret = BigInteger.ModPow(otherPublicKey, _privateKey, _prime);
+            BigInteger sharedSecret = BigInteger.ModPow(otherPublicKey, privateKey, prime);
 
             // Convert the shared secret to a byte array (unsigned, big‑endian).
             byte[] sharedSecretBytes = sharedSecret.ToByteArray(isUnsigned: true, isBigEndian: true);

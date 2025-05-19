@@ -197,10 +197,10 @@ namespace AvaloniaLsbProject1.Services
                 {
                     FileName = ffplayPath, // Use ffplay instead of ffmpeg
                     Arguments = arguments,
-                    UseShellExecute = false, // Do not use the shell to execute the process
-                    RedirectStandardOutput = false, // We do not need to capture the output
-                    RedirectStandardError = false,  // We do not need to capture the error output
-                    CreateNoWindow = false // Allow ffplay to open its own playback window
+                    UseShellExecute = false, 
+                    RedirectStandardOutput = false, 
+                    RedirectStandardError = false,  
+                    CreateNoWindow = false // Allowing ffplay to open its own playback window
                 }
             };
 
@@ -208,7 +208,7 @@ namespace AvaloniaLsbProject1.Services
             {
                 ffplayProcess.Start();
                 Console.WriteLine("Playing video...");
-                ffplayProcess.WaitForExit(); // Wait for the process to finish
+                ffplayProcess.WaitForExit(); // Waiting for the process to finish
             }
             catch (Exception ex)
             {

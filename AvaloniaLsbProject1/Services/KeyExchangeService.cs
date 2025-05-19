@@ -19,7 +19,7 @@ public static class KeyExchangeService
     // <returns>A task that represents the asynchronous read operation. The task result contains the received data as a byte array.</returns>
     public static async Task<byte[]> ListenAsync(int port)
     {
-        TcpListener listener = new(IPAddress.Any, port); // 127.0.0.1
+        TcpListener listener = new(IPAddress.Any, port); // for testing locally 127.0.0.1
         listener.Start();
 
         try
@@ -64,7 +64,7 @@ public static class KeyExchangeService
     public static async Task SendAsync(byte[] data, int port)
     {
         using TcpClient client = new();
-        await client.ConnectAsync("127.0.0.1", port);
+        await client.ConnectAsync("127.0.0.1", port);//change later on to be able to set ip and press connect
         using NetworkStream stream = client.GetStream();
 
         await stream.WriteAsync(data);

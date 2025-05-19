@@ -5,7 +5,7 @@
     xmlns:vm="clr-namespace:AvaloniaLsbProject1.ViewModels"
     x:Class="AvaloniaLsbProject1.Views.VideoLibraryPage"
     x:DataType="vm:VideoLibraryViewModel">
-
+	<ScrollViewer>
 	<Grid Margin="20">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
@@ -92,10 +92,12 @@
 					  HeadersVisibility="Column"
 					  IsReadOnly="True">
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="Video Name" Binding="{Binding VideoName}"/>
-					<DataGridTextColumn Header="Password"   Binding="{Binding Password}"/>
+					
+					<DataGridTextColumn Header="Video Name" Binding="{Binding Password }"/>
+					<DataGridTextColumn Header="Password"   Binding="{Binding VideoName}"/>
 				</DataGrid.Columns>
 			</DataGrid>
 		</Border>
 	</Grid>
+	</ScrollViewer>
 </UserControl>

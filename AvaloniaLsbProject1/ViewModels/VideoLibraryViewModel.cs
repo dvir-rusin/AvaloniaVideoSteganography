@@ -134,13 +134,12 @@ namespace AvaloniaLsbProject1.ViewModels
 
             try
             {
-                // Read the *hash* and compare with hash of entered password
+                // *hash* from file is compared with hash of entered password
                 var storedHash = File.ReadAllText(MasterPath);
                 if (storedHash != ComputeHash(MasterPassword))
                     throw new CryptographicException("Wrong password");
 
-                // Use the stored hash as the encryption/decryption key
-                //bool worked = EncryptionAes.EncryptExistingVideoKeyStorage(storedHash);
+                // Using the stored hash as the encryption/decryption key
 
                 // Decrypt every entry
                 var list = new ObservableCollection<VideoEntry>();

@@ -78,7 +78,7 @@ namespace AvaloniaLsbProject1.ViewModels
             }
             else if (e.PropertyName == nameof(VideoLibraryViewModel.IsUnlocked))
             {
-                // flow unlock → your own flag (if you still need it)
+                // flow unlock → your own flag
                 IsUnlocked = _libraryVm.IsUnlocked;
             }
         }

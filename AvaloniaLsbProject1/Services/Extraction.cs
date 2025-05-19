@@ -54,11 +54,11 @@ namespace AvaloniaLsbProject1.Services
             // output pattern for frame images
             string outputPattern = Path.Combine(outputDirectory, "frame_%04d.png");
 
-            // Create the conversion with input and output
+            // Creating the conversion with input and output
             var conversion = FFmpeg.Conversions.New()
                .AddParameter($"-i \"{videoFilePath}\"")           // Input file path
-               .AddParameter("-vf select='eq(pict_type,I)'")      // Filter for only I-frames
-               .AddParameter("-vsync vfr")                        // Avoid duplicate frames
+               .AddParameter("-vf select='eq(pict_type,I)'")      // Filtering for only I-frames
+               .AddParameter("-vsync vfr")                        // to Avoid duplicate frames
                .SetOutput(outputPattern);
 
             Console.WriteLine("Extracting I-frames...");
@@ -157,7 +157,7 @@ namespace AvaloniaLsbProject1.Services
                 int y = i / frameBitmap.Width;
                 System.Drawing.Color pixelColor = frameBitmap.GetPixel(x, y);
 
-                // Extract LSBs from each color channel using a switch
+                // Extract LSB from each color channel using a switch
                 for (int channel = 0; channel < 3 && !exit; channel++) // 0 = R, 1 = G, 2 = B
                 {
                     int bit = ExtractBitFromPixel(pixelColor, channel);
@@ -170,7 +170,7 @@ namespace AvaloniaLsbProject1.Services
 
                         if (NullCheck(hiddenMessage, messageBitsExtracted))
                         {
-                            hiddenMessage = hiddenMessage.Remove(hiddenMessage.Length - 1); // remove \0
+                            hiddenMessage = hiddenMessage.Remove(hiddenMessage.Length - 1); // removing \0
                             exit = true;
                         }
                     }
@@ -219,7 +219,7 @@ namespace AvaloniaLsbProject1.Services
             };
         }
 
-        //this functions prints the last 4 pixels of the image
+        //this functions prints the last 4 pixels of the image testing purposes
         public static void GetPixelColor(string filePath)
         {
             
@@ -259,10 +259,10 @@ namespace AvaloniaLsbProject1.Services
 
         public static async Task ExtractFrameMetadata(string videoFilePath, string metadataFile)
         {
-            // Set the FFmpeg executables path
-            FFmpeg.SetExecutablesPath("C:/ffmpeg/bin"); // Adjust this path as necessary
+            // Setting the FFmpeg executables path
+            FFmpeg.SetExecutablesPath("C:/ffmpeg/bin");
 
-            // Use ffprobe to extract frame metadata
+            // Using ffprobe to extract frame metadata
             var ffprobeCommand = $"ffprobe -v error -i \"{videoFilePath}\" -select_streams v:0 -show_entries frame=pict_type -of csv=p=0 > \"{metadataFile}\"";
 
 

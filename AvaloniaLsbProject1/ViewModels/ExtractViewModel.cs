@@ -189,8 +189,6 @@ namespace AvaloniaLsbProject1.ViewModels
 
         /// <summary>
         /// Extracts the message from the selected video.
-        /// Uses project 
-        /// s from the JSON configuration instead of hardcoded paths.
         /// </summary>
         private async Task ExtractMessageAsync()
         {
@@ -215,27 +213,22 @@ namespace AvaloniaLsbProject1.ViewModels
             ProcessingStatusText = "Extracting Message";
             ExtractButtonText = "Extracting Message";
             IsProcessing = true;
-
-            
-            //string allFramesFolder = Path.Combine(projectPath, config.Paths.AllFramesFolder);
-            //string allFramesWithMessageFolder = Path.Combine(projectPath, config.Paths.AllFramesWithMessageFolder);
-            //string metaDataFile = Path.Combine(projectPath, config.Paths.MetaDataFile);
            
 
             try
             {
-                // Load configuration for project paths.
+                // Loading configuration for project paths.
                 var config = LoadProjectConfig();
                 string projectPath = config.BaseProjectPath;
                 string newVideoIframes = Path.Combine(projectPath, config.Paths.NewVideoIframes);
                 
-                // Ensure the folder for new video I-frames exists.
+                // Ensuring the folder for new video I-frames exists.
                 if (!Directory.Exists(newVideoIframes))
                 {
                     Directory.CreateDirectory(newVideoIframes);
                 }
 
-                // Extract I-frames from the selected video into the designated folder.
+                // Extracting I-frames from the selected video into the designated folder.
                 await Services.Extraction.ExtractIFrames(SelectedVideoPath, newVideoIframes);
 
                 if (decryptionPassword != null)
@@ -243,13 +236,13 @@ namespace AvaloniaLsbProject1.ViewModels
                     // Status tracking variable
                     string status = "None";
 
-                    // Extract message from I - frames
+                    // Extracting message from I - frames
                  result = Services.Extraction.ExtractMessageFromIFrames(
                     newVideoIframes,
                     decryptionPassword,
                     ref status);
 
-                    // Display appropriate message based on status
+                    // Displaying appropriate message based on status
                     if (status == "Success")
                     {
                         DisplaySuccessMessage(result);
@@ -324,6 +317,7 @@ namespace AvaloniaLsbProject1.ViewModels
 
             ErrorMessage = null;
             return "";
+
         }
 
         #endregion

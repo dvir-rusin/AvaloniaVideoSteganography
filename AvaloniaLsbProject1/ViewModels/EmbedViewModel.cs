@@ -18,6 +18,7 @@ using Tmds.DBus.Protocol;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections;
+using System.Globalization;
 
 
 namespace AvaloniaLsbProject1.ViewModels
@@ -196,7 +197,10 @@ namespace AvaloniaLsbProject1.ViewModels
             EmbeddMessageCommand = new AsyncRelayCommand(EmbeddMessageAsync);
             PlayVideoCommand = new AsyncRelayCommand(PlayVideoAsync);
             PreviewVideoCommand = new AsyncRelayCommand(PreviewVideoAsync);
-            videoNameAndFormat = "NewVideo2april.mp4";
+
+            //UPDATES THE DATE TO NUMBER AND MONTH NAME
+            VideoNameAndFormat = $"NewVideo{DateTime.Now.Day}{DateTime.Now.ToString("MMMM", CultureInfo.InvariantCulture)}.mp4";
+
             EmbedButtonText = "Embed Message";
             // Initialize default colors and status.
             errorBoardercolor = new SolidColorBrush(Color.Parse("#CCCCCC"));
@@ -590,7 +594,7 @@ namespace AvaloniaLsbProject1.ViewModels
             // Extract I-frame locations
             int[] iframesLocation = await Services.Extraction.GetIFrameLocations(paths.MetaDataFile);
 
-            // Create output directory if it does not exist
+            // Created output directory if it does not exist
             Directory.CreateDirectory(paths.AllFramesWithMessageFolder);
 
             // Logging message to indicate embedding started
