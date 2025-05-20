@@ -224,7 +224,7 @@ namespace AvaloniaLsbProject1.Views
             }
             else if (Role == "Broadcaster")
             {
-                await Task.Delay(1000); // Small delay to ensure Listener is ready
+                await Task.Delay(1000); // added Small delay to make sure Listener is ready
                 Console.WriteLine("Broadcaster sending public key...");
                 await KeyExchangeService.SendPublicKeyAsync(KeyExchange.PublicKey, Role);
                 Console.WriteLine("Broadcaster public key sent.");

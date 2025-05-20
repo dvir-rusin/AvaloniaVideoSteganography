@@ -18,6 +18,7 @@ namespace AvaloniaLsbProject1.Services
             StringBuilder sb = new StringBuilder();
             foreach (char c in data)
             {
+                //for each char c it converts it to binary and adds padding to left side if less then 8 bits are generated 1000,000 -> 0100,0000
                 sb.Append(Convert.ToString(c, 2).PadLeft(8, '0'));
             }
             return sb.ToString();
@@ -32,10 +33,9 @@ namespace AvaloniaLsbProject1.Services
             {
                 // Take 8 bits and convert them to a character
                 string byteString = binaryData.Substring(i, 8);
-
-                //add a decryption method for the extracted bits later on 
-
+                //converts to ascii value 
                 int asciiValue = Convert.ToInt32(byteString, 2);
+                //converts ascii to character by casting to char 
                 sb.Append((char)asciiValue);
             }
 
@@ -77,9 +77,8 @@ namespace AvaloniaLsbProject1.Services
         public static string ReconstructVideo(string framesPath, string outputFilePath, double frameRate,int[] iFramesLocations)
         {
             string message;
-            // Check for FFmpeg availability
-            string ffmpegPath = "ffmpeg"; // Assumes ffmpeg is in system PATH
-            string inputPattern = $"{framesPath}\\frame_%04d.png"; // Adjust for the frame naming format (e.g., frame_0001.png)
+            string ffmpegPath = "ffmpeg"; 
+            string inputPattern = $"{framesPath}\\frame_%04d.png"; // frame_0001.png
             string arguments;
 
             // FFmpeg command to reconstruct and compress video
@@ -142,11 +141,9 @@ namespace AvaloniaLsbProject1.Services
                            $"-c:v libx264 -preset ultrafast -qp 0 \"{outputFilePath}\"";
             }
 
-
-
             try
             {
-                // Configure the process
+                // Configuring the process
                 ProcessStartInfo processInfo = new ProcessStartInfo
                 {
                     FileName = ffmpegPath,
@@ -157,7 +154,7 @@ namespace AvaloniaLsbProject1.Services
                     CreateNoWindow = true
                 };
 
-                // Start the process
+                // Starting the process
                 using (Process process = new Process { StartInfo = processInfo })
                 {
                     process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
@@ -166,7 +163,7 @@ namespace AvaloniaLsbProject1.Services
                     Console.WriteLine("Starting video reconstruction...");
                     process.Start();
 
-                    // Begin async reading of output/error
+                    // reading output/error
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
@@ -183,7 +180,7 @@ namespace AvaloniaLsbProject1.Services
 
         }
 
-        public static void PlayVideo(string videoPath, int windowWidth = 640, int windowHeight = 360)
+        public static void PlayVideo(string videoPath, int windowWidth = 1920, int windowHeight = 1080)
         {
             // Path to ffplay executable
             string ffplayPath = @"C:\ffmpeg\bin\ffplay.exe"; 
@@ -195,12 +192,12 @@ namespace AvaloniaLsbProject1.Services
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = ffplayPath, // Use ffplay instead of ffmpeg
+                    FileName = ffplayPath,
                     Arguments = arguments,
                     UseShellExecute = false, 
                     RedirectStandardOutput = false, 
                     RedirectStandardError = false,  
-                    CreateNoWindow = false // Allowing ffplay to open its own playback window
+                    CreateNoWindow = true 
                 }
             };
 

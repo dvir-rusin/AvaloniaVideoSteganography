@@ -75,7 +75,7 @@ namespace AvaloniaLsbProject1.ViewModels
         partial void OnIsMasterKeySetChanged(bool value)
         {
             OnPropertyChanged(nameof(IsMasterKeyNotSet));
-            // re-enable/disable the two password buttons:
+            // enable/disable the two password buttons:
             (SetMasterPasswordCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (EnterMasterPasswordCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
@@ -112,7 +112,7 @@ namespace AvaloniaLsbProject1.ViewModels
             // ensure folder exists
             Directory.CreateDirectory(Path.GetDirectoryName(MasterPath)!);
 
-            // Hash the new password before saving:
+            // Hashed the new password before saving:
             var hashed = ComputeHash(NewMasterPassword);
             File.WriteAllText(MasterPath, hashed);
 

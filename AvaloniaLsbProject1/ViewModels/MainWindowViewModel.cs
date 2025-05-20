@@ -55,7 +55,7 @@ namespace AvaloniaLsbProject1.ViewModels
             NavigateToHomeCommand = new RelayCommand(_ => NavigateToHome());
             NavigateToLibraryCommand = new RelayCommand(_ => NavigateToLibrary());
 
-            // NOW: Embed/Extract/Stream only need the file to exist
+            // Embed/Extract/Stream only need the file to exist
             NavigateToEmbedCommand = new RelayCommand(_ => NavigateToEmbed(), _ => _libraryVm.IsMasterKeySet);
             NavigateToExtractCommand = new RelayCommand(_ => NavigateToExtract(), _ => _libraryVm.IsMasterKeySet);
             NavigateToStreamCommand = new RelayCommand(_ => NavigateToStream(), _ => _libraryVm.IsMasterKeySet);
@@ -71,14 +71,14 @@ namespace AvaloniaLsbProject1.ViewModels
         {
             if (e.PropertyName == nameof(VideoLibraryViewModel.IsMasterKeySet))
             {
-                // re‐query nav button enabled state
+                // re query nav button enabled state
                 (NavigateToEmbedCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 (NavigateToExtractCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 (NavigateToStreamCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
             else if (e.PropertyName == nameof(VideoLibraryViewModel.IsUnlocked))
             {
-                // flow unlock → your own flag
+                // flow unlock
                 IsUnlocked = _libraryVm.IsUnlocked;
             }
         }

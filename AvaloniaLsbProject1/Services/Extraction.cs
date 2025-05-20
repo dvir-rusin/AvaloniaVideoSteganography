@@ -42,7 +42,7 @@ namespace AvaloniaLsbProject1.Services
 
             // Execute the conversion
             await conversion.Start();
-
+             
             Console.WriteLine("All frames have been extracted and saved to the output directory.");
         }
 

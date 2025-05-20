@@ -45,7 +45,7 @@ namespace AvaloniaLsbProject1.ViewModels
         [ObservableProperty]
         private string? duration;
 
-        private Process? ffmpegProcess; // Reference to the FFmpeg process
+        private Process? ffmpegProcess; // FFmpeg process
 
         [ObservableProperty]
         public bool isProcessing;
@@ -214,29 +214,19 @@ namespace AvaloniaLsbProject1.ViewModels
 
                 switch (fileExtension)
                 {
-                    //arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t 2.2 -f mpegts udp://{MulticastIP}:{Port}";
                     case ".mp4":
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t  \"{durationInSeconds}\" -f mpegts udp://{MulticastIP}:{Port}"; 
                         break;
                     case ".avi":
-                        //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
-                        // Use uncompressed rawvideo for LSB-safe streaming
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \"{durationInSeconds}\" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                     case ".mkv":
-                        //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v copy -c:a aac -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
-                        // Use rawvideo in MKV container for LSB-safe streaming
-                        //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v rawvideo -pix_fmt rgb24 -allow_raw_vfw 1 -t 4.2 -f matroska udp://{MulticastIP}:{Port}";
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \"{durationInSeconds}\" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                     case ".mov":
-                        //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 5 -c:a mp2 -b:a 192k -f mpegts udp://{MulticastIP}:{Port}";
-                        // MOV also supports rawvideo; use this for LSB safety
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \" {durationInSeconds} \" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                     default:
-                        //arguments = $"-re -i \"{SelectedVideoPath}\" -c:v mpeg2video -q:v 6 -c:a mp2 -b:a 128k -f mpegts udp://{MulticastIP}:{Port}";
-                        // Fallback: safe general-purpose rawvideo
                         arguments = $"-re -i \"{SelectedVideoPath}\" -c copy -t \" {durationInSeconds} \" -f mpegts udp://{MulticastIP}:{Port}";
                         break;
                 }
@@ -250,7 +240,7 @@ namespace AvaloniaLsbProject1.ViewModels
                         WorkingDirectory = Path.GetDirectoryName(ffmpegPath),
                         UseShellExecute = false,
                         RedirectStandardError = true,
-                        CreateNoWindow = false
+                        CreateNoWindow = true
                     }
                 };
 
@@ -266,7 +256,6 @@ namespace AvaloniaLsbProject1.ViewModels
 
                 ffmpegProcess.Start();
                 ffmpegProcess.BeginErrorReadLine();
-                // Update view model properties with the result.
                 DisplaySuccessMessage($"Streaming to {MulticastIP}:{Port}...");
 
             }
@@ -337,7 +326,7 @@ namespace AvaloniaLsbProject1.ViewModels
                         FileName = ffplayPath,
                         Arguments = arguments,
                         UseShellExecute = false,
-                        CreateNoWindow = false,
+                        CreateNoWindow = true,
                         RedirectStandardError = true,
                         RedirectStandardOutput = true
                     }
@@ -361,12 +350,7 @@ namespace AvaloniaLsbProject1.ViewModels
                 DisplayErrorMessage("Multicast IP or port is missing.");
                 return;
             }
-            //if (string.IsNullOrEmpty(Duration))
-            //{
-                
-            //    DisplayErrorMessage("Video attribute 'Duration' is null.");
-            //    return;
-            //}
+            
 
             try
             {
@@ -385,7 +369,7 @@ namespace AvaloniaLsbProject1.ViewModels
                         Arguments = arguments,
                         UseShellExecute = false,
                         RedirectStandardError = true,
-                        CreateNoWindow = false,
+                        CreateNoWindow = true,
                     }
                 };
 
