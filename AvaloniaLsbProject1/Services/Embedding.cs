@@ -26,7 +26,6 @@ namespace AvaloniaLsbProject1.Services
         private static (string inputFramesDirectory, string outputFramesDirectory) GetDefaultPaths()
         {
             // Load the configuration from the JSON file (adjust the path as needed)
-            
             var configFilePath = Path.Combine(AppContext.BaseDirectory, "Json", "projectPaths.json");
 
             // loadding the JSON ,this gives ProjectPathsLoader.Config object

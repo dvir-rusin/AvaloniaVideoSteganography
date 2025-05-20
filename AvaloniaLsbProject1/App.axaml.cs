@@ -33,6 +33,7 @@ namespace AvaloniaLsbProject1
 
         public override void OnFrameworkInitializationCompleted()
         {
+            //desktop application
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 // Load the configuration using a relative path to the Json folder
@@ -43,26 +44,26 @@ namespace AvaloniaLsbProject1
                 // Set up project paths
                 ProjectPaths paths = SetupProjectPaths(projectPath, config);
 
-                // Optional: Ensure that the app shuts down when the last window closes.
+                // the app shuts down when the last window closes.
                 desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
 
-                // Subscribe to the desktop lifetime Exit event.
+                // calls delete files when desktop is Exitting.
                 desktop.Exit += (sender, e) =>
                 {
                     DeleteDirectoryAndFiles(paths.AllFramesWithMessageFolder, paths.AllFramesFolder, paths.MetaDataFile);
                 };
-                // Subscribe to the Exit event to perform cleanup when the app shuts down.
+
+                // perform cleanup when the app shuts down.
                 AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
                 {
                     DeleteDirectoryAndFiles(paths.AllFramesWithMessageFolder, paths.AllFramesFolder, paths.MetaDataFile);
                 };
 
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-                // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 DisableAvaloniaDataAnnotationValidation();
-                // Initialize MainWindow without passing contentArea
-                var listener = new MainWindow("Listener");
 
+                // Initializing MainWindow for listener and broadcaster
+                var listener = new MainWindow("Listener");
                 listener.Show();
 
                 var broadcaster = new MainWindow("Broadcaster");
