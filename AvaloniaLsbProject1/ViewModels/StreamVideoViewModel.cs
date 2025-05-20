@@ -175,19 +175,30 @@ namespace AvaloniaLsbProject1.ViewModels
                 DisplayErrorMessage("Video attribute 'Duration' is null.");
                 return;
             }
-            if (int.TryParse(Duration.ToString(), out int parsedDuration) && parsedDuration > 5)
+            if (TimeSpan.TryParse(Duration.ToString(), out TimeSpan timeSpan))
             {
-                 durationInSeconds = 5;
-            }
-            else if( parsedDuration <= 5 && parsedDuration>=2)
-            {
-                 durationInSeconds = parsedDuration-1;
+                int parsedDuration = (int)timeSpan.TotalSeconds;
+
+                if (parsedDuration > 5)
+                {
+                    durationInSeconds = 5;
+                }
+                else if (parsedDuration >= 2)
+                {
+                    durationInSeconds = parsedDuration - 1;
+                }
+                else
+                {
+                    DisplayErrorMessage("duration value is too little");
+                    return;
+                }
             }
             else
             {
-                DisplayErrorMessage("duration value is too little");
+                DisplayErrorMessage("Invalid duration format");
                 return;
             }
+
 
 
 
